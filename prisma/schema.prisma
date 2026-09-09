@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Synagogue community member record
+model Member {
+  id                     String         @id @default(cuid())
+  email                  String         @unique
+  passwordHash           String?
+  firstName              String
+  lastName               String
+  phone                  String
+  street                 String
+  city                   String
+  halachicStatus         String         @default("yisrael") // kohen | levi | yisrael
+  role                   String         @default("member")  // member | gabay | super_admin
+  isApproved             Boolean        @default(false)
+  showPhoneInDirectory   Boolean        @default(true)
+  showAddressInDirectory Boolean        @default(true)
+  toddlerChildren        Int            @default(0)
+  elementaryChildren     Int            @default(0)
+  teenChildren           Int            @default(0)
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  yahrzeits              Yahrzeit[]
+  transactions           Transaction[]
+}
+
+// Memorial tracking for weekly aliyot and memorial prayers
+model Yahrzeit {
+  id              String   @id @default(cuid())
+  deceasedName    String
+  relation        String   // father | mother | brother | sister | spouse | child | other
+  hebrewDay       Int
+  hebrewMonth     String
+  diedAfterSunset Boolean  @default(false)
+  notes           String?
+  memberId        String
+  member          Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+}
+
+// Public join requests awaiting gabay review
+model JoinRequest {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String
+  phone       String
+  address     String
+  about       String?
+  isProcessed Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+// Synagogue financial ledger synced via Nedarim Plus
+model Transaction {
+  id            String   @id @default(cuid())
+  transactionId String   @unique // Nedarim Plus external transaction ID
+  clientName    String
+  amount        Float
+  targetFund    String
+  phone         String?
+  email         String?
+  memberId      String?
+  member        Member?  @relation(fields: [memberId], references: [id])
+  createdAt     DateTime @default(now())
+}
