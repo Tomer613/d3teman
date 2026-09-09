@@ -15,6 +15,7 @@ export default function JoinRequestPage() {
         email: "",
         phone: "",
         address: "",
+        city: "",
         about: "",
     });
 
@@ -124,16 +125,29 @@ export default function JoinRequestPage() {
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block text-xs font-medium text-slate-700">כתובת מגורים (רחוב ומספר)</label>
-                            <input
-                                type="text"
-                                required
-                                value={formData.address}
-                                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                className="mt-1 block w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600 focus:bg-white"
-                                placeholder="רחוב שבזי 10"
-                            />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs font-medium text-slate-700">כתובת מגורים (רחוב ומספר)</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={formData.address}
+                                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                    className="mt-1 block w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600 focus:bg-white"
+                                    placeholder="רחוב שבזי 10"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-medium text-slate-700">עיר</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={formData.city}
+                                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                    className="mt-1 block w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600 focus:bg-white"
+                                    placeholder="בני ברק"
+                                />
+                            </div>
                         </div>
 
                         <div>

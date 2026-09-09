@@ -2,15 +2,31 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { login } from "@/app/actions/auth";
 
 export default function LoginPage() {
+    const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // Authentication logic will be wired up with the backend
-        console.log("Login attempt:", { email, password });
+        setError(null);
+        setIsSubmitting(true);
+
+        const result = await login(new FormData(e.currentTarget));
+
+        if (!result.success) {
+            setError(result.error);
+            setIsSubmitting(false);
+            return;
+        }
+
+        router.push(result.role === "member" ? "/profile" : "/admin");
+        router.refresh();
     };
 
     return (
@@ -30,12 +46,19 @@ export default function LoginPage() {
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="bg-white py-8 px-6 shadow-xs border border-slate-200/80 rounded-2xl sm:px-10">
                     <form className="space-y-5" onSubmit={handleSubmit}>
+                        {error && (
+                            <div className="px-3.5 py-2.5 bg-rose-50 border border-rose-200 rounded-xl text-xs font-medium text-rose-700">
+                                {error}
+                            </div>
+                        )}
+
                         <div>
                             <label className="block text-sm font-medium text-slate-700">
                                 כתובת מייל
                             </label>
                             <input
                                 type="email"
+                                name="email"
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -50,6 +73,7 @@ export default function LoginPage() {
                             </label>
                             <input
                                 type="password"
+                                name="password"
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -60,9 +84,10 @@ export default function LoginPage() {
 
                         <button
                             type="submit"
-                            className="w-full flex justify-center py-2.5 px-4 rounded-xl shadow-xs text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 focus:outline-hidden focus:ring-2 focus:ring-amber-500 transition-colors"
+                            disabled={isSubmitting}
+                            className="w-full flex justify-center py-2.5 px-4 rounded-xl shadow-xs text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 disabled:bg-slate-300 focus:outline-hidden focus:ring-2 focus:ring-amber-500 transition-colors"
                         >
-                            התחברות
+                            {isSubmitting ? "מתחבר..." : "התחברות"}
                         </button>
                     </form>
 

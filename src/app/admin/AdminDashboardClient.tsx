@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { approveJoinRequest, rejectJoinRequest } from "@/app/actions/admin";
+import { logout } from "@/app/actions/auth";
 
 interface PendingRequest {
     id: string;
@@ -12,6 +13,7 @@ interface PendingRequest {
     email: string;
     phone: string;
     address: string;
+    city: string;
     about: string | null;
     createdAt: Date;
 }
@@ -39,6 +41,13 @@ interface AdminDashboardClientProps {
     transactions: TransactionRecord[];
 }
 
+// Generates a random, readable initial password for a newly-approved member.
+// This is only ever used for one-time on-screen display - the server hashes
+// it before it reaches the database.
+function generateInitialPassword() {
+    return crypto.randomUUID().replace(/-/g, "").slice(0, 10);
+}
+
 export default function AdminDashboardClient({
     pendingRequests,
     members,
@@ -47,11 +56,33 @@ export default function AdminDashboardClient({
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const [processingId, setProcessingId] = useState<string | null>(null);
+    const [pendingApproval, setPendingApproval] = useState<{ id: string; password: string } | null>(null);
+    const [approveError, setApproveError] = useState<string | null>(null);
+    const [rejectError, setRejectError] = useState<string | null>(null);
 
-    const handleApprove = (id: string) => {
+    const handleStartApprove = (id: string) => {
+        setApproveError(null);
+        setPendingApproval({ id, password: generateInitialPassword() });
+    };
+
+    const handleCancelApprove = () => {
+        setApproveError(null);
+        setPendingApproval(null);
+    };
+
+    const handleConfirmApprove = (id: string, password: string) => {
         setProcessingId(id);
+        setApproveError(null);
         startTransition(async () => {
-            await approveJoinRequest(id);
+            const result = await approveJoinRequest(id, password);
+            if (!result.success) {
+                // Keep the password panel open so the admin can retry -
+                // dismissing it here would lose the one-time password.
+                setApproveError(result.error);
+                setProcessingId(null);
+                return;
+            }
+            setPendingApproval(null);
             router.refresh();
             setProcessingId(null);
         });
@@ -59,8 +90,14 @@ export default function AdminDashboardClient({
 
     const handleReject = (id: string) => {
         setProcessingId(id);
+        setRejectError(null);
         startTransition(async () => {
-            await rejectJoinRequest(id);
+            const result = await rejectJoinRequest(id);
+            if (!result.success) {
+                setRejectError(result.error);
+                setProcessingId(null);
+                return;
+            }
             router.refresh();
             setProcessingId(null);
         });
@@ -95,6 +132,13 @@ export default function AdminDashboardClient({
                         >
                             חזרה לדף הבית
                         </Link>
+                        <button
+                            type="button"
+                            onClick={() => startTransition(() => logout())}
+                            className="px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                        >
+                            התנתקות
+                        </button>
                     </div>
                 </div>
 
@@ -123,6 +167,12 @@ export default function AdminDashboardClient({
                         {isPending && <span className="text-xs text-slate-400">מעדכן נתונים...</span>}
                     </div>
 
+                    {rejectError && (
+                        <div className="mx-6 mt-4 px-3.5 py-2.5 bg-rose-50 border border-rose-200 rounded-xl text-xs font-medium text-rose-700">
+                            {rejectError}
+                        </div>
+                    )}
+
                     {pendingRequests.length === 0 ? (
                         <div className="p-8 text-center text-sm text-slate-400">
                             אין כרגע בקשות הצטרפות ממתינות
@@ -139,7 +189,7 @@ export default function AdminDashboardClient({
                                             <span className="font-semibold text-slate-900 text-sm">
                                                 {req.firstName} {req.lastName}
                                             </span>
-                                            <span className="text-xs text-slate-400">({req.address})</span>
+                                            <span className="text-xs text-slate-400">({req.address}, {req.city})</span>
                                         </div>
                                         <div className="text-xs text-slate-600 flex flex-wrap gap-x-4 gap-y-1">
                                             <span>טלפון: {req.phone}</span>
@@ -152,22 +202,65 @@ export default function AdminDashboardClient({
                                         )}
                                     </div>
 
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => handleApprove(req.id)}
-                                            disabled={processingId === req.id}
-                                            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors"
-                                        >
-                                            {processingId === req.id ? "מעבד..." : "אשר חבר קהילה"}
-                                        </button>
-                                        <button
-                                            onClick={() => handleReject(req.id)}
-                                            disabled={processingId === req.id}
-                                            className="px-3 py-2 bg-rose-50 hover:bg-rose-100 disabled:bg-slate-100 text-rose-700 text-xs font-semibold rounded-xl border border-rose-200 transition-colors"
-                                        >
-                                            דחה
-                                        </button>
-                                    </div>
+                                    {pendingApproval?.id === req.id ? (
+                                        <div className="w-full md:w-80 p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2">
+                                            <p className="text-xs font-semibold text-emerald-900">
+                                                סיסמה ראשונית שנוצרה - יש למסור אותה לחבר החדש (טלפון/וואטסאפ). הסיסמה לא תוצג שוב.
+                                            </p>
+                                            <div className="flex items-center gap-2">
+                                                <code className="flex-1 px-2.5 py-1.5 bg-white border border-emerald-300 rounded-lg text-sm font-mono text-emerald-900 select-all">
+                                                    {pendingApproval.password}
+                                                </code>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => navigator.clipboard.writeText(pendingApproval.password)}
+                                                    className="px-2.5 py-1.5 bg-white hover:bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-semibold rounded-lg transition-colors"
+                                                >
+                                                    העתק
+                                                </button>
+                                            </div>
+                                            {approveError && (
+                                                <p className="text-xs font-medium text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-2.5 py-1.5">
+                                                    {approveError}
+                                                </p>
+                                            )}
+                                            <div className="flex items-center gap-2 pt-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleConfirmApprove(req.id, pendingApproval.password)}
+                                                    disabled={processingId === req.id}
+                                                    className="flex-1 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white text-xs font-semibold rounded-xl transition-colors"
+                                                >
+                                                    {processingId === req.id ? "מאשר..." : "אשר ושמור"}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleCancelApprove}
+                                                    disabled={processingId === req.id}
+                                                    className="px-3 py-2 text-slate-600 hover:bg-slate-100 text-xs font-semibold rounded-xl transition-colors"
+                                                >
+                                                    ביטול
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => handleStartApprove(req.id)}
+                                                disabled={processingId === req.id}
+                                                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors"
+                                            >
+                                                אשר חבר קהילה
+                                            </button>
+                                            <button
+                                                onClick={() => handleReject(req.id)}
+                                                disabled={processingId === req.id}
+                                                className="px-3 py-2 bg-rose-50 hover:bg-rose-100 disabled:bg-slate-100 text-rose-700 text-xs font-semibold rounded-xl border border-rose-200 transition-colors"
+                                            >
+                                                דחה
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>

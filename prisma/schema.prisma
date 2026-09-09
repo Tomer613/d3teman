@@ -10,34 +10,34 @@ datasource db {
 
 // Synagogue community member record
 model Member {
-  id                     String         @id @default(cuid())
-  email                  String         @unique
+  id                     String   @id @default(cuid())
+  email                  String   @unique
   passwordHash           String?
   firstName              String
   lastName               String
   phone                  String
   street                 String
   city                   String
-  halachicStatus         String         @default("yisrael") // kohen | levi | yisrael
-  role                   String         @default("member")  // member | gabay | super_admin
-  isApproved             Boolean        @default(false)
-  showPhoneInDirectory   Boolean        @default(true)
-  showAddressInDirectory Boolean        @default(true)
-  toddlerChildren        Int            @default(0)
-  elementaryChildren     Int            @default(0)
-  teenChildren           Int            @default(0)
-  createdAt              DateTime       @default(now())
-  updatedAt              DateTime       @updatedAt
+  halachicStatus         String   @default("yisrael") // kohen | levi | yisrael
+  role                   String   @default("member") // member | gabay | super_admin
+  isApproved             Boolean  @default(false)
+  showPhoneInDirectory   Boolean  @default(true)
+  showAddressInDirectory Boolean  @default(true)
+  toddlerChildren        Int      @default(0)
+  elementaryChildren     Int      @default(0)
+  teenChildren           Int      @default(0)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
-  yahrzeits              Yahrzeit[]
-  transactions           Transaction[]
+  yahrzeits    Yahrzeit[]
+  transactions Transaction[]
 }
 
 // Memorial tracking for weekly aliyot and memorial prayers
 model Yahrzeit {
   id              String   @id @default(cuid())
   deceasedName    String
-  relation        String   // father | mother | brother | sister | spouse | child | other
+  relation        String // father | mother | brother | sister | spouse | child | other
   hebrewDay       Int
   hebrewMonth     String
   diedAfterSunset Boolean  @default(false)
@@ -55,6 +55,7 @@ model JoinRequest {
   email       String
   phone       String
   address     String
+  city        String   @default("")
   about       String?
   isProcessed Boolean  @default(false)
   createdAt   DateTime @default(now())

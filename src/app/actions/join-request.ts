@@ -8,11 +8,17 @@ export interface JoinRequestInput {
     email: string;
     phone: string;
     address: string;
+    city: string;
     about?: string;
 }
 
 export async function submitJoinRequest(data: JoinRequestInput) {
     try {
+        const city = data.city.trim();
+        if (!city) {
+            return { success: false as const, error: "City is required" };
+        }
+
         const record = await prisma.joinRequest.create({
             data: {
                 firstName: data.firstName.trim(),
@@ -20,13 +26,14 @@ export async function submitJoinRequest(data: JoinRequestInput) {
                 email: data.email.trim().toLowerCase(),
                 phone: data.phone.trim(),
                 address: data.address.trim(),
+                city,
                 about: data.about?.trim() || null,
             },
         });
 
-        return { success: true, id: record.id };
+        return { success: true as const, id: record.id };
     } catch (error) {
         console.error("[Join Request Error]:", error);
-        return { success: false, error: "Failed to persist join request" };
+        return { success: false as const, error: "Failed to persist join request" };
     }
 }

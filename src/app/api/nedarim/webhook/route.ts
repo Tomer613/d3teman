@@ -33,8 +33,14 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        const expectedMosadId = process.env.NEDARIM_MOSAD_ID || "700123";
-        if (payload.MosadId && payload.MosadId !== expectedMosadId) {
+        const expectedMosadId = process.env.NEDARIM_MOSAD_ID;
+        if (!expectedMosadId) {
+            // Fail closed rather than falling back to a hardcoded, source-visible
+            // default - an unset secret must never behave like a valid one.
+            console.error("[Nedarim Webhook] NEDARIM_MOSAD_ID is not configured");
+            return NextResponse.json({ error: "Webhook not configured" }, { status: 500 });
+        }
+        if (!payload.MosadId || payload.MosadId !== expectedMosadId) {
             return NextResponse.json({ error: "Invalid Mosad ID" }, { status: 401 });
         }
 
