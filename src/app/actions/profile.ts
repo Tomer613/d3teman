@@ -18,6 +18,7 @@ export interface UpdateProfileInput {
     halachicStatus: string;
     showPhoneInDirectory: boolean;
     showAddressInDirectory: boolean;
+    receiveNewsletter: boolean;
     toddlerChildren: number;
     elementaryChildren: number;
     teenChildren: number;
@@ -37,6 +38,7 @@ export async function updateProfile(data: UpdateProfileInput) {
                 halachicStatus: data.halachicStatus,
                 showPhoneInDirectory: !!data.showPhoneInDirectory,
                 showAddressInDirectory: !!data.showAddressInDirectory,
+                receiveNewsletter: !!data.receiveNewsletter,
                 toddlerChildren: clampChildCount(data.toddlerChildren),
                 elementaryChildren: clampChildCount(data.elementaryChildren),
                 teenChildren: clampChildCount(data.teenChildren),

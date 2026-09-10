@@ -10,6 +10,11 @@ interface NedarimWebhookPayload {
     Email?: string;
     Target?: string;
     Status?: string;
+    // PLACEHOLDER: the real field name(s) Nedarim Plus uses to flag a
+    // recurring (standing order) charge, and to group installments of the
+    // same standing order, are not yet known - update this interface and
+    // the isRecurring/recurringId mapping below once their webhook docs are
+    // available. Until then every transaction is recorded as one-time.
     [key: string]: unknown;
 }
 
@@ -80,6 +85,12 @@ export async function POST(request: NextRequest) {
                 phone: clientPhone || null,
                 email: clientEmail || null,
                 memberId: matchedMemberId,
+                // PLACEHOLDER: replace with the real field(s) once Nedarim
+                // Plus's recurring-payment payload shape is known, e.g.:
+                // isRecurring: payload.IsTashlumim === "1",
+                // recurringId: payload.HoraatKevaId ?? null,
+                isRecurring: false,
+                recurringId: null,
             },
         });
 

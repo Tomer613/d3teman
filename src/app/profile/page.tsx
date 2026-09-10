@@ -25,5 +25,25 @@ export default async function ProfilePage() {
         redirect("/login");
     }
 
-    return <ProfileClient member={member} yahrzeits={member.yahrzeits} />;
+    // Capped so a long-tenured donor's page doesn't grow unbounded; the total
+    // below still reflects every donation, not just the ones displayed.
+    const [donations, donationTotal] = await Promise.all([
+        prisma.transaction.findMany({
+            where: { memberId: member.id },
+            orderBy: { createdAt: "desc" },
+            take: 100,
+            select: { id: true, amount: true, targetFund: true, isRecurring: true, createdAt: true },
+        }),
+        prisma.transaction.aggregate({ where: { memberId: member.id }, _sum: { amount: true } }),
+    ]);
+    const totalDonated = donationTotal._sum.amount ?? 0;
+
+    return (
+        <ProfileClient
+            member={member}
+            yahrzeits={member.yahrzeits}
+            donations={donations}
+            totalDonated={totalDonated}
+        />
+    );
 }

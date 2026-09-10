@@ -24,23 +24,35 @@ interface ProfileMember {
     halachicStatus: string;
     showPhoneInDirectory: boolean;
     showAddressInDirectory: boolean;
+    receiveNewsletter: boolean;
     toddlerChildren: number;
     elementaryChildren: number;
     teenChildren: number;
 }
 
+interface DonationRecord {
+    id: string;
+    amount: number;
+    targetFund: string;
+    isRecurring: boolean;
+    createdAt: Date;
+}
+
 interface ProfileClientProps {
     member: ProfileMember;
     yahrzeits: YahrzeitRecord[];
+    donations: DonationRecord[];
+    totalDonated: number;
 }
 
-export default function ProfileClient({ member, yahrzeits }: ProfileClientProps) {
+export default function ProfileClient({ member, yahrzeits, donations, totalDonated }: ProfileClientProps) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
     const [halachicStatus, setHalachicStatus] = useState<HalachicStatus>(member.halachicStatus as HalachicStatus);
     const [showPhoneInDirectory, setShowPhoneInDirectory] = useState(member.showPhoneInDirectory);
     const [showAddressInDirectory, setShowAddressInDirectory] = useState(member.showAddressInDirectory);
+    const [receiveNewsletter, setReceiveNewsletter] = useState(member.receiveNewsletter);
     const [childrenAges, setChildrenAges] = useState({
         toddler: member.toddlerChildren,
         elementary: member.elementaryChildren,
@@ -55,6 +67,7 @@ export default function ProfileClient({ member, yahrzeits }: ProfileClientProps)
                 halachicStatus,
                 showPhoneInDirectory,
                 showAddressInDirectory,
+                receiveNewsletter,
                 toddlerChildren: childrenAges.toddler,
                 elementaryChildren: childrenAges.elementary,
                 teenChildren: childrenAges.teen,
@@ -218,6 +231,15 @@ export default function ProfileClient({ member, yahrzeits }: ProfileClientProps)
                                         className="rounded-md border-slate-300 text-amber-600 focus:ring-amber-500"
                                     />
                                     הצג את כתובת המגורים שלי באלפון
+                                </label>
+                                <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={receiveNewsletter}
+                                        onChange={(e) => setReceiveNewsletter(e.target.checked)}
+                                        className="rounded-md border-slate-300 text-amber-600 focus:ring-amber-500"
+                                    />
+                                    קבלת ניוזלטר קהילתי במייל
                                 </label>
                             </div>
                         </div>
@@ -405,6 +427,53 @@ export default function ProfileClient({ member, yahrzeits }: ProfileClientProps)
                             </div>
                         ))}
                     </div>
+                </div>
+
+                {/* Section 4: My Donations */}
+                <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <div>
+                            <h2 className="text-lg font-bold text-slate-900">היסטוריית תרומות</h2>
+                            <p className="text-xs text-slate-500">תרומות שסונכרנו ממערכת נדרים פלוס</p>
+                        </div>
+                        <Link
+                            href="/donate"
+                            className="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold rounded-lg transition-colors"
+                        >
+                            תרומה נוספת
+                        </Link>
+                    </div>
+
+                    {donations.length === 0 ? (
+                        <p className="text-sm text-slate-400 py-4 text-center">
+                            עדיין לא נרשמו תרומות תחת כתובת המייל או מספר הטלפון שלך.
+                        </p>
+                    ) : (
+                        <>
+                            <div className="p-4 bg-emerald-50/60 rounded-xl border border-emerald-200/70">
+                                <span className="text-xs text-emerald-800">סך כל התרומות</span>
+                                <p className="text-2xl font-extrabold text-emerald-900">₪{totalDonated.toLocaleString()}</p>
+                            </div>
+                            <div className="divide-y divide-slate-100">
+                                {donations.map((d) => (
+                                    <div key={d.id} className="py-2.5 flex items-center justify-between text-sm">
+                                        <div>
+                                            <span className="font-semibold text-slate-800">₪{d.amount.toLocaleString()}</span>
+                                            <span className="text-xs text-slate-500 mr-2">{d.targetFund}</span>
+                                            {d.isRecurring && (
+                                                <span className="mr-2 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-sky-100 text-sky-800">
+                                                    הוראת קבע
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span className="text-xs text-slate-400">
+                                            {new Date(d.createdAt).toLocaleDateString("he-IL")}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    )}
                 </div>
 
             </div>

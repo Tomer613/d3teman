@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdminOrRedirect } from "@/lib/auth";
 import { getAdminDashboardData } from "@/app/actions/admin";
 import AdminDashboardClient from "./AdminDashboardClient";
 
@@ -11,19 +10,19 @@ export default async function AdminDashboardPage() {
     // letting getAdminDashboardData's try/catch swallow it into an empty
     // dashboard. requireAdmin re-checks the role against the database, so a
     // demoted gabay is rejected immediately rather than for up to 30 days.
-    try {
-        await requireAdmin();
-    } catch {
-        redirect("/login");
-    }
+    await requireAdminOrRedirect();
 
-    const { pendingRequests, members, recentTransactions } = await getAdminDashboardData();
+    const { pendingRequests, members, recentTransactions, totalIncome, fundBreakdown, recurringCount } =
+        await getAdminDashboardData();
 
     return (
         <AdminDashboardClient
             pendingRequests={pendingRequests}
             members={members}
             transactions={recentTransactions}
+            totalIncome={totalIncome}
+            fundBreakdown={fundBreakdown}
+            recurringCount={recurringCount}
         />
     );
 }

@@ -9,32 +9,42 @@ export async function getAdminDashboardData() {
     try {
         await requireAdmin();
 
-        const [pendingRequests, members, recentTransactions] = await Promise.all([
-            prisma.joinRequest.findMany({
-                where: { isProcessed: false },
-                orderBy: { createdAt: "desc" },
-            }),
-            prisma.member.findMany({
-                orderBy: { createdAt: "desc" },
-                include: { yahrzeits: true },
-                omit: { passwordHash: true },
-            }),
-            prisma.transaction.findMany({
-                take: 10,
-                orderBy: { createdAt: "desc" },
-            }),
-        ]);
+        const [pendingRequests, members, recentTransactions, fundBreakdownRaw, recurringCount, totalAllTime] =
+            await Promise.all([
+                prisma.joinRequest.findMany({
+                    where: { isProcessed: false },
+                    orderBy: { createdAt: "desc" },
+                }),
+                prisma.member.findMany({
+                    orderBy: { createdAt: "desc" },
+                    include: { yahrzeits: true },
+                    omit: { passwordHash: true },
+                }),
+                prisma.transaction.findMany({
+                    take: 20,
+                    orderBy: { createdAt: "desc" },
+                }),
+                prisma.transaction.groupBy({
+                    by: ["targetFund"],
+                    _sum: { amount: true },
+                    orderBy: { _sum: { amount: "desc" } },
+                }),
+                prisma.transaction.count({ where: { isRecurring: true } }),
+                prisma.transaction.aggregate({ _sum: { amount: true } }),
+            ]);
 
-        const totalIncome = recentTransactions.reduce(
-            (sum, tx) => sum + tx.amount,
-            0
-        );
+        const fundBreakdown = fundBreakdownRaw.map((f: (typeof fundBreakdownRaw)[number]) => ({
+            targetFund: f.targetFund,
+            total: f._sum.amount ?? 0,
+        }));
 
         return {
             pendingRequests,
             members,
             recentTransactions,
-            totalIncome,
+            totalIncome: totalAllTime._sum.amount ?? 0,
+            fundBreakdown,
+            recurringCount,
         };
     } catch (error) {
         console.error("[Get Admin Data Error]:", error);
@@ -43,6 +53,8 @@ export async function getAdminDashboardData() {
             members: [],
             recentTransactions: [],
             totalIncome: 0,
+            fundBreakdown: [],
+            recurringCount: 0,
         };
     }
 }

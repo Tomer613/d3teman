@@ -41,6 +41,12 @@ export default function HomePage() {
 
           <nav className="flex items-center gap-2">
             <Link
+              href="/donate"
+              className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-xs"
+            >
+              תרומה
+            </Link>
+            <Link
               href="/login"
               className="px-4 py-2 text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors"
             >

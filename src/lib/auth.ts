@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import {
     ADMIN_ROLES,
@@ -59,4 +60,15 @@ export async function requireAdmin(): Promise<SessionPayload> {
         throw new Error("Not authorized");
     }
     return session;
+}
+
+// For admin Server Component pages: redirects to /login instead of throwing,
+// so every admin route gets the same behavior on an invalid/expired/
+// no-longer-admin session without repeating the try/catch at each call site.
+export async function requireAdminOrRedirect(): Promise<SessionPayload> {
+    try {
+        return await requireAdmin();
+    } catch {
+        redirect("/login");
+    }
 }

@@ -23,6 +23,7 @@ model Member {
   isApproved             Boolean  @default(false)
   showPhoneInDirectory   Boolean  @default(true)
   showAddressInDirectory Boolean  @default(true)
+  receiveNewsletter      Boolean  @default(true)
   toddlerChildren        Int      @default(0)
   elementaryChildren     Int      @default(0)
   teenChildren           Int      @default(0)
@@ -72,5 +73,24 @@ model Transaction {
   email         String?
   memberId      String?
   member        Member?  @relation(fields: [memberId], references: [id])
+  // PLACEHOLDER: Nedarim Plus's recurring-donation (standing order) webhook
+  // field names are not yet known - these default to false/null until the
+  // real payload shape is confirmed. See TODO in the webhook route.
+  isRecurring   Boolean  @default(false)
+  recurringId   String? // Groups installments of the same standing order, once known
   createdAt     DateTime @default(now())
+}
+
+// A community newsletter, built in the admin newsletter editor and sent by
+// email to approved members who have not opted out.
+model Newsletter {
+  id          String    @id @default(cuid())
+  subject     String
+  targetGroup String    @default("all") // all | board | volunteers
+  items       Json // NewsletterItem[]: { category, title, body, imageUrl }
+  status      String    @default("draft") // draft | sent
+  sentCount   Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  sentAt      DateTime?
 }

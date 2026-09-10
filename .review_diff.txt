@@ -1,0 +1,1614 @@
+diff --git a/package-lock.json b/package-lock.json
+index 0cdffc5..3d07346 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -8,11 +8,14 @@
+       "name": "d3teman",
+       "version": "0.1.0",
+       "dependencies": {
++        "@react-email/components": "^1.0.12",
++        "@react-email/render": "^2.1.0",
+         "bcryptjs": "^3.0.3",
+         "jose": "^6.2.12",
+         "next": "16.3.4",
+         "react": "19.2.8",
+-        "react-dom": "19.2.8"
++        "react-dom": "19.2.8",
++        "resend": "^6.26.0"
+       },
+       "devDependencies": {
+         "@prisma/client": "^6.19.3",
+@@ -1404,6 +1407,376 @@
+         "@prisma/debug": "6.19.3"
+       }
+     },
++    "node_modules/@react-email/body": {
++      "version": "0.3.0",
++      "resolved": "https://registry.npmjs.org/@react-email/body/-/body-0.3.0.tgz",
++      "integrity": "sha512-uGo0BOOzjbMUo3lu+BIDWayvn5o6Xyfmnlla5VGf05n8gHMvO1ll7U4FtzWe3hxMLwt53pmc4iE0M+B5slG+Ug==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/button": {
++      "version": "0.2.1",
++      "resolved": "https://registry.npmjs.org/@react-email/button/-/button-0.2.1.tgz",
++      "integrity": "sha512-qXyj7RZLE7POy9BMKSoqQ00tOXThjOZSUnI2Yu9i29IHngPlmrNayIWBoVKtElES7OWwypUcpiajwi1mUWx6/A==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/code-block": {
++      "version": "0.2.1",
++      "resolved": "https://registry.npmjs.org/@react-email/code-block/-/code-block-0.2.1.tgz",
++      "integrity": "sha512-M3B7JpVH4ytgn83/ujRR1k1DQHvTeABiDM61OvAbjLRPhC/5KLHU5KkzIbbuGIrjWwxAbL1kSQzU8MhLEtSxyw==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "dependencies": {
++        "prismjs": "^1.30.0"
++      },
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/code-inline": {
++      "version": "0.0.6",
++      "resolved": "https://registry.npmjs.org/@react-email/code-inline/-/code-inline-0.0.6.tgz",
++      "integrity": "sha512-jfhebvv3dVsp3OdPgKXnk8+e2pBiDVZejDOBFzBa/IblrAJ9cQDkN6rBD5IyEg8hTOxwbw3iaI/yZFmDmIguIA==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/column": {
++      "version": "0.0.14",
++      "resolved": "https://registry.npmjs.org/@react-email/column/-/column-0.0.14.tgz",
++      "integrity": "sha512-f+W+Bk2AjNO77zynE33rHuQhyqVICx4RYtGX9NKsGUg0wWjdGP0qAuIkhx9Rnmk4/hFMo1fUrtYNqca9fwJdHg==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/components": {
++      "version": "1.0.12",
++      "resolved": "https://registry.npmjs.org/@react-email/components/-/components-1.0.12.tgz",
++      "integrity": "sha512-tH18JhPDWgE+3jnYkzyB6ZrZdfNnEsFe4PwmuXmlOw4NGIysP8wPY5aXZg++pTG9qUabXg1nzX/FGHGkObH8xQ==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "dependencies": {
++        "@react-email/body": "0.3.0",
++        "@react-email/button": "0.2.1",
++        "@react-email/code-block": "0.2.1",
++        "@react-email/code-inline": "0.0.6",
++        "@react-email/column": "0.0.14",
++        "@react-email/container": "0.0.16",
++        "@react-email/font": "0.0.10",
++        "@react-email/head": "0.0.13",
++        "@react-email/heading": "0.0.16",
++        "@react-email/hr": "0.0.12",
++        "@react-email/html": "0.0.12",
++        "@react-email/img": "0.0.12",
++        "@react-email/link": "0.0.13",
++        "@react-email/markdown": "0.0.18",
++        "@react-email/preview": "0.0.14",
++        "@react-email/render": "2.0.6",
++        "@react-email/row": "0.0.13",
++        "@react-email/section": "0.0.17",
++        "@react-email/tailwind": "2.0.7",
++        "@react-email/text": "0.1.6"
++      },
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/components/node_modules/@react-email/render": {
++      "version": "2.0.6",
++      "resolved": "https://registry.npmjs.org/@react-email/render/-/render-2.0.6.tgz",
++      "integrity": "sha512-xOzaYkH3jLZKqN5MqrTXYnmqBYUnZSVbkxdb5PGGmDcK6sKDVMliaDiSwfXajRC9JtSHTcGc2tmGLHWuCgVpog==",
++      "license": "MIT",
++      "dependencies": {
++        "html-to-text": "^9.0.5",
++        "prettier": "^3.5.3"
++      },
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc",
++        "react-dom": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/container": {
++      "version": "0.0.16",
++      "resolved": "https://registry.npmjs.org/@react-email/container/-/container-0.0.16.tgz",
++      "integrity": "sha512-QWBB56RkkU0AJ9h+qy33gfT5iuZknPC7Un/IjZv9B0QmMIK+WWacc0cH6y2SV5Cv/b99hU94fjEMOOO4enpkbQ==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/font": {
++      "version": "0.0.10",
++      "resolved": "https://registry.npmjs.org/@react-email/font/-/font-0.0.10.tgz",
++      "integrity": "sha512-0urVSgCmQIfx5r7Xc586miBnQUVnGp3OTYUm8m5pwtQRdTRO5XrTtEfNJ3JhYhSOruV0nD8fd+dXtKXobum6tA==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/head": {
++      "version": "0.0.13",
++      "resolved": "https://registry.npmjs.org/@react-email/head/-/head-0.0.13.tgz",
++      "integrity": "sha512-AJg6le/08Gz4tm+6MtKXqtNNyKHzmooOCdmtqmWxD7FxoAdU1eVcizhtQ0gcnVaY6ethEyE/hnEzQxt1zu5Kog==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/heading": {
++      "version": "0.0.16",
++      "resolved": "https://registry.npmjs.org/@react-email/heading/-/heading-0.0.16.tgz",
++      "integrity": "sha512-jmsKnQm1ykpBzw4hCYHwBkt5pW2jScXffPeEH5ZRF5tZeF5b1pvlFTO9han7C0pCkZYo1kEvWiRtx69yfCIwuw==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/hr": {
++      "version": "0.0.12",
++      "resolved": "https://registry.npmjs.org/@react-email/hr/-/hr-0.0.12.tgz",
++      "integrity": "sha512-TwmOmBDibavUQpXBxpmZYi2Iks/yeZOzFYh+di9EltMSnEabH8dMZXrl+pxNXzCgZ2XE8HY7VmUL65Lenfu5PA==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/html": {
++      "version": "0.0.12",
++      "resolved": "https://registry.npmjs.org/@react-email/html/-/html-0.0.12.tgz",
++      "integrity": "sha512-KTShZesan+UsreU7PDUV90afrZwU5TLwYlALuCSU0OT+/U8lULNNbAUekg+tGwCnOfIKYtpDPKkAMRdYlqUznw==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/img": {
++      "version": "0.0.12",
++      "resolved": "https://registry.npmjs.org/@react-email/img/-/img-0.0.12.tgz",
++      "integrity": "sha512-sRCpEARNVTf3FQhZOC+JTvu5r6ubiYWkT0ucYXg8ctkyi4G8QG+jgYPiNUqVeTLA2STOfmPM/nrk1nb84y6CPQ==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/link": {
++      "version": "0.0.13",
++      "resolved": "https://registry.npmjs.org/@react-email/link/-/link-0.0.13.tgz",
++      "integrity": "sha512-lkWc/NjOcefRZMkQoSDDbuKBEBDES9aXnFEOuPH845wD3TxPwh+QTf0fStuzjoRLUZWpHnio4z7qGGRYusn/sw==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/markdown": {
++      "version": "0.0.18",
++      "resolved": "https://registry.npmjs.org/@react-email/markdown/-/markdown-0.0.18.tgz",
++      "integrity": "sha512-gSuYK5fsMbGk87jDebqQ6fa2fKcWlkf2Dkva8kMONqLgGCq8/0d+ZQYMEJsdidIeBo3kmsnHZPrwdFB4HgjUXg==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "dependencies": {
++        "marked": "^15.0.12"
++      },
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/preview": {
++      "version": "0.0.14",
++      "resolved": "https://registry.npmjs.org/@react-email/preview/-/preview-0.0.14.tgz",
++      "integrity": "sha512-aYK8q0IPkBXyMsbpMXgxazwHxYJxTrXrV95GFuu2HbEiIToMwSyUgb8HDFYwPqqfV03/jbwqlsXmFxsOd+VNaw==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/render": {
++      "version": "2.1.0",
++      "resolved": "https://registry.npmjs.org/@react-email/render/-/render-2.1.0.tgz",
++      "integrity": "sha512-F+zE3O6d6sW6Aj2UjvZAA17R7tJKM7kcq2mgV6k4HCT8jeLLFaVP2txMtH1lgqYFRMZ0Gxsd37q2PRyiXLXXxA==",
++      "license": "MIT",
++      "dependencies": {
++        "entities": "^4.5.0",
++        "html-to-text": "^9.0.5",
++        "html5parser": "^3.0.0",
++        "prettier": "^3.5.3"
++      },
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc",
++        "react-dom": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/row": {
++      "version": "0.0.13",
++      "resolved": "https://registry.npmjs.org/@react-email/row/-/row-0.0.13.tgz",
++      "integrity": "sha512-bYnOac40vIKCId7IkwuLAAsa3fKfSfqCvv6epJKmPE0JBuu5qI4FHFCl9o9dVpIIS08s/ub+Y/txoMt0dYziGw==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/section": {
++      "version": "0.0.17",
++      "resolved": "https://registry.npmjs.org/@react-email/section/-/section-0.0.17.tgz",
++      "integrity": "sha512-qNl65ye3W0Rd5udhdORzTV9ezjb+GFqQQSae03NDzXtmJq6sqVXNWNiVolAjvJNypim+zGXmv6J9TcV5aNtE/w==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/@react-email/tailwind": {
++      "version": "2.0.7",
++      "resolved": "https://registry.npmjs.org/@react-email/tailwind/-/tailwind-2.0.7.tgz",
++      "integrity": "sha512-kGw80weVFXikcnCXbigTGXGWQ0MRCSYNCudcdkWxebkWYd0FG6/NPoN3V1p/u68/4+NxZwYPVi2fhnp0x23HdA==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "dependencies": {
++        "tailwindcss": "^4.1.18"
++      },
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "@react-email/body": ">=0",
++        "@react-email/button": ">=0",
++        "@react-email/code-block": ">=0",
++        "@react-email/code-inline": ">=0",
++        "@react-email/container": ">=0",
++        "@react-email/heading": ">=0",
++        "@react-email/hr": ">=0",
++        "@react-email/img": ">=0",
++        "@react-email/link": ">=0",
++        "@react-email/preview": ">=0",
++        "@react-email/text": ">=0",
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      },
++      "peerDependenciesMeta": {
++        "@react-email/body": {
++          "optional": true
++        },
++        "@react-email/button": {
++          "optional": true
++        },
++        "@react-email/code-block": {
++          "optional": true
++        },
++        "@react-email/code-inline": {
++          "optional": true
++        },
++        "@react-email/container": {
++          "optional": true
++        },
++        "@react-email/heading": {
++          "optional": true
++        },
++        "@react-email/hr": {
++          "optional": true
++        },
++        "@react-email/img": {
++          "optional": true
++        },
++        "@react-email/link": {
++          "optional": true
++        },
++        "@react-email/preview": {
++          "optional": true
++        }
++      }
++    },
++    "node_modules/@react-email/text": {
++      "version": "0.1.6",
++      "resolved": "https://registry.npmjs.org/@react-email/text/-/text-0.1.6.tgz",
++      "integrity": "sha512-TYqkioRS45wTR5il3dYk/SbUjjEdhSwh9BtRNB99qNH1pXAwA45H7rAuxehiu8iJQJH0IyIr+6n62gBz9ezmsw==",
++      "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
++      "license": "MIT",
++      "engines": {
++        "node": ">=20.0.0"
++      },
++      "peerDependencies": {
++        "react": "^18.0 || ^19.0 || ^19.0.0-rc"
++      }
++    },
+     "node_modules/@rtsao/scc": {
+       "version": "1.1.0",
+       "resolved": "https://registry.npmjs.org/@rtsao/scc/-/scc-1.1.0.tgz",
+@@ -1411,6 +1784,25 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/@selderee/plugin-htmlparser2": {
++      "version": "0.11.0",
++      "resolved": "https://registry.npmjs.org/@selderee/plugin-htmlparser2/-/plugin-htmlparser2-0.11.0.tgz",
++      "integrity": "sha512-P33hHGdldxGabLFjPPpaTxVolMrzrcegejx+0GxjrIb9Zv48D8yAIA/QTDR2dFl7Uz7urX8aX6+5bCZslr+gWQ==",
++      "license": "MIT",
++      "dependencies": {
++        "domhandler": "^5.0.3",
++        "selderee": "^0.11.0"
++      },
++      "funding": {
++        "url": "https://ko-fi.com/killymxi"
++      }
++    },
++    "node_modules/@stablelib/base64": {
++      "version": "1.0.1",
++      "resolved": "https://registry.npmjs.org/@stablelib/base64/-/base64-1.0.1.tgz",
++      "integrity": "sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==",
++      "license": "MIT"
++    },
+     "node_modules/@standard-schema/spec": {
+       "version": "1.1.0",
+       "resolved": "https://registry.npmjs.org/@standard-schema/spec/-/spec-1.1.0.tgz",
+@@ -3068,6 +3460,15 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/deepmerge": {
++      "version": "4.3.1",
++      "resolved": "https://registry.npmjs.org/deepmerge/-/deepmerge-4.3.1.tgz",
++      "integrity": "sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==",
++      "license": "MIT",
++      "engines": {
++        "node": ">=0.10.0"
++      }
++    },
+     "node_modules/deepmerge-ts": {
+       "version": "7.1.5",
+       "resolved": "https://registry.npmjs.org/deepmerge-ts/-/deepmerge-ts-7.1.5.tgz",
+@@ -3151,6 +3552,61 @@
+         "node": ">=0.10.0"
+       }
+     },
++    "node_modules/dom-serializer": {
++      "version": "2.0.0",
++      "resolved": "https://registry.npmjs.org/dom-serializer/-/dom-serializer-2.0.0.tgz",
++      "integrity": "sha512-wIkAryiqt/nV5EQKqQpo3SToSOV9J0DnbJqwK7Wv/Trc92zIAYZ4FlMu+JPFW1DfGFt81ZTCGgDEabffXeLyJg==",
++      "license": "MIT",
++      "dependencies": {
++        "domelementtype": "^2.3.0",
++        "domhandler": "^5.0.2",
++        "entities": "^4.2.0"
++      },
++      "funding": {
++        "url": "https://github.com/cheeriojs/dom-serializer?sponsor=1"
++      }
++    },
++    "node_modules/domelementtype": {
++      "version": "2.3.0",
++      "resolved": "https://registry.npmjs.org/domelementtype/-/domelementtype-2.3.0.tgz",
++      "integrity": "sha512-OLETBj6w0OsagBwdXnPdN0cnMfF9opN69co+7ZrbfPGrdpPVNBUj02spi6B1N7wChLQiPn4CSH/zJvXw56gmHw==",
++      "funding": [
++        {
++          "type": "github",
++          "url": "https://github.com/sponsors/fb55"
++        }
++      ],
++      "license": "BSD-2-Clause"
++    },
++    "node_modules/domhandler": {
++      "version": "5.0.3",
++      "resolved": "https://registry.npmjs.org/domhandler/-/domhandler-5.0.3.tgz",
++      "integrity": "sha512-cgwlv/1iFQiFnU96XXgROh8xTeetsnJiDsTc7TYCLFd9+/WNkIqPTxiM/8pSd8VIrhXGTf1Ny1q1hquVqDJB5w==",
++      "license": "BSD-2-Clause",
++      "dependencies": {
++        "domelementtype": "^2.3.0"
++      },
++      "engines": {
++        "node": ">= 4"
++      },
++      "funding": {
++        "url": "https://github.com/fb55/domhandler?sponsor=1"
++      }
++    },
++    "node_modules/domutils": {
++      "version": "3.2.2",
++      "resolved": "https://registry.npmjs.org/domutils/-/domutils-3.2.2.tgz",
++      "integrity": "sha512-6kZKyUajlDuqlHKVX1w7gyslj9MPIXzIFiz/rGu35uC1wMi+kMhQwGhl4lt9unC9Vb9INnY9Z3/ZA3+FhASLaw==",
++      "license": "BSD-2-Clause",
++      "dependencies": {
++        "dom-serializer": "^2.0.0",
++        "domelementtype": "^2.3.0",
++        "domhandler": "^5.0.3"
++      },
++      "funding": {
++        "url": "https://github.com/fb55/domutils?sponsor=1"
++      }
++    },
+     "node_modules/dotenv": {
+       "version": "16.6.1",
+       "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-16.6.1.tgz",
+@@ -3228,6 +3684,18 @@
+         "node": ">=10.13.0"
+       }
+     },
++    "node_modules/entities": {
++      "version": "4.5.0",
++      "resolved": "https://registry.npmjs.org/entities/-/entities-4.5.0.tgz",
++      "integrity": "sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==",
++      "license": "BSD-2-Clause",
++      "engines": {
++        "node": ">=0.12"
++      },
++      "funding": {
++        "url": "https://github.com/fb55/entities?sponsor=1"
++      }
++    },
+     "node_modules/es-abstract": {
+       "version": "1.24.2",
+       "resolved": "https://registry.npmjs.org/es-abstract/-/es-abstract-1.24.2.tgz",
+@@ -3938,6 +4406,12 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/fast-sha256": {
++      "version": "1.3.0",
++      "resolved": "https://registry.npmjs.org/fast-sha256/-/fast-sha256-1.3.0.tgz",
++      "integrity": "sha512-n11RGP/lrWEFI/bWdygLxhI+pVeo1ZYIVwvvPkW7azl/rOy+F3HYRZ2K5zeE9mmkhQppyv9sQFx0JM9UabnpPQ==",
++      "license": "Unlicense"
++    },
+     "node_modules/fastq": {
+       "version": "1.20.3",
+       "resolved": "https://registry.npmjs.org/fastq/-/fastq-1.20.3.tgz",
+@@ -4354,6 +4828,47 @@
+         "hermes-estree": "0.25.1"
+       }
+     },
++    "node_modules/html-to-text": {
++      "version": "9.0.5",
++      "resolved": "https://registry.npmjs.org/html-to-text/-/html-to-text-9.0.5.tgz",
++      "integrity": "sha512-qY60FjREgVZL03vJU6IfMV4GDjGBIoOyvuFdpBDIX9yTlDw0TjxVBQp+P8NvpdIXNJvfWBTNul7fsAQJq2FNpg==",
++      "license": "MIT",
++      "dependencies": {
++        "@selderee/plugin-htmlparser2": "^0.11.0",
++        "deepmerge": "^4.3.1",
++        "dom-serializer": "^2.0.0",
++        "htmlparser2": "^8.0.2",
++        "selderee": "^0.11.0"
++      },
++      "engines": {
++        "node": ">=14"
++      }
++    },
++    "node_modules/html5parser": {
++      "version": "3.0.0",
++      "resolved": "https://registry.npmjs.org/html5parser/-/html5parser-3.0.0.tgz",
++      "integrity": "sha512-iNpSopa+4YHX50UOk825tBy7MghmXHo/ZpLskBYN0kAr1xhH8GlIMk5bLRXcZlfP3AnLUcSuFMu8C4MdOUxA8A==",
++      "license": "MIT"
++    },
++    "node_modules/htmlparser2": {
++      "version": "8.0.2",
++      "resolved": "https://registry.npmjs.org/htmlparser2/-/htmlparser2-8.0.2.tgz",
++      "integrity": "sha512-GYdjWKDkbRLkZ5geuHs5NY1puJ+PXwP7+fHPRz06Eirsb9ugf6d8kkXav6ADhcODhFFPMIXyxkxSuMf3D6NCFA==",
++      "funding": [
++        "https://github.com/fb55/htmlparser2?sponsor=1",
++        {
++          "type": "github",
++          "url": "https://github.com/sponsors/fb55"
++        }
++      ],
++      "license": "MIT",
++      "dependencies": {
++        "domelementtype": "^2.3.0",
++        "domhandler": "^5.0.3",
++        "domutils": "^3.0.1",
++        "entities": "^4.4.0"
++      }
++    },
+     "node_modules/ignore": {
+       "version": "5.3.2",
+       "resolved": "https://registry.npmjs.org/ignore/-/ignore-5.3.2.tgz",
+@@ -5011,6 +5526,15 @@
+         "node": ">=0.10"
+       }
+     },
++    "node_modules/leac": {
++      "version": "0.6.0",
++      "resolved": "https://registry.npmjs.org/leac/-/leac-0.6.0.tgz",
++      "integrity": "sha512-y+SqErxb8h7nE/fiEX07jsbuhrpO9lL8eca7/Y1nuWV2moNlXhyd59iDGcRf6moVyDMbmTNzL40SUyrFU/yDpg==",
++      "license": "MIT",
++      "funding": {
++        "url": "https://ko-fi.com/killymxi"
++      }
++    },
+     "node_modules/levn": {
+       "version": "0.4.1",
+       "resolved": "https://registry.npmjs.org/levn/-/levn-0.4.1.tgz",
+@@ -5342,6 +5866,18 @@
+         "@jridgewell/sourcemap-codec": "^1.5.5"
+       }
+     },
++    "node_modules/marked": {
++      "version": "15.0.12",
++      "resolved": "https://registry.npmjs.org/marked/-/marked-15.0.12.tgz",
++      "integrity": "sha512-8dD6FusOQSrpv9Z1rdNMdlSgQOIP880DHqnohobOmYLElGEqAL/JvxvuxZO16r4HtjTlfPRDC1hbvxC9dPN2nA==",
++      "license": "MIT",
++      "bin": {
++        "marked": "bin/marked.js"
++      },
++      "engines": {
++        "node": ">= 18"
++      }
++    },
+     "node_modules/math-intrinsics": {
+       "version": "1.1.0",
+       "resolved": "https://registry.npmjs.org/math-intrinsics/-/math-intrinsics-1.1.0.tgz",
+@@ -5801,6 +6337,19 @@
+         "node": ">=6"
+       }
+     },
++    "node_modules/parseley": {
++      "version": "0.12.1",
++      "resolved": "https://registry.npmjs.org/parseley/-/parseley-0.12.1.tgz",
++      "integrity": "sha512-e6qHKe3a9HWr0oMRVDTRhKce+bRO8VGQR3NyVwcjwrbhMmFCX9KszEV35+rn4AdilFAq9VPxP/Fe1wC9Qjd2lw==",
++      "license": "MIT",
++      "dependencies": {
++        "leac": "^0.6.0",
++        "peberminta": "^0.9.0"
++      },
++      "funding": {
++        "url": "https://ko-fi.com/killymxi"
++      }
++    },
+     "node_modules/path-exists": {
+       "version": "4.0.0",
+       "resolved": "https://registry.npmjs.org/path-exists/-/path-exists-4.0.0.tgz",
+@@ -5835,6 +6384,15 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/peberminta": {
++      "version": "0.9.0",
++      "resolved": "https://registry.npmjs.org/peberminta/-/peberminta-0.9.0.tgz",
++      "integrity": "sha512-XIxfHpEuSJbITd1H3EeQwpcZbTLHc+VVr8ANI9t5sit565tsI4/xK3KWTUFE2e6QiangUkh3B0jihzmGnNrRsQ==",
++      "license": "MIT",
++      "funding": {
++        "url": "https://ko-fi.com/killymxi"
++      }
++    },
+     "node_modules/perfect-debounce": {
+       "version": "1.0.0",
+       "resolved": "https://registry.npmjs.org/perfect-debounce/-/perfect-debounce-1.0.0.tgz",
+@@ -5890,6 +6448,12 @@
+         "node": ">= 0.4"
+       }
+     },
++    "node_modules/postal-mime": {
++      "version": "2.7.5",
++      "resolved": "https://registry.npmjs.org/postal-mime/-/postal-mime-2.7.5.tgz",
++      "integrity": "sha512-GNEXKvWFQnbgO5NlrGzVa0FmWzBZ24PersAWErttSg1Hjpf0ATxTwS5DOMGaOpTG6bUh5cTr7xi0jAD942wCJA==",
++      "license": "MIT-0"
++    },
+     "node_modules/postcss": {
+       "version": "8.5.28",
+       "resolved": "https://registry.npmjs.org/postcss/-/postcss-8.5.28.tgz",
+@@ -5929,6 +6493,21 @@
+         "node": ">= 0.8.0"
+       }
+     },
++    "node_modules/prettier": {
++      "version": "3.9.6",
++      "resolved": "https://registry.npmjs.org/prettier/-/prettier-3.9.6.tgz",
++      "integrity": "sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g==",
++      "license": "MIT",
++      "bin": {
++        "prettier": "bin/prettier.cjs"
++      },
++      "engines": {
++        "node": ">=14"
++      },
++      "funding": {
++        "url": "https://github.com/prettier/prettier?sponsor=1"
++      }
++    },
+     "node_modules/prisma": {
+       "version": "6.19.3",
+       "resolved": "https://registry.npmjs.org/prisma/-/prisma-6.19.3.tgz",
+@@ -5955,6 +6534,15 @@
+         }
+       }
+     },
++    "node_modules/prismjs": {
++      "version": "1.30.0",
++      "resolved": "https://registry.npmjs.org/prismjs/-/prismjs-1.30.0.tgz",
++      "integrity": "sha512-DEvV2ZF2r2/63V+tK8hQvrR2ZGn10srHbXviTlcv7Kpzw8jWiNTqbVgjO3IY8RxrrOUF8VPMQQFysYYYv0YZxw==",
++      "license": "MIT",
++      "engines": {
++        "node": ">=6"
++      }
++    },
+     "node_modules/prop-types": {
+       "version": "15.8.1",
+       "resolved": "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz",
+@@ -6112,6 +6700,27 @@
+         "url": "https://github.com/sponsors/ljharb"
+       }
+     },
++    "node_modules/resend": {
++      "version": "6.26.0",
++      "resolved": "https://registry.npmjs.org/resend/-/resend-6.26.0.tgz",
++      "integrity": "sha512-vkrULozV5nGF8o7tyun/t0+qFgtPpn+cyRhVqeorhOsPUNDiSc/9p/pn8AprdHqJpYaTvftpnQgWurW++FkCdw==",
++      "license": "MIT",
++      "dependencies": {
++        "postal-mime": "2.7.5",
++        "standardwebhooks": "1.0.0"
++      },
++      "engines": {
++        "node": ">=20"
++      },
++      "peerDependencies": {
++        "@react-email/render": "*"
++      },
++      "peerDependenciesMeta": {
++        "@react-email/render": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/resolve": {
+       "version": "2.0.0-next.7",
+       "resolved": "https://registry.npmjs.org/resolve/-/resolve-2.0.0-next.7.tgz",
+@@ -6252,6 +6861,18 @@
+       "integrity": "sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==",
+       "license": "MIT"
+     },
++    "node_modules/selderee": {
++      "version": "0.11.0",
++      "resolved": "https://registry.npmjs.org/selderee/-/selderee-0.11.0.tgz",
++      "integrity": "sha512-5TF+l7p4+OsnP8BCCvSyZiSPc4x4//p5uPwK8TCnVPJYRmU2aYKMpOXvw8zM5a5JvuuCGN1jmsMwuU2W02ukfA==",
++      "license": "MIT",
++      "dependencies": {
++        "parseley": "^0.12.0"
++      },
++      "funding": {
++        "url": "https://ko-fi.com/killymxi"
++      }
++    },
+     "node_modules/semver": {
+       "version": "6.3.1",
+       "resolved": "https://registry.npmjs.org/semver/-/semver-6.3.1.tgz",
+@@ -6489,6 +7110,16 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/standardwebhooks": {
++      "version": "1.0.0",
++      "resolved": "https://registry.npmjs.org/standardwebhooks/-/standardwebhooks-1.0.0.tgz",
++      "integrity": "sha512-BbHGOQK9olHPMvQNHWul6MYlrRTAOKn03rOe4A8O3CLWhNf4YHBqq2HJKKC+sfqpxiBY52pNeesD6jIiLDz8jg==",
++      "license": "MIT",
++      "dependencies": {
++        "@stablelib/base64": "^1.0.0",
++        "fast-sha256": "^1.3.0"
++      }
++    },
+     "node_modules/stop-iteration-iterator": {
+       "version": "1.1.0",
+       "resolved": "https://registry.npmjs.org/stop-iteration-iterator/-/stop-iteration-iterator-1.1.0.tgz",
+@@ -6693,7 +7324,6 @@
+       "version": "4.3.3",
+       "resolved": "https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.3.3.tgz",
+       "integrity": "sha512-gOhV3P7ufE62QDGg1zVaTgCR+EtPv92k2nIhVcVKcLmxT1sUBsQGhnZj175j+MqRt4zLF7ic+sCYjfhxMxj7YQ==",
+-      "dev": true,
+       "license": "MIT"
+     },
+     "node_modules/tapable": {
+diff --git a/package.json b/package.json
+index a815b07..f73554b 100644
+--- a/package.json
++++ b/package.json
+@@ -9,11 +9,14 @@
+     "lint": "eslint"
+   },
+   "dependencies": {
++    "@react-email/components": "^1.0.12",
++    "@react-email/render": "^2.1.0",
+     "bcryptjs": "^3.0.3",
+     "jose": "^6.2.12",
+     "next": "16.3.4",
+     "react": "19.2.8",
+-    "react-dom": "19.2.8"
++    "react-dom": "19.2.8",
++    "resend": "^6.26.0"
+   },
+   "devDependencies": {
+     "@prisma/client": "^6.19.3",
+diff --git a/prisma/schema.prisma b/prisma/schema.prisma
+index aa82b8d..a05e33e 100644
+--- a/prisma/schema.prisma
++++ b/prisma/schema.prisma
+@@ -23,6 +23,7 @@ model Member {
+   isApproved             Boolean  @default(false)
+   showPhoneInDirectory   Boolean  @default(true)
+   showAddressInDirectory Boolean  @default(true)
++  receiveNewsletter      Boolean  @default(true)
+   toddlerChildren        Int      @default(0)
+   elementaryChildren     Int      @default(0)
+   teenChildren           Int      @default(0)
+@@ -72,5 +73,24 @@ model Transaction {
+   email         String?
+   memberId      String?
+   member        Member?  @relation(fields: [memberId], references: [id])
++  // PLACEHOLDER: Nedarim Plus's recurring-donation (standing order) webhook
++  // field names are not yet known - these default to false/null until the
++  // real payload shape is confirmed. See TODO in the webhook route.
++  isRecurring   Boolean  @default(false)
++  recurringId   String? // Groups installments of the same standing order, once known
+   createdAt     DateTime @default(now())
+ }
++
++// A community newsletter, built in the admin newsletter editor and sent by
++// email to approved members who have not opted out.
++model Newsletter {
++  id          String    @id @default(cuid())
++  subject     String
++  targetGroup String    @default("all") // all | board | volunteers
++  items       Json // NewsletterItem[]: { category, title, body, imageUrl }
++  status      String    @default("draft") // draft | sent
++  sentCount   Int?
++  createdAt   DateTime  @default(now())
++  updatedAt   DateTime  @updatedAt
++  sentAt      DateTime?
++}
+diff --git a/src/app/actions/admin.ts b/src/app/actions/admin.ts
+index 35306ef..306c909 100644
+--- a/src/app/actions/admin.ts
++++ b/src/app/actions/admin.ts
+@@ -9,32 +9,42 @@ export async function getAdminDashboardData() {
+     try {
+         await requireAdmin();
+ 
+-        const [pendingRequests, members, recentTransactions] = await Promise.all([
+-            prisma.joinRequest.findMany({
+-                where: { isProcessed: false },
+-                orderBy: { createdAt: "desc" },
+-            }),
+-            prisma.member.findMany({
+-                orderBy: { createdAt: "desc" },
+-                include: { yahrzeits: true },
+-                omit: { passwordHash: true },
+-            }),
+-            prisma.transaction.findMany({
+-                take: 10,
+-                orderBy: { createdAt: "desc" },
+-            }),
+-        ]);
++        const [pendingRequests, members, recentTransactions, fundBreakdownRaw, recurringCount, totalAllTime] =
++            await Promise.all([
++                prisma.joinRequest.findMany({
++                    where: { isProcessed: false },
++                    orderBy: { createdAt: "desc" },
++                }),
++                prisma.member.findMany({
++                    orderBy: { createdAt: "desc" },
++                    include: { yahrzeits: true },
++                    omit: { passwordHash: true },
++                }),
++                prisma.transaction.findMany({
++                    take: 20,
++                    orderBy: { createdAt: "desc" },
++                }),
++                prisma.transaction.groupBy({
++                    by: ["targetFund"],
++                    _sum: { amount: true },
++                    orderBy: { _sum: { amount: "desc" } },
++                }),
++                prisma.transaction.count({ where: { isRecurring: true } }),
++                prisma.transaction.aggregate({ _sum: { amount: true } }),
++            ]);
+ 
+-        const totalIncome = recentTransactions.reduce(
+-            (sum, tx) => sum + tx.amount,
+-            0
+-        );
++        const fundBreakdown = fundBreakdownRaw.map((f: (typeof fundBreakdownRaw)[number]) => ({
++            targetFund: f.targetFund,
++            total: f._sum.amount ?? 0,
++        }));
+ 
+         return {
+             pendingRequests,
+             members,
+             recentTransactions,
+-            totalIncome,
++            totalIncome: totalAllTime._sum.amount ?? 0,
++            fundBreakdown,
++            recurringCount,
+         };
+     } catch (error) {
+         console.error("[Get Admin Data Error]:", error);
+@@ -43,6 +53,8 @@ export async function getAdminDashboardData() {
+             members: [],
+             recentTransactions: [],
+             totalIncome: 0,
++            fundBreakdown: [],
++            recurringCount: 0,
+         };
+     }
+ }
+diff --git a/src/app/actions/profile.ts b/src/app/actions/profile.ts
+index 1d46baf..fc4b434 100644
+--- a/src/app/actions/profile.ts
++++ b/src/app/actions/profile.ts
+@@ -18,6 +18,7 @@ export interface UpdateProfileInput {
+     halachicStatus: string;
+     showPhoneInDirectory: boolean;
+     showAddressInDirectory: boolean;
++    receiveNewsletter: boolean;
+     toddlerChildren: number;
+     elementaryChildren: number;
+     teenChildren: number;
+@@ -37,6 +38,7 @@ export async function updateProfile(data: UpdateProfileInput) {
+                 halachicStatus: data.halachicStatus,
+                 showPhoneInDirectory: !!data.showPhoneInDirectory,
+                 showAddressInDirectory: !!data.showAddressInDirectory,
++                receiveNewsletter: !!data.receiveNewsletter,
+                 toddlerChildren: clampChildCount(data.toddlerChildren),
+                 elementaryChildren: clampChildCount(data.elementaryChildren),
+                 teenChildren: clampChildCount(data.teenChildren),
+diff --git a/src/app/admin/AdminDashboardClient.tsx b/src/app/admin/AdminDashboardClient.tsx
+index 8c82c3d..e2a3bad 100644
+--- a/src/app/admin/AdminDashboardClient.tsx
++++ b/src/app/admin/AdminDashboardClient.tsx
+@@ -32,13 +32,22 @@ interface TransactionRecord {
+     clientName: string;
+     amount: number;
+     targetFund: string;
++    isRecurring: boolean;
+     createdAt: Date;
+ }
+ 
++interface FundBreakdownEntry {
++    targetFund: string;
++    total: number;
++}
++
+ interface AdminDashboardClientProps {
+     pendingRequests: PendingRequest[];
+     members: MemberRecord[];
+     transactions: TransactionRecord[];
++    totalIncome: number;
++    fundBreakdown: FundBreakdownEntry[];
++    recurringCount: number;
+ }
+ 
+ // Generates a random, readable initial password for a newly-approved member.
+@@ -52,6 +61,9 @@ export default function AdminDashboardClient({
+     pendingRequests,
+     members,
+     transactions,
++    totalIncome,
++    fundBreakdown,
++    recurringCount,
+ }: AdminDashboardClientProps) {
+     const router = useRouter();
+     const [isPending, startTransition] = useTransition();
+@@ -143,7 +155,7 @@ export default function AdminDashboardClient({
+                 </div>
+ 
+                 {/* Stats Row */}
+-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
++                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                     <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                         <div className="text-xs text-slate-500">בקשות ממתינות לאישור</div>
+                         <div className="text-2xl font-bold text-amber-600 mt-1">{pendingRequests.length}</div>
+@@ -153,8 +165,12 @@ export default function AdminDashboardClient({
+                         <div className="text-2xl font-bold text-slate-900 mt-1">{members.length}</div>
+                     </div>
+                     <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+-                        <div className="text-xs text-slate-500">עסקאות נדרים פלוס אחרונות</div>
+-                        <div className="text-2xl font-bold text-emerald-600 mt-1">{transactions.length}</div>
++                        <div className="text-xs text-slate-500">סה&quot;כ תרומות (נדרים פלוס)</div>
++                        <div className="text-2xl font-bold text-emerald-600 mt-1">₪{totalIncome.toLocaleString()}</div>
++                    </div>
++                    <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
++                        <div className="text-xs text-slate-500">הוראות קבע</div>
++                        <div className="text-2xl font-bold text-sky-600 mt-1">{recurringCount}</div>
+                     </div>
+                 </div>
+ 
+@@ -314,6 +330,69 @@ export default function AdminDashboardClient({
+                         </div>
+                     )}
+                 </div>
++
++                {/* Donations Section */}
++                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
++                    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
++                        <div className="px-6 py-4 border-b border-slate-100">
++                            <h2 className="text-sm font-bold text-slate-900">התפלגות תרומות לפי יעד</h2>
++                        </div>
++                        {fundBreakdown.length === 0 ? (
++                            <div className="p-6 text-center text-xs text-slate-400">אין עדיין תרומות רשומות</div>
++                        ) : (
++                            <div className="divide-y divide-slate-100">
++                                {fundBreakdown.map((f) => (
++                                    <div key={f.targetFund} className="px-6 py-3 flex items-center justify-between text-xs">
++                                        <span className="text-slate-700">{f.targetFund}</span>
++                                        <span className="font-bold text-slate-900">₪{f.total.toLocaleString()}</span>
++                                    </div>
++                                ))}
++                            </div>
++                        )}
++                    </div>
++
++                    <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
++                        <div className="px-6 py-4 border-b border-slate-100">
++                            <h2 className="text-sm font-bold text-slate-900">תרומות אחרונות</h2>
++                        </div>
++                        {transactions.length === 0 ? (
++                            <div className="p-6 text-center text-xs text-slate-400">אין עדיין תרומות רשומות</div>
++                        ) : (
++                            <div className="overflow-x-auto">
++                                <table className="w-full text-right text-xs">
++                                    <thead className="bg-slate-50 text-slate-500 font-medium">
++                                        <tr>
++                                            <th className="px-6 py-3">תורם</th>
++                                            <th className="px-6 py-3">סכום</th>
++                                            <th className="px-6 py-3">יעד</th>
++                                            <th className="px-6 py-3">סוג</th>
++                                            <th className="px-6 py-3">תאריך</th>
++                                        </tr>
++                                    </thead>
++                                    <tbody className="divide-y divide-slate-100 text-slate-700">
++                                        {transactions.map((tx) => (
++                                            <tr key={tx.id} className="hover:bg-slate-50/50">
++                                                <td className="px-6 py-3 font-semibold text-slate-900">{tx.clientName}</td>
++                                                <td className="px-6 py-3">₪{tx.amount.toLocaleString()}</td>
++                                                <td className="px-6 py-3">{tx.targetFund}</td>
++                                                <td className="px-6 py-3">
++                                                    {tx.isRecurring ? (
++                                                        <span className="px-2 py-0.5 rounded-md bg-sky-100 text-sky-800">הוראת קבע</span>
++                                                    ) : (
++                                                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">חד פעמי</span>
++                                                    )}
++                                                </td>
++                                                <td className="px-6 py-3 text-slate-500">
++                                                    {new Date(tx.createdAt).toLocaleDateString("he-IL")}
++                                                </td>
++                                            </tr>
++                                        ))}
++                                    </tbody>
++                                </table>
++                            </div>
++                        )}
++                    </div>
++                </div>
+             </div>
+         </div>
+     );
+diff --git a/src/app/admin/newsletter/page.tsx b/src/app/admin/newsletter/page.tsx
+index 9f6d28a..a6f3506 100644
+--- a/src/app/admin/newsletter/page.tsx
++++ b/src/app/admin/newsletter/page.tsx
+@@ -1,317 +1,25 @@
+-"use client";
++import { redirect } from "next/navigation";
++import { requireAdmin } from "@/lib/auth";
++import { getNewsletterDashboardData } from "@/app/actions/newsletter";
++import NewsletterClient from "./NewsletterClient";
+ 
+-import { useState } from "react";
+-import Link from "next/link";
++// Always dynamic: reads the session cookie to authorize the request.
++export const dynamic = "force-dynamic";
+ 
+-interface NewsletterItem {
+-    id: string;
+-    category: "שמחות" | "הודעת ועד" | "זמני תפילה" | "השכבות";
+-    title: string;
+-    body: string;
+-    imageUrl?: string;
+-}
+-
+-export default function NewsletterBuilderPage() {
+-    const [subject, setSubject] = useState("עלון שבת פרשת יתרו - קהילת תפארת תימן");
+-    const [targetGroup, setTargetGroup] = useState<"all" | "board" | "volunteers">("all");
+-    const [items, setItems] = useState<NewsletterItem[]>([
+-        {
+-            id: "1",
+-            category: "שמחות",
+-            title: "מזל טוב למשפחת שרעבי",
+-            body: "ברכת הקהילה לרגל הולדת הבן בשעה טובה. לימוד ברית יצחק יתקיים ביום שלישי בבית המשפחה.",
+-        },
+-        {
+-            id: "2",
+-            category: "הודעת ועד",
+-            title: "עדכון עבודות שיפוץ עזרת נשים",
+-            body: "בשעה טובה הסתיימו עבודות הסיוד והתקנת המיזוג החדש לקראת שבתות הקיץ.",
+-        },
+-    ]);
+-
+-    // Modal / form state for adding a new section
+-    const [isAddingItem, setIsAddingItem] = useState(false);
+-    const [newItem, setNewItem] = useState<Omit<NewsletterItem, "id">>({
+-        category: "הודעת ועד",
+-        title: "",
+-        body: "",
+-        imageUrl: "",
+-    });
+-
+-    const handleAddItem = (e: React.FormEvent) => {
+-        e.preventDefault();
+-        if (!newItem.title || !newItem.body) return;
+-
+-        setItems([
+-            ...items,
+-            {
+-                id: Date.now().toString(),
+-                ...newItem,
+-            },
+-        ]);
++export default async function NewsletterBuilderPage() {
++    try {
++        await requireAdmin();
++    } catch {
++        redirect("/login");
++    }
+ 
+-        setNewItem({
+-            category: "הודעת ועד",
+-            title: "",
+-            body: "",
+-            imageUrl: "",
+-        });
+-        setIsAddingItem(false);
+-    };
+-
+-    const handleRemoveItem = (id: string) => {
+-        setItems(items.filter((item) => item.id !== id));
+-    };
+-
+-    const handleSendBroadcast = () => {
+-        const groupName =
+-            targetGroup === "all"
+-                ? "כלל חברי הקהילה"
+-                : targetGroup === "board"
+-                    ? "הוועד המנהל"
+-                    : "צוות מתנדבים";
+-        alert(`הניוזלטר נשלח בהצלחה אל: ${groupName} (${items.length} אייטמים)`);
+-    };
++    const data = await getNewsletterDashboardData();
+ 
+     return (
+-        <div className="min-h-screen bg-slate-100 py-8 px-4 sm:px-6 lg:px-8">
+-            <div className="max-w-7xl mx-auto space-y-6">
+-
+-                {/* Navigation & Actions */}
+-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+-                    <div>
+-                        <Link href="/admin" className="text-xs font-semibold text-amber-700 hover:text-amber-800">
+-                            ← חזרה לפאנל ניהול
+-                        </Link>
+-                        <h1 className="text-2xl font-bold text-slate-900 mt-1">עורך ניוזלטר קהילתי</h1>
+-                        <p className="text-sm text-slate-500">עריכת תכנים והפצה בתבנית מייל ממותגת</p>
+-                    </div>
+-
+-                    <div className="flex items-center gap-3">
+-                        <button
+-                            type="button"
+-                            onClick={() => alert("טיוטת בדיקה נשלחה לכתובת המייל שלך")}
+-                            className="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
+-                        >
+-                            שליחת בדיקה אליי
+-                        </button>
+-                        <button
+-                            type="button"
+-                            onClick={handleSendBroadcast}
+-                            className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
+-                        >
+-                            שיגור תפוצה לקהילה ✉
+-                        </button>
+-                    </div>
+-                </div>
+-
+-                {/* Workspace: Left Editor, Right Live Preview */}
+-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+-
+-                    {/* Controls Column */}
+-                    <div className="lg:col-span-5 space-y-6">
+-
+-                        {/* Delivery Settings */}
+-                        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+-                            <h2 className="text-sm font-bold text-slate-900 pb-2 border-b border-slate-100">
+-                                הגדרות תפוצה
+-                            </h2>
+-
+-                            <div>
+-                                <label className="block text-xs font-medium text-slate-700 mb-1">נושא המייל (Subject)</label>
+-                                <input
+-                                    type="text"
+-                                    value={subject}
+-                                    onChange={(e) => setSubject(e.target.value)}
+-                                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600 focus:bg-white"
+-                                />
+-                            </div>
+-
+-                            <div>
+-                                <label className="block text-xs font-medium text-slate-700 mb-1">קבוצת תפוצה</label>
+-                                <select
+-                                    value={targetGroup}
+-                                    onChange={(e) => setTargetGroup(e.target.value as any)}
+-                                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600 focus:bg-white"
+-                                >
+-                                    <option value="all">כלל חברי הקהילה (68 משפחות)</option>
+-                                    <option value="board">ועד מנהל בלבד (5 חברים)</option>
+-                                    <option value="volunteers">צוות חסד ואירועים (12 חברים)</option>
+-                                </select>
+-                            </div>
+-                        </div>
+-
+-                        {/* Modular Items List */}
+-                        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+-                            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+-                                <h2 className="text-sm font-bold text-slate-900">אייטמים בניוזלטר ({items.length})</h2>
+-                                {!isAddingItem && (
+-                                    <button
+-                                        type="button"
+-                                        onClick={() => setIsAddingItem(true)}
+-                                        className="px-3 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold rounded-lg transition-colors"
+-                                    >
+-                                        + הוסף אייטם
+-                                    </button>
+-                                )}
+-                            </div>
+-
+-                            {/* Add Item Form */}
+-                            {isAddingItem && (
+-                                <form onSubmit={handleAddItem} className="p-4 bg-amber-50/60 rounded-xl border border-amber-200 space-y-3">
+-                                    <h3 className="text-xs font-bold text-amber-900">אייטם חדש</h3>
+-
+-                                    <div>
+-                                        <label className="block text-xs font-medium text-slate-700">קטגוריה</label>
+-                                        <select
+-                                            value={newItem.category}
+-                                            onChange={(e) => setNewItem({ ...newItem, category: e.target.value as any })}
+-                                            className="mt-1 w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
+-                                        >
+-                                            <option value="שמחות">שמחות</option>
+-                                            <option value="הודעת ועד">הודעת ועד</option>
+-                                            <option value="זמני תפילה">זמני תפילה</option>
+-                                            <option value="השכבות">השכבות וימי זיכרון</option>
+-                                        </select>
+-                                    </div>
+-
+-                                    <div>
+-                                        <label className="block text-xs font-medium text-slate-700">כותרת</label>
+-                                        <input
+-                                            type="text"
+-                                            required
+-                                            value={newItem.title}
+-                                            onChange={(e) => setNewItem({ ...newItem, title: e.target.value })}
+-                                            className="mt-1 w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
+-                                        />
+-                                    </div>
+-
+-                                    <div>
+-                                        <label className="block text-xs font-medium text-slate-700">תוכן ההודעה</label>
+-                                        <textarea
+-                                            rows={3}
+-                                            required
+-                                            value={newItem.body}
+-                                            onChange={(e) => setNewItem({ ...newItem, body: e.target.value })}
+-                                            className="mt-1 w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
+-                                        />
+-                                    </div>
+-
+-                                    <div>
+-                                        <label className="block text-xs font-medium text-slate-700">קישור לתמונה (אופציונלי)</label>
+-                                        <input
+-                                            type="url"
+-                                            placeholder="https://..."
+-                                            value={newItem.imageUrl}
+-                                            onChange={(e) => setNewItem({ ...newItem, imageUrl: e.target.value })}
+-                                            className="mt-1 w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
+-                                        />
+-                                    </div>
+-
+-                                    <div className="flex justify-end gap-2 pt-1">
+-                                        <button
+-                                            type="button"
+-                                            onClick={() => setIsAddingItem(false)}
+-                                            className="px-3 py-1 text-xs text-slate-600 hover:bg-slate-100 rounded-lg"
+-                                        >
+-                                            ביטול
+-                                        </button>
+-                                        <button
+-                                            type="submit"
+-                                            className="px-3 py-1 bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold rounded-lg"
+-                                        >
+-                                            הוסף למייל
+-                                        </button>
+-                                    </div>
+-                                </form>
+-                            )}
+-
+-                            {/* Items Reorder / Remove List */}
+-                            <div className="space-y-2">
+-                                {items.map((item, index) => (
+-                                    <div
+-                                        key={item.id}
+-                                        className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center justify-between text-xs"
+-                                    >
+-                                        <div>
+-                                            <span className="font-semibold text-amber-800 ml-2">[{item.category}]</span>
+-                                            <span className="font-bold text-slate-800">{item.title}</span>
+-                                        </div>
+-                                        <button
+-                                            type="button"
+-                                            onClick={() => handleRemoveItem(item.id)}
+-                                            className="text-rose-600 hover:text-rose-800 font-semibold"
+-                                        >
+-                                            מחק
+-                                        </button>
+-                                    </div>
+-                                ))}
+-                            </div>
+-                        </div>
+-
+-                    </div>
+-
+-                    {/* Email Live Preview Column */}
+-                    <div className="lg:col-span-7">
+-                        <div className="bg-slate-200/70 p-4 sm:p-6 rounded-3xl border border-slate-300/80 shadow-inner">
+-                            <div className="text-center pb-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+-                                תצוגה מקדימה של המייל (Email Client Preview)
+-                            </div>
+-
+-                            {/* Simulated Email Canvas */}
+-                            <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-md overflow-hidden border border-slate-200 text-slate-800 font-sans">
+-
+-                                {/* Email Header */}
+-                                <div className="bg-amber-800 text-white p-6 text-center">
+-                                    <div className="w-12 h-12 rounded-2xl bg-white text-amber-800 font-extrabold text-2xl flex items-center justify-center mx-auto mb-2 shadow-xs">
+-                                        ת
+-                                    </div>
+-                                    <h2 className="text-xl font-bold tracking-tight">קהילת תפארת תימן</h2>
+-                                    <p className="text-amber-200 text-xs mt-1">{subject}</p>
+-                                </div>
+-
+-                                {/* Email Content Body */}
+-                                <div className="p-6 space-y-6 divide-y divide-slate-100">
+-                                    {items.map((item) => (
+-                                        <div key={item.id} className="pt-5 first:pt-0 space-y-2">
+-                                            <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800">
+-                                                {item.category}
+-                                            </span>
+-                                            <h3 className="text-base font-bold text-slate-900">{item.title}</h3>
+-                                            <p className="text-xs text-slate-600 leading-relaxed">{item.body}</p>
+-
+-                                            {item.imageUrl && (
+-                                                <div className="mt-2 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 h-40 flex items-center justify-center text-xs text-slate-400">
+-                                                    תמונה מצורפת: {item.imageUrl}
+-                                                </div>
+-                                            )}
+-                                        </div>
+-                                    ))}
+-
+-                                    {items.length === 0 && (
+-                                        <p className="text-center text-xs text-slate-400 py-8">
+-                                            הניוזלטר ריק. הוסף אייטמים משמאל כדי לראותם כאן.
+-                                        </p>
+-                                    )}
+-                                </div>
+-
+-                                {/* Email Footer */}
+-                                <div className="bg-slate-50 p-6 text-center border-t border-slate-100 space-y-2 text-xs text-slate-400">
+-                                    <p className="font-medium text-slate-600">קהילת תפארת תימן • רחוב שבזי, בני ברק</p>
+-                                    <p>נשלח אליך מאחר שאתה רשום בפורטל הקהילה.</p>
+-                                    <div className="pt-2 text-[10px] text-slate-400">
+-                                        <span className="underline cursor-pointer">עדכון הגדרות קבלה</span> •{" "}
+-                                        <span className="underline cursor-pointer">הסרה מרשימת תפוצה</span>
+-                                    </div>
+-                                </div>
+-
+-                            </div>
+-                        </div>
+-                    </div>
+-
+-                </div>
+-
+-            </div>
+-        </div>
++        <NewsletterClient
++            recipientCount={data.recipientCount}
++            emailConfigured={data.emailConfigured}
++            newsletters={data.newsletters}
++        />
+     );
+-}
+\ No newline at end of file
++}
+diff --git a/src/app/admin/page.tsx b/src/app/admin/page.tsx
+index dd82f74..05d21bd 100644
+--- a/src/app/admin/page.tsx
++++ b/src/app/admin/page.tsx
+@@ -17,13 +17,17 @@ export default async function AdminDashboardPage() {
+         redirect("/login");
+     }
+ 
+-    const { pendingRequests, members, recentTransactions } = await getAdminDashboardData();
++    const { pendingRequests, members, recentTransactions, totalIncome, fundBreakdown, recurringCount } =
++        await getAdminDashboardData();
+ 
+     return (
+         <AdminDashboardClient
+             pendingRequests={pendingRequests}
+             members={members}
+             transactions={recentTransactions}
++            totalIncome={totalIncome}
++            fundBreakdown={fundBreakdown}
++            recurringCount={recurringCount}
+         />
+     );
+ }
+diff --git a/src/app/api/nedarim/webhook/route.ts b/src/app/api/nedarim/webhook/route.ts
+index a60a173..7e20559 100644
+--- a/src/app/api/nedarim/webhook/route.ts
++++ b/src/app/api/nedarim/webhook/route.ts
+@@ -10,6 +10,11 @@ interface NedarimWebhookPayload {
+     Email?: string;
+     Target?: string;
+     Status?: string;
++    // PLACEHOLDER: the real field name(s) Nedarim Plus uses to flag a
++    // recurring (standing order) charge, and to group installments of the
++    // same standing order, are not yet known - update this interface and
++    // the isRecurring/recurringId mapping below once their webhook docs are
++    // available. Until then every transaction is recorded as one-time.
+     [key: string]: unknown;
+ }
+ 
+@@ -80,6 +85,12 @@ export async function POST(request: NextRequest) {
+                 phone: clientPhone || null,
+                 email: clientEmail || null,
+                 memberId: matchedMemberId,
++                // PLACEHOLDER: replace with the real field(s) once Nedarim
++                // Plus's recurring-payment payload shape is known, e.g.:
++                // isRecurring: payload.IsTashlumim === "1",
++                // recurringId: payload.HoraatKevaId ?? null,
++                isRecurring: false,
++                recurringId: null,
+             },
+         });
+ 
+diff --git a/src/app/page.tsx b/src/app/page.tsx
+index 4a5de84..7273200 100644
+--- a/src/app/page.tsx
++++ b/src/app/page.tsx
+@@ -40,6 +40,12 @@ export default function HomePage() {
+           </div>
+ 
+           <nav className="flex items-center gap-2">
++            <Link
++              href="/donate"
++              className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-xs"
++            >
++              תרומה
++            </Link>
+             <Link
+               href="/login"
+               className="px-4 py-2 text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors"
+diff --git a/src/app/profile/ProfileClient.tsx b/src/app/profile/ProfileClient.tsx
+index 771a464..842c016 100644
+--- a/src/app/profile/ProfileClient.tsx
++++ b/src/app/profile/ProfileClient.tsx
+@@ -24,23 +24,35 @@ interface ProfileMember {
+     halachicStatus: string;
+     showPhoneInDirectory: boolean;
+     showAddressInDirectory: boolean;
++    receiveNewsletter: boolean;
+     toddlerChildren: number;
+     elementaryChildren: number;
+     teenChildren: number;
+ }
+ 
++interface DonationRecord {
++    id: string;
++    amount: number;
++    targetFund: string;
++    isRecurring: boolean;
++    createdAt: Date;
++}
++
+ interface ProfileClientProps {
+     member: ProfileMember;
+     yahrzeits: YahrzeitRecord[];
++    donations: DonationRecord[];
++    totalDonated: number;
+ }
+ 
+-export default function ProfileClient({ member, yahrzeits }: ProfileClientProps) {
++export default function ProfileClient({ member, yahrzeits, donations, totalDonated }: ProfileClientProps) {
+     const router = useRouter();
+     const [isPending, startTransition] = useTransition();
+ 
+     const [halachicStatus, setHalachicStatus] = useState<HalachicStatus>(member.halachicStatus as HalachicStatus);
+     const [showPhoneInDirectory, setShowPhoneInDirectory] = useState(member.showPhoneInDirectory);
+     const [showAddressInDirectory, setShowAddressInDirectory] = useState(member.showAddressInDirectory);
++    const [receiveNewsletter, setReceiveNewsletter] = useState(member.receiveNewsletter);
+     const [childrenAges, setChildrenAges] = useState({
+         toddler: member.toddlerChildren,
+         elementary: member.elementaryChildren,
+@@ -55,6 +67,7 @@ export default function ProfileClient({ member, yahrzeits }: ProfileClientProps)
+                 halachicStatus,
+                 showPhoneInDirectory,
+                 showAddressInDirectory,
++                receiveNewsletter,
+                 toddlerChildren: childrenAges.toddler,
+                 elementaryChildren: childrenAges.elementary,
+                 teenChildren: childrenAges.teen,
+@@ -219,6 +232,15 @@ export default function ProfileClient({ member, yahrzeits }: ProfileClientProps)
+                                     />
+                                     הצג את כתובת המגורים שלי באלפון
+                                 </label>
++                                <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
++                                    <input
++                                        type="checkbox"
++                                        checked={receiveNewsletter}
++                                        onChange={(e) => setReceiveNewsletter(e.target.checked)}
++                                        className="rounded-md border-slate-300 text-amber-600 focus:ring-amber-500"
++                                    />
++                                    קבלת ניוזלטר קהילתי במייל
++                                </label>
+                             </div>
+                         </div>
+                     </div>
+@@ -407,6 +429,53 @@ export default function ProfileClient({ member, yahrzeits }: ProfileClientProps)
+                     </div>
+                 </div>
+ 
++                {/* Section 4: My Donations */}
++                <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
++                    <div className="flex items-center justify-between pb-2 border-b border-slate-100">
++                        <div>
++                            <h2 className="text-lg font-bold text-slate-900">היסטוריית תרומות</h2>
++                            <p className="text-xs text-slate-500">תרומות שסונכרנו ממערכת נדרים פלוס</p>
++                        </div>
++                        <Link
++                            href="/donate"
++                            className="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold rounded-lg transition-colors"
++                        >
++                            תרומה נוספת
++                        </Link>
++                    </div>
++
++                    {donations.length === 0 ? (
++                        <p className="text-sm text-slate-400 py-4 text-center">
++                            עדיין לא נרשמו תרומות תחת כתובת המייל או מספר הטלפון שלך.
++                        </p>
++                    ) : (
++                        <>
++                            <div className="p-4 bg-emerald-50/60 rounded-xl border border-emerald-200/70">
++                                <span className="text-xs text-emerald-800">סך כל התרומות</span>
++                                <p className="text-2xl font-extrabold text-emerald-900">₪{totalDonated.toLocaleString()}</p>
++                            </div>
++                            <div className="divide-y divide-slate-100">
++                                {donations.map((d) => (
++                                    <div key={d.id} className="py-2.5 flex items-center justify-between text-sm">
++                                        <div>
++                                            <span className="font-semibold text-slate-800">₪{d.amount.toLocaleString()}</span>
++                                            <span className="text-xs text-slate-500 mr-2">{d.targetFund}</span>
++                                            {d.isRecurring && (
++                                                <span className="mr-2 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-sky-100 text-sky-800">
++                                                    הוראת קבע
++                                                </span>
++                                            )}
++                                        </div>
++                                        <span className="text-xs text-slate-400">
++                                            {new Date(d.createdAt).toLocaleDateString("he-IL")}
++                                        </span>
++                                    </div>
++                                ))}
++                            </div>
++                        </>
++                    )}
++                </div>
++
+             </div>
+         </div>
+     );
+diff --git a/src/app/profile/page.tsx b/src/app/profile/page.tsx
+index 6be1840..9ee674f 100644
+--- a/src/app/profile/page.tsx
++++ b/src/app/profile/page.tsx
+@@ -25,5 +25,19 @@ export default async function ProfilePage() {
+         redirect("/login");
+     }
+ 
+-    return <ProfileClient member={member} yahrzeits={member.yahrzeits} />;
++    const donations = await prisma.transaction.findMany({
++        where: { memberId: member.id },
++        orderBy: { createdAt: "desc" },
++        select: { id: true, amount: true, targetFund: true, isRecurring: true, createdAt: true },
++    });
++    const totalDonated = donations.reduce((sum: number, d: (typeof donations)[number]) => sum + d.amount, 0);
++
++    return (
++        <ProfileClient
++            member={member}
++            yahrzeits={member.yahrzeits}
++            donations={donations}
++            totalDonated={totalDonated}
++        />
++    );
+ }

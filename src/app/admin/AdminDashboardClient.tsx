@@ -32,13 +32,22 @@ interface TransactionRecord {
     clientName: string;
     amount: number;
     targetFund: string;
+    isRecurring: boolean;
     createdAt: Date;
+}
+
+interface FundBreakdownEntry {
+    targetFund: string;
+    total: number;
 }
 
 interface AdminDashboardClientProps {
     pendingRequests: PendingRequest[];
     members: MemberRecord[];
     transactions: TransactionRecord[];
+    totalIncome: number;
+    fundBreakdown: FundBreakdownEntry[];
+    recurringCount: number;
 }
 
 // Generates a random, readable initial password for a newly-approved member.
@@ -52,6 +61,9 @@ export default function AdminDashboardClient({
     pendingRequests,
     members,
     transactions,
+    totalIncome,
+    fundBreakdown,
+    recurringCount,
 }: AdminDashboardClientProps) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
@@ -143,7 +155,7 @@ export default function AdminDashboardClient({
                 </div>
 
                 {/* Stats Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
                         <div className="text-xs text-slate-500">בקשות ממתינות לאישור</div>
                         <div className="text-2xl font-bold text-amber-600 mt-1">{pendingRequests.length}</div>
@@ -153,8 +165,12 @@ export default function AdminDashboardClient({
                         <div className="text-2xl font-bold text-slate-900 mt-1">{members.length}</div>
                     </div>
                     <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-                        <div className="text-xs text-slate-500">עסקאות נדרים פלוס אחרונות</div>
-                        <div className="text-2xl font-bold text-emerald-600 mt-1">{transactions.length}</div>
+                        <div className="text-xs text-slate-500">סה&quot;כ תרומות (נדרים פלוס)</div>
+                        <div className="text-2xl font-bold text-emerald-600 mt-1">₪{totalIncome.toLocaleString()}</div>
+                    </div>
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <div className="text-xs text-slate-500">הוראות קבע</div>
+                        <div className="text-2xl font-bold text-sky-600 mt-1">{recurringCount}</div>
                     </div>
                 </div>
 
@@ -313,6 +329,69 @@ export default function AdminDashboardClient({
                             </table>
                         </div>
                     )}
+                </div>
+
+                {/* Donations Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                        <div className="px-6 py-4 border-b border-slate-100">
+                            <h2 className="text-sm font-bold text-slate-900">התפלגות תרומות לפי יעד</h2>
+                        </div>
+                        {fundBreakdown.length === 0 ? (
+                            <div className="p-6 text-center text-xs text-slate-400">אין עדיין תרומות רשומות</div>
+                        ) : (
+                            <div className="divide-y divide-slate-100">
+                                {fundBreakdown.map((f) => (
+                                    <div key={f.targetFund} className="px-6 py-3 flex items-center justify-between text-xs">
+                                        <span className="text-slate-700">{f.targetFund}</span>
+                                        <span className="font-bold text-slate-900">₪{f.total.toLocaleString()}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                        <div className="px-6 py-4 border-b border-slate-100">
+                            <h2 className="text-sm font-bold text-slate-900">תרומות אחרונות</h2>
+                        </div>
+                        {transactions.length === 0 ? (
+                            <div className="p-6 text-center text-xs text-slate-400">אין עדיין תרומות רשומות</div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-right text-xs">
+                                    <thead className="bg-slate-50 text-slate-500 font-medium">
+                                        <tr>
+                                            <th className="px-6 py-3">תורם</th>
+                                            <th className="px-6 py-3">סכום</th>
+                                            <th className="px-6 py-3">יעד</th>
+                                            <th className="px-6 py-3">סוג</th>
+                                            <th className="px-6 py-3">תאריך</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 text-slate-700">
+                                        {transactions.map((tx) => (
+                                            <tr key={tx.id} className="hover:bg-slate-50/50">
+                                                <td className="px-6 py-3 font-semibold text-slate-900">{tx.clientName}</td>
+                                                <td className="px-6 py-3">₪{tx.amount.toLocaleString()}</td>
+                                                <td className="px-6 py-3">{tx.targetFund}</td>
+                                                <td className="px-6 py-3">
+                                                    {tx.isRecurring ? (
+                                                        <span className="px-2 py-0.5 rounded-md bg-sky-100 text-sky-800">הוראת קבע</span>
+                                                    ) : (
+                                                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">חד פעמי</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-3 text-slate-500">
+                                                    {new Date(tx.createdAt).toLocaleDateString("he-IL")}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
