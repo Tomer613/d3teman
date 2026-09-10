@@ -10,7 +10,7 @@ export default async function AdminDashboardPage() {
     // letting getAdminDashboardData's try/catch swallow it into an empty
     // dashboard. requireAdmin re-checks the role against the database, so a
     // demoted gabay is rejected immediately rather than for up to 30 days.
-    await requireAdminOrRedirect();
+    const session = await requireAdminOrRedirect();
 
     const { pendingRequests, members, recentTransactions, totalIncome, fundBreakdown, recurringCount } =
         await getAdminDashboardData();
@@ -23,6 +23,8 @@ export default async function AdminDashboardPage() {
             totalIncome={totalIncome}
             fundBreakdown={fundBreakdown}
             recurringCount={recurringCount}
+            viewerRole={session.role}
+            viewerId={session.sub}
         />
     );
 }

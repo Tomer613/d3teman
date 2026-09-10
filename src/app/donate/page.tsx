@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { COMMUNITY_NAME } from "@/lib/branding";
 
 function getDonateUrl(): string | null {
     const url = process.env.NEDARIM_DONATE_URL;
@@ -18,7 +19,7 @@ export default function DonatePage() {
                     <Link href="/" className="inline-block text-xs font-semibold text-amber-700 hover:text-amber-800 mb-2">
                         ← חזרה לדף הבית
                     </Link>
-                    <h1 className="text-2xl font-bold text-slate-900">תרומה לקהילת תפארת תימן</h1>
+                    <h1 className="text-2xl font-bold text-slate-900">תרומה ל{COMMUNITY_NAME}</h1>
                     <p className="text-sm text-slate-500 mt-1">
                         כל תרומה, גדולה כקטנה, תומכת בפעילות בית הכנסת ובקהילה
                     </p>

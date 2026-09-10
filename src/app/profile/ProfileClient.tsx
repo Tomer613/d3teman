@@ -145,7 +145,7 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
             <div className="max-w-4xl mx-auto space-y-8">
 
                 {/* Top Header */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <Link href="/" className="text-xs font-semibold text-amber-700 hover:text-amber-800">
                             ← חזרה לדף הבית
@@ -157,7 +157,7 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                             הפרטים מסייעים לגבאים בשיבוץ עליות, תיאום השכבות ופעילות קהילתית
                         </p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                         <button
                             type="button"
                             onClick={handleSaveProfile}

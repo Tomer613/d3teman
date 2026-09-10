@@ -48,19 +48,6 @@ export interface MemberProfile {
     createdAt: string;
 }
 
-// Community announcements and celebrations
-export type EventType = "brit_yitzchak" | "shabbat_chatan" | "bar_mitzvah" | "wedding" | "general";
-
-export interface CommunityEvent {
-    id: string;
-    title: string;
-    type: EventType;
-    description: string;
-    eventDate: string;
-    memberId?: string; // Optional reference to the celebrating member
-    location?: string;
-}
-
 // Nedarim Plus transaction payload skeleton
 export interface NedarimTransaction {
     transactionId: string;

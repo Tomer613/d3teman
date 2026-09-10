@@ -127,3 +127,64 @@ export async function rejectJoinRequest(requestId: string) {
         return { success: false as const, error: "Failed to dismiss request" };
     }
 }
+
+const VALID_ROLES = new Set(["member", "gabay", "super_admin"]);
+
+// Changing roles is restricted to super_admin (stricter than the general
+// requireAdmin gabay-or-super_admin check) to prevent a gabay self-escalating.
+export async function updateMemberRole(memberId: string, newRole: string) {
+    try {
+        const session = await requireAdmin();
+        if (session.role !== "super_admin") {
+            return { success: false as const, error: "Only a super admin can change roles" };
+        }
+        if (!VALID_ROLES.has(newRole)) {
+            return { success: false as const, error: "Invalid role" };
+        }
+        if (memberId === session.sub && newRole !== "super_admin") {
+            return { success: false as const, error: "You cannot remove your own super admin role" };
+        }
+
+        await prisma.member.update({
+            where: { id: memberId },
+            data: { role: newRole },
+        });
+
+        revalidatePath("/admin");
+        return { success: true as const };
+    } catch (error) {
+        console.error("[Update Member Role Error]:", error);
+        return { success: false as const, error: "Failed to update role" };
+    }
+}
+
+// Deactivate/reactivate a member - gabay-level, same permission as approving
+// a join request in the first place. Deactivating a super_admin still
+// requires super_admin, so a gabay can't lock out a super_admin this way.
+export async function setMemberApproval(memberId: string, isApproved: boolean) {
+    try {
+        const session = await requireAdmin();
+        if (memberId === session.sub && !isApproved) {
+            return { success: false as const, error: "You cannot deactivate your own account" };
+        }
+
+        if (!isApproved) {
+            const target = await prisma.member.findUnique({ where: { id: memberId }, select: { role: true } });
+            if (target?.role === "super_admin" && session.role !== "super_admin") {
+                return { success: false as const, error: "Only a super admin can deactivate a super admin" };
+            }
+        }
+
+        await prisma.member.update({
+            where: { id: memberId },
+            data: { isApproved },
+        });
+
+        revalidatePath("/admin");
+        revalidatePath("/directory");
+        return { success: true as const };
+    } catch (error) {
+        console.error("[Set Member Approval Error]:", error);
+        return { success: false as const, error: "Failed to update member status" };
+    }
+}

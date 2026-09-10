@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { login } from "@/app/actions/auth";
+import CommunityLogo from "@/components/CommunityLogo";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -32,9 +33,7 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-                <div className="w-12 h-12 rounded-2xl bg-amber-600 mx-auto flex items-center justify-center text-white font-bold text-xl shadow-sm mb-4">
-                    ת
-                </div>
+                <CommunityLogo size="md" className="mx-auto mb-4" />
                 <h2 className="text-2xl font-bold tracking-tight text-slate-900">
                     כניסה לפורטל הקהילה
                 </h2>

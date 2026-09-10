@@ -1,45 +1,30 @@
 import Link from "next/link";
-import { CommunityEvent } from "@/types";
+import { COMMUNITY_NAME, COMMUNITY_TAGLINE } from "@/lib/branding";
+import CommunityLogo from "@/components/CommunityLogo";
+import EventCard from "@/components/EventCard";
+import { getUpcomingEvents } from "@/app/actions/events";
 
-// Mock community events demonstrating localized structure
-const UPCOMING_EVENTS: CommunityEvent[] = [
-  {
-    id: "1",
-    title: "ברית יצחק - משפחת שרעבי",
-    type: "brit_yitzchak",
-    description: "לימוד וסעודת מצווה בליל הברית לקראת הכנסת הבן בבריתו של אברהם אבינו.",
-    eventDate: "יום שלישי, אור לכ\"ג בשבט, בשעה 20:30",
-    location: "בית משפחת שרעבי, רחוב שבזי 14",
-  },
-  {
-    id: "2",
-    title: "שבת חתן - משפחת מחפוד",
-    type: "shabbat_chatan",
-    description: "עליות ותפילת שחרית חגיגית לכבוד נישואי הבן ינון הי\"ו.",
-    eventDate: "שבת פרשת יתרו",
-    location: "בית הכנסת המרכזי",
-  },
-];
+export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const events = await getUpcomingEvents();
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-xs">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
-              ת
-            </div>
-            <div>
-              <span className="font-bold text-lg text-slate-800 tracking-tight block leading-tight">
-                קהילת תפארת תימן
+            <CommunityLogo size="sm" />
+            <div className="min-w-0">
+              <span className="font-bold text-base sm:text-lg text-slate-800 tracking-tight block leading-tight">
+                {COMMUNITY_NAME}
               </span>
-              <span className="text-xs text-slate-500">פורטל החברים והגבאות</span>
+              <span className="text-xs text-slate-500">{COMMUNITY_TAGLINE}</span>
             </div>
           </div>
 
-          <nav className="flex items-center gap-2">
+          <nav className="flex flex-wrap items-center gap-2">
             <Link
               href="/donate"
               className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-xs"
@@ -80,9 +65,9 @@ export default function HomePage() {
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">שמחות החודש</p>
-            <p className="text-3xl font-extrabold text-amber-600 mt-2">3</p>
-            <p className="text-xs text-slate-500 font-medium mt-1">ברית יצחק, שבת חתן ובר מצווה</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">שמחות קרובות</p>
+            <p className="text-3xl font-extrabold text-amber-600 mt-2">{events.length}</p>
+            <p className="text-xs text-slate-500 font-medium mt-1">אירועים מתוכננים בשבועות הקרובים</p>
           </div>
         </section>
 
@@ -93,30 +78,24 @@ export default function HomePage() {
             <span className="text-xs text-slate-500">מעודכן ללוח השבועי</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {UPCOMING_EVENTS.map((event) => (
-              <div
-                key={event.id}
-                className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-amber-300 transition-colors"
-              >
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
-                      {event.type === "brit_yitzchak" ? "ברית יצחק" : "שבת חתן"}
-                    </span>
-                    <span className="text-xs text-slate-400">•</span>
-                    <span className="text-xs font-medium text-slate-600">{event.eventDate}</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">{event.title}</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed mb-4">{event.description}</p>
-                </div>
-
-                <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                  <span>מיקום: {event.location}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+          {events.length === 0 ? (
+            <div className="bg-white p-8 rounded-2xl border border-slate-200/80 text-center text-sm text-slate-400">
+              אין כרגע אירועים קרובים מתוכננים.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {events.map((event) => (
+                <EventCard
+                  key={event.id}
+                  title={event.title}
+                  type={event.type}
+                  description={event.description}
+                  eventDateLabel={event.eventDateLabel}
+                  location={event.location}
+                />
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Join Community Callout */}

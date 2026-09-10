@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { submitJoinRequest } from "@/app/actions/join-request";
+import { COMMUNITY_CITY } from "@/lib/branding";
 
 export default function JoinRequestPage() {
     const [submitted, setSubmitted] = useState(false);
@@ -134,7 +135,7 @@ export default function JoinRequestPage() {
                                     value={formData.address}
                                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                                     className="mt-1 block w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600 focus:bg-white"
-                                    placeholder="רחוב שבזי 10"
+                                    placeholder="לדוגמה: רחוב הראשי 10"
                                 />
                             </div>
                             <div>
@@ -145,7 +146,7 @@ export default function JoinRequestPage() {
                                     value={formData.city}
                                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                                     className="mt-1 block w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600 focus:bg-white"
-                                    placeholder="בני ברק"
+                                    placeholder={COMMUNITY_CITY}
                                 />
                             </div>
                         </div>

@@ -1,13 +1,26 @@
 "use server";
 
+import fs from "fs";
+import path from "path";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { getResendClient, getFromAddress, isEmailConfigured } from "@/lib/resend";
 import { createUnsubscribeToken, getAppUrl } from "@/lib/unsubscribe";
+import { LOGO_PATH } from "@/lib/branding";
 import { render } from "@react-email/render";
 import NewsletterEmail from "@/emails/NewsletterEmail";
 import { revalidatePath } from "next/cache";
+
+// Resolves to an absolute logo URL only once a real file has been dropped at
+// public/logo.png - NewsletterEmail falls back to the letter badge otherwise.
+function getEmailLogoUrl(): string | undefined {
+    const logoFilePath = path.join(process.cwd(), "public", LOGO_PATH.replace(/^\//, ""));
+    if (!fs.existsSync(logoFilePath)) {
+        return undefined;
+    }
+    return `${getAppUrl()}${LOGO_PATH}`;
+}
 
 export interface NewsletterItemInput {
     category: string;
@@ -150,6 +163,7 @@ export async function sendTestEmail(data: SendTestEmailInput) {
                 subject: `[בדיקה] ${data.subject}`,
                 items: data.items,
                 unsubscribeUrl: `${getAppUrl()}/unsubscribe?token=${unsubscribeToken}`,
+                logoUrl: getEmailLogoUrl(),
             })
         );
 
@@ -232,6 +246,7 @@ export async function sendNewsletter(newsletterId: string) {
 
         const from = getFromAddress();
         const appUrl = getAppUrl();
+        const logoUrl = getEmailLogoUrl();
         const resend = getResendClient();
 
         // Sent as one email per recipient (rather than one email with every
@@ -247,6 +262,7 @@ export async function sendNewsletter(newsletterId: string) {
                             subject: newsletter.subject,
                             items,
                             unsubscribeUrl: `${appUrl}/unsubscribe?token=${unsubscribeToken}`,
+                            logoUrl,
                         })
                     );
                     return { from, to: r.email, subject: newsletter.subject, html };

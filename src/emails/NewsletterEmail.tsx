@@ -1,4 +1,5 @@
 import { Body, Container, Head, Heading, Hr, Html, Img, Preview, Section, Text } from "@react-email/components";
+import { COMMUNITY_NAME, COMMUNITY_ADDRESS_LINE, LOGO_INITIAL } from "@/lib/branding";
 
 export interface NewsletterEmailItem {
     category: string;
@@ -11,9 +12,12 @@ export interface NewsletterEmailProps {
     subject: string;
     items: NewsletterEmailItem[];
     unsubscribeUrl?: string;
+    // Absolute URL to the real logo - resolved server-side (email clients
+    // can't do a client-side onError fallback the way <CommunityLogo> does).
+    logoUrl?: string;
 }
 
-export default function NewsletterEmail({ subject, items, unsubscribeUrl }: NewsletterEmailProps) {
+export default function NewsletterEmail({ subject, items, unsubscribeUrl, logoUrl }: NewsletterEmailProps) {
     return (
         <Html dir="rtl" lang="he">
             <Head />
@@ -21,8 +25,12 @@ export default function NewsletterEmail({ subject, items, unsubscribeUrl }: News
             <Body style={main}>
                 <Container style={container}>
                     <Section style={header}>
-                        <div style={logoCircle}>ת</div>
-                        <Heading style={communityName}>קהילת תפארת תימן</Heading>
+                        {logoUrl ? (
+                            <Img src={logoUrl} width="48" height="48" alt={COMMUNITY_NAME} style={logoImage} />
+                        ) : (
+                            <div style={logoCircle}>{LOGO_INITIAL}</div>
+                        )}
+                        <Heading style={communityName}>{COMMUNITY_NAME}</Heading>
                         <Text style={subjectText}>{subject}</Text>
                     </Section>
 
@@ -41,7 +49,7 @@ export default function NewsletterEmail({ subject, items, unsubscribeUrl }: News
                     </Section>
 
                     <Section style={footer}>
-                        <Text style={footerText}>קהילת תפארת תימן • רחוב שבזי, בני ברק</Text>
+                        <Text style={footerText}>{COMMUNITY_NAME} • {COMMUNITY_ADDRESS_LINE}</Text>
                         <Text style={footerText}>נשלח אליך מאחר שאתה רשום בפורטל הקהילה.</Text>
                         {unsubscribeUrl && (
                             <Text style={footerLink}>
@@ -77,6 +85,7 @@ const logoCircle = {
     textAlign: "center" as const,
     margin: "0 auto 8px",
 };
+const logoImage = { borderRadius: "16px", margin: "0 auto 8px", display: "block" };
 const communityName = { color: "#ffffff", fontSize: "20px", fontWeight: "bold", margin: "0" };
 const subjectText = { color: "#fde68a", fontSize: "13px", marginTop: "4px" };
 const content = { padding: "24px" };

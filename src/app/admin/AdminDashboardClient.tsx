@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { approveJoinRequest, rejectJoinRequest } from "@/app/actions/admin";
+import { approveJoinRequest, rejectJoinRequest, updateMemberRole, setMemberApproval } from "@/app/actions/admin";
 import { logout } from "@/app/actions/auth";
 
 interface PendingRequest {
@@ -25,7 +25,15 @@ interface MemberRecord {
     phone: string;
     email: string;
     halachicStatus: string;
+    role: string;
+    isApproved: boolean;
 }
+
+const ROLE_LABELS: Record<string, string> = {
+    member: "חבר",
+    gabay: "גבאי",
+    super_admin: "מנהל על",
+};
 
 interface TransactionRecord {
     id: string;
@@ -48,6 +56,8 @@ interface AdminDashboardClientProps {
     totalIncome: number;
     fundBreakdown: FundBreakdownEntry[];
     recurringCount: number;
+    viewerRole: string;
+    viewerId: string;
 }
 
 // Generates a random, readable initial password for a newly-approved member.
@@ -64,6 +74,8 @@ export default function AdminDashboardClient({
     totalIncome,
     fundBreakdown,
     recurringCount,
+    viewerRole,
+    viewerId,
 }: AdminDashboardClientProps) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
@@ -71,6 +83,31 @@ export default function AdminDashboardClient({
     const [pendingApproval, setPendingApproval] = useState<{ id: string; password: string } | null>(null);
     const [approveError, setApproveError] = useState<string | null>(null);
     const [rejectError, setRejectError] = useState<string | null>(null);
+    const [memberActionError, setMemberActionError] = useState<string | null>(null);
+
+    const handleRoleChange = (memberId: string, newRole: string) => {
+        setMemberActionError(null);
+        startTransition(async () => {
+            const result = await updateMemberRole(memberId, newRole);
+            if (!result.success) {
+                setMemberActionError(result.error);
+                return;
+            }
+            router.refresh();
+        });
+    };
+
+    const handleToggleApproval = (memberId: string, isApproved: boolean) => {
+        setMemberActionError(null);
+        startTransition(async () => {
+            const result = await setMemberApproval(memberId, !isApproved);
+            if (!result.success) {
+                setMemberActionError(result.error);
+                return;
+            }
+            router.refresh();
+        });
+    };
 
     const handleStartApprove = (id: string) => {
         setApproveError(null);
@@ -131,7 +168,19 @@ export default function AdminDashboardClient({
                             אישור מצטרפים חדשים, מעקב גבייה וסנכרון תרומות
                         </p>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
+                        <Link
+                            href="/admin/events"
+                            className="px-3.5 py-2 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                        >
+                            אירועים ושמחות
+                        </Link>
+                        <Link
+                            href="/admin/newsletter"
+                            className="px-3.5 py-2 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                        >
+                            ניוזלטר
+                        </Link>
                         <Link
                             href="/directory"
                             className="px-3.5 py-2 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
@@ -287,9 +336,15 @@ export default function AdminDashboardClient({
                 <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
                     <div className="px-6 py-4 border-b border-slate-100">
                         <h2 className="text-sm font-bold text-slate-900">
-                            חברי קהילה מאושרים במערכת ({members.length})
+                            חברי קהילה במערכת ({members.length})
                         </h2>
                     </div>
+
+                    {memberActionError && (
+                        <div className="mx-6 mt-4 px-3.5 py-2.5 bg-rose-50 border border-rose-200 rounded-xl text-xs font-medium text-rose-700">
+                            {memberActionError}
+                        </div>
+                    )}
 
                     {members.length === 0 ? (
                         <div className="p-8 text-center text-sm text-slate-400">
@@ -304,6 +359,9 @@ export default function AdminDashboardClient({
                                         <th className="px-6 py-3">טלפון</th>
                                         <th className="px-6 py-3">מייל</th>
                                         <th className="px-6 py-3">מעמד הלכתי</th>
+                                        <th className="px-6 py-3">תפקיד</th>
+                                        <th className="px-6 py-3">סטטוס</th>
+                                        <th className="px-6 py-3">פעולות</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -322,6 +380,47 @@ export default function AdminDashboardClient({
                                                             ? "לוי"
                                                             : "ישראל"}
                                                 </span>
+                                            </td>
+                                            <td className="px-6 py-3">
+                                                {viewerRole === "super_admin" ? (
+                                                    <select
+                                                        value={m.role}
+                                                        disabled={isPending}
+                                                        onChange={(e) => handleRoleChange(m.id, e.target.value)}
+                                                        className="px-2 py-1 bg-white border border-slate-300 rounded-lg text-xs disabled:bg-slate-100"
+                                                    >
+                                                        {Object.entries(ROLE_LABELS).map(([value, label]) => (
+                                                            <option key={value} value={value}>{label}</option>
+                                                        ))}
+                                                    </select>
+                                                ) : (
+                                                    <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">
+                                                        {ROLE_LABELS[m.role] ?? m.role}
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-3">
+                                                <span
+                                                    className={`px-2 py-0.5 rounded-md ${m.isApproved ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-500"
+                                                        }`}
+                                                >
+                                                    {m.isApproved ? "פעיל" : "לא פעיל"}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-3">
+                                                {m.id !== viewerId && (m.role !== "super_admin" || viewerRole === "super_admin") && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleToggleApproval(m.id, m.isApproved)}
+                                                        disabled={isPending}
+                                                        className={`px-3 py-1 rounded-lg font-semibold transition-colors disabled:opacity-50 ${m.isApproved
+                                                            ? "bg-rose-50 hover:bg-rose-100 text-rose-700"
+                                                            : "bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
+                                                            }`}
+                                                    >
+                                                        {m.isApproved ? "השבתה" : "הפעלה"}
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}

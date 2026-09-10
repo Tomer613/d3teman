@@ -11,6 +11,9 @@ import {
     sendNewsletter,
     sendTestEmail,
 } from "@/app/actions/newsletter";
+import { COMMUNITY_NAME, COMMUNITY_ADDRESS_LINE, LOGO_INITIAL } from "@/lib/branding";
+import { buildWhatsAppMessage } from "@/lib/whatsapp";
+import { copyToClipboard } from "@/lib/clipboard";
 
 type NewsletterCategory = "שמחות" | "הודעת ועד" | "זמני תפילה" | "השכבות";
 
@@ -86,6 +89,15 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
         });
     };
 
+    const handleCopyForWhatsApp = async () => {
+        const text = buildWhatsAppMessage(subject, items);
+        if (await copyToClipboard(text)) {
+            setStatusMessage({ type: "success", text: "הטקסט הועתק - ניתן להדביק בקבוצת הוואטסאפ" });
+        } else {
+            setStatusMessage({ type: "error", text: "ההעתקה נכשלה" });
+        }
+    };
+
     const handleSendTest = () => {
         setStatusMessage(null);
         startTransition(async () => {
@@ -147,7 +159,7 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                         <p className="text-sm text-slate-500">עריכת תכנים והפצה בתבנית מייל ממותגת</p>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                         <button
                             type="button"
                             onClick={handleSaveDraft}
@@ -155,6 +167,23 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                             className="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 disabled:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
                         >
                             שמירת טיוטה
+                        </button>
+                        {currentId && (
+                            <Link
+                                href={`/admin/newsletter/${currentId}/print`}
+                                target="_blank"
+                                className="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
+                            >
+                                הדפסה / PDF
+                            </Link>
+                        )}
+                        <button
+                            type="button"
+                            onClick={handleCopyForWhatsApp}
+                            disabled={items.length === 0}
+                            className="px-4 py-2 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 text-emerald-800 text-xs font-semibold rounded-xl transition-colors"
+                        >
+                            העתקה לוואטסאפ
                         </button>
                         <button
                             type="button"
@@ -442,9 +471,9 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                                 {/* Email Header */}
                                 <div className="bg-amber-800 text-white p-6 text-center">
                                     <div className="w-12 h-12 rounded-2xl bg-white text-amber-800 font-extrabold text-2xl flex items-center justify-center mx-auto mb-2 shadow-xs">
-                                        ת
+                                        {LOGO_INITIAL}
                                     </div>
-                                    <h2 className="text-xl font-bold tracking-tight">קהילת תפארת תימן</h2>
+                                    <h2 className="text-xl font-bold tracking-tight">{COMMUNITY_NAME}</h2>
                                     <p className="text-amber-200 text-xs mt-1">{subject}</p>
                                 </div>
 
@@ -475,7 +504,7 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
 
                                 {/* Email Footer */}
                                 <div className="bg-slate-50 p-6 text-center border-t border-slate-100 space-y-2 text-xs text-slate-400">
-                                    <p className="font-medium text-slate-600">קהילת תפארת תימן • רחוב שבזי, בני ברק</p>
+                                    <p className="font-medium text-slate-600">{COMMUNITY_NAME} • {COMMUNITY_ADDRESS_LINE}</p>
                                     <p>נשלח אליך מאחר שאתה רשום בפורטל הקהילה.</p>
                                     <div className="pt-2 text-[10px] text-slate-400">
                                         <span className="underline cursor-pointer">עדכון הגדרות קבלה</span> •{" "}

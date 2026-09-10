@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Rubik } from "next/font/google";
+import { COMMUNITY_NAME } from "@/lib/branding";
 import "./globals.css";
 
 // Configure Hebrew-supporting Google Font
@@ -10,8 +11,8 @@ const rubik = Rubik({
 });
 
 export const metadata: Metadata = {
-  title: "פורטל הקהילה",
-  description: "מערכת ניהול וחיבור קהילתי",
+  title: `${COMMUNITY_NAME} | פורטל הקהילה`,
+  description: `מערכת ניהול וחיבור קהילתי - ${COMMUNITY_NAME}`,
 };
 
 export default function RootLayout({
