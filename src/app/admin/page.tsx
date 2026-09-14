@@ -1,5 +1,6 @@
 import { requireAdminOrRedirect } from "@/lib/auth";
 import { getAdminDashboardData } from "@/app/actions/admin";
+import GatedHeader from "@/components/layout/GatedHeader";
 import AdminDashboardClient from "./AdminDashboardClient";
 
 // Always dynamic: reads the session cookie to authorize the request.
@@ -16,15 +17,18 @@ export default async function AdminDashboardPage() {
         await getAdminDashboardData();
 
     return (
-        <AdminDashboardClient
-            pendingRequests={pendingRequests}
-            members={members}
-            transactions={recentTransactions}
-            totalIncome={totalIncome}
-            fundBreakdown={fundBreakdown}
-            recurringCount={recurringCount}
-            viewerRole={session.role}
-            viewerId={session.sub}
-        />
+        <>
+            <GatedHeader />
+            <AdminDashboardClient
+                pendingRequests={pendingRequests}
+                members={members}
+                transactions={recentTransactions}
+                totalIncome={totalIncome}
+                fundBreakdown={fundBreakdown}
+                recurringCount={recurringCount}
+                viewerRole={session.role}
+                viewerId={session.sub}
+            />
+        </>
     );
 }

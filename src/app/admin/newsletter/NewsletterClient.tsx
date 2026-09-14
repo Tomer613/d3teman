@@ -152,10 +152,7 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                 {/* Navigation & Actions */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <Link href="/admin" className="text-xs font-semibold text-primary hover:text-primary-hover">
-                            ← חזרה לפאנל ניהול
-                        </Link>
-                        <h1 className="text-2xl font-bold text-text mt-1">עורך ניוזלטר קהילתי</h1>
+                        <h1 className="text-2xl font-bold text-text">עורך ניוזלטר קהילתי</h1>
                         <p className="text-sm text-text-muted">עריכת תכנים והפצה בתבנית מייל ממותגת</p>
                     </div>
 

@@ -1,5 +1,6 @@
 import { requireSessionOrRedirect } from "@/lib/auth";
 import { getDirectoryMembers } from "@/app/actions/directory";
+import GatedHeader from "@/components/layout/GatedHeader";
 import DirectoryClient from "./DirectoryClient";
 
 // Always dynamic: reads the session cookie to authorize the request.
@@ -10,5 +11,10 @@ export default async function DirectoryPage() {
 
     const members = await getDirectoryMembers();
 
-    return <DirectoryClient members={members} />;
+    return (
+        <>
+            <GatedHeader />
+            <DirectoryClient members={members} />
+        </>
+    );
 }

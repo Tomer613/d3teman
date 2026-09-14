@@ -19,7 +19,7 @@ const SIZE_CLASSES: Record<ButtonSize, string> = {
 };
 
 const BASE_CLASSES =
-    "inline-flex items-center justify-center gap-2 rounded-xl font-semibold shadow-xs transition-colors disabled:opacity-60 disabled:pointer-events-none";
+    "relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-xl font-semibold shadow-xs transition-colors disabled:opacity-60 disabled:pointer-events-none";
 
 function buttonClasses(variant: ButtonVariant, size: ButtonSize, fullWidth: boolean, className: string) {
     return [
@@ -59,6 +59,11 @@ export default function Button({
             {...props}
         >
             {isLoading ? loadingLabel ?? children : children}
+            {isLoading && (
+                <span className="absolute inset-x-0 bottom-0 h-1 bg-white/20" aria-hidden="true">
+                    <span className="block h-full bg-white/80 loading-bar-fill" />
+                </span>
+            )}
         </button>
     );
 }

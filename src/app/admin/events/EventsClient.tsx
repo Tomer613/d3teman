@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { createEvent, deleteEvent, updateEvent, CommunityEventRecord } from "@/app/actions/events";
 import { buildWhatsAppMessage } from "@/lib/whatsapp";
 import { copyToClipboard } from "@/lib/clipboard";
@@ -110,10 +109,7 @@ export default function EventsClient({ events }: EventsClientProps) {
             <div className="max-w-4xl mx-auto space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <Link href="/admin" className="text-xs font-semibold text-primary hover:text-primary-hover">
-                            ← חזרה לפאנל ניהול
-                        </Link>
-                        <h1 className="text-2xl font-bold text-text mt-1">שמחות ואירועים קרובים</h1>
+                        <h1 className="text-2xl font-bold text-text">שמחות ואירועים קרובים</h1>
                         <p className="text-sm text-text-muted">ניהול האירועים המוצגים בדף הבית</p>
                     </div>
                     {!isEditing && (

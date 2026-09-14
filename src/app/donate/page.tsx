@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Home } from "lucide-react";
 import { COMMUNITY_NAME } from "@/lib/branding";
 import Card from "@/components/ui/Card";
 import { LinkButton } from "@/components/ui/Button";
@@ -18,9 +19,10 @@ export default function DonatePage() {
         <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto space-y-8">
                 <div className="text-center">
-                    <Link href="/login" className="inline-block text-xs font-semibold text-primary hover:text-primary-hover mb-2">
-                        ← חזרה למסך הכניסה
-                    </Link>
+                    <LinkButton href="/login" variant="secondary" size="sm" className="mb-3">
+                        <Home className="size-4" aria-hidden="true" />
+                        <span>חזרה למסך הכניסה</span>
+                    </LinkButton>
                     <h1 className="text-2xl font-bold text-text">תרומה ל{COMMUNITY_NAME}</h1>
                     <p className="text-sm text-text-muted mt-1">
                         כל תרומה, גדולה כקטנה, תומכת בפעילות בית הכנסת ובקהילה

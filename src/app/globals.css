@@ -19,3 +19,15 @@
 body {
   font-family: var(--font-rubik), system-ui, sans-serif;
 }
+
+/* Indeterminate progress fill shown inside buttons while isLoading is true -
+   grows to ~90% and holds, since we don't know the real completion time. */
+@keyframes loading-bar-fill {
+  0% { width: 0%; }
+  60% { width: 70%; }
+  100% { width: 90%; }
+}
+
+.loading-bar-fill {
+  animation: loading-bar-fill 1.4s ease-out forwards;
+}

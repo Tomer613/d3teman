@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { Home } from "lucide-react";
 import { submitJoinRequest } from "@/app/actions/join-request";
 import { COMMUNITY_CITY } from "@/lib/branding";
 import DecorativePattern from "@/components/ui/DecorativePattern";
@@ -68,9 +68,10 @@ export default function JoinRequestPage() {
 
             <div className="relative max-w-xl mx-auto">
                 <div className="text-center mb-8">
-                    <Link href="/login" className="inline-block text-xs font-semibold text-primary hover:text-primary-hover mb-2">
-                        ← חזרה למסך הכניסה
-                    </Link>
+                    <LinkButton href="/login" variant="secondary" size="sm" className="mb-3">
+                        <Home className="size-4" aria-hidden="true" />
+                        <span>חזרה למסך הכניסה</span>
+                    </LinkButton>
                     <h1 className="text-2xl font-bold text-text">בקשת הצטרפות לקהילה</h1>
                     <p className="text-sm text-text-muted mt-1">
                         ההרשמה מיועדת לתושבי השכונה לצורך עדכונים, חיובים ופעילות קהילתית

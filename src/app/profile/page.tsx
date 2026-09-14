@@ -1,16 +1,17 @@
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth";
+import { requireSessionOrRedirect } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import GatedHeader from "@/components/layout/GatedHeader";
 import ProfileClient from "./ProfileClient";
 
 // Always dynamic: reads the session cookie to authorize the request.
 export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
-    const session = await getSession();
-    if (!session) {
-        redirect("/login");
-    }
+    // Same guard as every other members-only page, so its DB check is
+    // deduped (via requireSession()'s React cache()) with GatedHeader's
+    // identical check below, instead of hitting the database twice.
+    const session = await requireSessionOrRedirect();
 
     const member = await prisma.member.findUnique({
         where: { id: session.sub },
@@ -18,10 +19,10 @@ export default async function ProfilePage() {
         omit: { passwordHash: true },
     });
 
-    // Re-checks approval against the just-fetched row rather than trusting
-    // the JWT for its full lifetime - a de-approved member (or a session for
-    // a deleted account) is rejected immediately, not after the token expires.
-    if (!member || !member.isApproved) {
+    // requireSessionOrRedirect() already confirmed the member exists and is
+    // approved; this only guards the narrow race where the account is
+    // deleted between that check and this query.
+    if (!member) {
         redirect("/login");
     }
 
@@ -39,11 +40,14 @@ export default async function ProfilePage() {
     const totalDonated = donationTotal._sum.amount ?? 0;
 
     return (
-        <ProfileClient
-            member={member}
-            yahrzeits={member.yahrzeits}
-            donations={donations}
-            totalDonated={totalDonated}
-        />
+        <>
+            <GatedHeader />
+            <ProfileClient
+                member={member}
+                yahrzeits={member.yahrzeits}
+                donations={donations}
+                totalDonated={totalDonated}
+            />
+        </>
     );
 }

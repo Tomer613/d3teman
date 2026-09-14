@@ -2,9 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { PartyPopper, Mail, Users } from "lucide-react";
 import { approveJoinRequest, rejectJoinRequest, updateMemberRole, setMemberApproval } from "@/app/actions/admin";
-import { logout } from "@/app/actions/auth";
+import { LinkButton } from "@/components/ui/Button";
 
 interface PendingRequest {
     id: string;
@@ -168,38 +168,19 @@ export default function AdminDashboardClient({
                             אישור מצטרפים חדשים, מעקב גבייה וסנכרון תרומות
                         </p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-3">
-                        <Link
-                            href="/admin/events"
-                            className="px-3.5 py-2 text-xs font-medium text-text bg-background hover:bg-border rounded-xl transition-colors"
-                        >
-                            אירועים ושמחות
-                        </Link>
-                        <Link
-                            href="/admin/newsletter"
-                            className="px-3.5 py-2 text-xs font-medium text-text bg-background hover:bg-border rounded-xl transition-colors"
-                        >
-                            ניוזלטר
-                        </Link>
-                        <Link
-                            href="/directory"
-                            className="px-3.5 py-2 text-xs font-medium text-text bg-background hover:bg-border rounded-xl transition-colors"
-                        >
-                            ספר הקהילה
-                        </Link>
-                        <Link
-                            href="/"
-                            className="px-3.5 py-2 text-xs font-medium text-accent-hover bg-accent/10 hover:bg-accent/20 rounded-xl transition-colors"
-                        >
-                            חזרה לדף הבית
-                        </Link>
-                        <button
-                            type="button"
-                            onClick={() => startTransition(() => logout())}
-                            className="px-3.5 py-2 text-xs font-medium text-text-muted hover:bg-background rounded-xl transition-colors"
-                        >
-                            התנתקות
-                        </button>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <LinkButton href="/admin/events" variant="secondary" size="sm">
+                            <PartyPopper className="size-4" aria-hidden="true" />
+                            <span>אירועים ושמחות</span>
+                        </LinkButton>
+                        <LinkButton href="/admin/newsletter" variant="secondary" size="sm">
+                            <Mail className="size-4" aria-hidden="true" />
+                            <span>ניוזלטר</span>
+                        </LinkButton>
+                        <LinkButton href="/directory" variant="secondary" size="sm">
+                            <Users className="size-4" aria-hidden="true" />
+                            <span>ספר הקהילה</span>
+                        </LinkButton>
                     </div>
                 </div>
 

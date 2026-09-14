@@ -2,11 +2,12 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { Gift, CheckCircle2, Circle } from "lucide-react";
 import { HalachicStatus } from "@/types";
 import { addYahrzeit, removeYahrzeit, updateProfile } from "@/app/actions/profile";
-import { logout } from "@/app/actions/auth";
 import { HEBREW_MONTHS, YAHRZEIT_RELATIONS } from "@/lib/yahrzeit";
+import { LinkButton } from "@/components/ui/Button";
+import ProgressBar from "@/components/ui/ProgressBar";
 
 interface YahrzeitRecord {
     id: string;
@@ -59,6 +60,21 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
         teen: member.teenChildren,
     });
     const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+    // Profile completion checklist: only tracks fields that are optional at
+    // registration (firstName/lastName/phone/address are always required, so
+    // they're always filled and not worth showing here). Reflects the
+    // unsaved form state for children ages so the bar moves as you type,
+    // matching a LinkedIn-style "fill this in" nudge rather than the last
+    // saved value.
+    const totalChildren = childrenAges.toddler + childrenAges.elementary + childrenAges.teen;
+    const completionChecks = [
+        { label: "פרטי ילדים במשפחה", done: totalChildren > 0 },
+        { label: "לפחות יום זיכרון אחד (יארצייט)", done: yahrzeits.length > 0 },
+    ];
+    const completionPercent = Math.round(
+        (completionChecks.filter((c) => c.done).length / completionChecks.length) * 100
+    );
 
     const handleSaveProfile = () => {
         setSaveMessage(null);
@@ -147,33 +163,21 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                 {/* Top Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <Link href="/" className="text-xs font-semibold text-primary hover:text-primary-hover">
-                            ← חזרה לדף הבית
-                        </Link>
-                        <h1 className="text-2xl font-bold text-text mt-1">
+                        <h1 className="text-2xl font-bold text-text">
                             האזור האישי של {member.firstName} {member.lastName}
                         </h1>
                         <p className="text-sm text-text-muted">
                             הפרטים מסייעים לגבאים בשיבוץ עליות, תיאום השכבות ופעילות קהילתית
                         </p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                        <button
-                            type="button"
-                            onClick={handleSaveProfile}
-                            disabled={isPending}
-                            className="px-5 py-2.5 bg-primary hover:bg-primary-hover disabled:bg-border text-white text-sm font-semibold rounded-xl shadow-xs transition-colors"
-                        >
-                            {isPending ? "שומר..." : "שמירת כל השינויים"}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => startTransition(() => logout())}
-                            className="px-4 py-2.5 bg-surface border border-border hover:bg-background text-text text-sm font-medium rounded-xl transition-colors"
-                        >
-                            התנתקות
-                        </button>
-                    </div>
+                    <button
+                        type="button"
+                        onClick={handleSaveProfile}
+                        disabled={isPending}
+                        className="px-5 py-2.5 bg-primary hover:bg-primary-hover disabled:bg-border text-white text-sm font-semibold rounded-xl shadow-xs transition-colors shrink-0"
+                    >
+                        {isPending ? "שומר..." : "שמירת כל השינויים"}
+                    </button>
                 </div>
 
                 {saveMessage && (
@@ -184,6 +188,29 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                             }`}
                     >
                         {saveMessage.text}
+                    </div>
+                )}
+
+                {/* Profile Completion Meter */}
+                {completionPercent < 100 && (
+                    <div className="bg-surface p-5 rounded-2xl border border-border shadow-xs space-y-3">
+                        <ProgressBar percent={completionPercent} label="השלמת הפרופיל" />
+                        <div className="flex flex-wrap gap-x-6 gap-y-1.5 pt-1">
+                            {completionChecks.map((check) => (
+                                <span
+                                    key={check.label}
+                                    className={`flex items-center gap-1.5 text-xs font-medium ${check.done ? "text-success" : "text-text-muted"
+                                        }`}
+                                >
+                                    {check.done ? (
+                                        <CheckCircle2 className="size-3.5" aria-hidden="true" />
+                                    ) : (
+                                        <Circle className="size-3.5" aria-hidden="true" />
+                                    )}
+                                    {check.label}
+                                </span>
+                            ))}
+                        </div>
                     </div>
                 )}
 
@@ -436,12 +463,10 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                             <h2 className="text-lg font-bold text-text">היסטוריית תרומות</h2>
                             <p className="text-xs text-text-muted">תרומות שסונכרנו ממערכת נדרים פלוס</p>
                         </div>
-                        <Link
-                            href="/donate"
-                            className="px-3.5 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold rounded-lg transition-colors"
-                        >
-                            תרומה נוספת
-                        </Link>
+                        <LinkButton href="/donate" variant="ghost" size="sm">
+                            <Gift className="size-4" aria-hidden="true" />
+                            <span>תרומה נוספת</span>
+                        </LinkButton>
                     </div>
 
                     {donations.length === 0 ? (

@@ -1,5 +1,6 @@
 import { requireAdminOrRedirect } from "@/lib/auth";
 import { getAllEvents } from "@/app/actions/events";
+import GatedHeader from "@/components/layout/GatedHeader";
 import EventsClient from "./EventsClient";
 
 export const dynamic = "force-dynamic";
@@ -9,5 +10,10 @@ export default async function AdminEventsPage() {
 
     const events = await getAllEvents();
 
-    return <EventsClient events={events} />;
+    return (
+        <>
+            <GatedHeader />
+            <EventsClient events={events} />
+        </>
+    );
 }

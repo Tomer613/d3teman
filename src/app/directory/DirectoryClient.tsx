@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Link from "next/link";
 import { HalachicStatus } from "@/types";
 import { DirectoryMember } from "@/app/actions/directory";
 import Badge from "@/components/ui/Badge";
@@ -54,10 +53,7 @@ export default function DirectoryClient({ members }: DirectoryClientProps) {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <Link href="/" className="text-xs font-semibold text-primary hover:text-primary-hover">
-                            ← חזרה לדף הבית
-                        </Link>
-                        <h1 className="text-2xl font-bold text-text mt-1">אלפון הקהילה</h1>
+                        <h1 className="text-2xl font-bold text-text">אלפון הקהילה</h1>
                         <p className="text-sm text-text-muted">
                             איתור חברי הקהילה ויצירת קשר מהיר
                         </p>
