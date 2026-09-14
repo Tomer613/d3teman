@@ -9,12 +9,19 @@ export const dynamic = "force-dynamic";
 export default async function AdminRequestsPage() {
     await requireAdminOrRedirect();
 
-    const { kiddushRequests, haftarahRequests } = await getRequestsDashboardData();
+    const { kiddushRequests, haftarahRequests, eventNotifications, generalInquiries, aliyahRequests } =
+        await getRequestsDashboardData();
 
     return (
         <>
             <GatedHeader />
-            <RequestsClient kiddushRequests={kiddushRequests} haftarahRequests={haftarahRequests} />
+            <RequestsClient
+                kiddushRequests={kiddushRequests}
+                haftarahRequests={haftarahRequests}
+                eventNotifications={eventNotifications}
+                generalInquiries={generalInquiries}
+                aliyahRequests={aliyahRequests}
+            />
         </>
     );
 }

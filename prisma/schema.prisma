@@ -36,6 +36,9 @@ model Member {
   communityEvents         CommunityEvent[]
   kiddushDonationRequests KiddushDonationRequest[]
   haftarahRequests        HaftarahRequest[]
+  eventNotifications      EventNotification[]
+  generalInquiries        GeneralInquiry[]
+  aliyahRequests          AliyahRequest[]
 }
 
 // Memorial tracking for weekly aliyot and memorial prayers
@@ -111,6 +114,54 @@ model HaftarahRequest {
   notes      String?
   status     String   @default("pending") // pending | approved | rejected
   adminNotes String? // gabay-only scratch notes
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// Member-submitted notice of a life-cycle event (simcha or mourning), for
+// the gabay team to triage - distinct from CommunityEvent, which is the
+// gabay-curated, public-facing homepage listing.
+model EventNotification {
+  id          String   @id @default(cuid())
+  memberId    String
+  member      Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  category    String // simcha | aveilut
+  eventType   String // simcha: birth | bar_bat_mitzvah | wedding | other ; aveilut: loss | yahrzeit | other
+  description String
+  eventDate   DateTime
+  notes       String?
+  status      String   @default("pending") // pending | approved | rejected
+  adminNotes  String? // gabay-only scratch notes
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Free-form member inquiry to the gabay team, not tied to a specific
+// synagogue service (that's what Kiddush/Haftarah/Aliyah requests are for)
+model GeneralInquiry {
+  id         String   @id @default(cuid())
+  memberId   String
+  member     Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  subject    String
+  message    String
+  status     String   @default("pending") // pending | approved | rejected
+  adminNotes String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// Member-submitted request for a Torah aliyah on a given Shabbat/parsha,
+// reviewed by a gabay - analogous to HaftarahRequest but for an aliyah slot
+model AliyahRequest {
+  id         String   @id @default(cuid())
+  memberId   String
+  member     Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  parsha     String // requested parsha / Shabbat
+  aliyahType String   @default("no_preference") // shlishi | revii | chamishi | shishi | shevii | maftir | no_preference
+  occasion   String?
+  notes      String?
+  status     String   @default("pending") // pending | approved | rejected
+  adminNotes String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }

@@ -28,25 +28,41 @@ export default async function ProfilePage() {
 
     // Capped so a long-tenured donor's page doesn't grow unbounded; the total
     // below still reflects every donation, not just the ones displayed.
-    const [donations, donationTotal, kiddushRequests, haftarahRequests] = await Promise.all([
-        prisma.transaction.findMany({
-            where: { memberId: member.id },
-            orderBy: { createdAt: "desc" },
-            take: 100,
-            select: { id: true, amount: true, targetFund: true, isRecurring: true, createdAt: true },
-        }),
-        prisma.transaction.aggregate({ where: { memberId: member.id }, _sum: { amount: true } }),
-        prisma.kiddushDonationRequest.findMany({
-            where: { memberId: member.id },
-            orderBy: { createdAt: "desc" },
-            take: 10,
-        }),
-        prisma.haftarahRequest.findMany({
-            where: { memberId: member.id },
-            orderBy: { createdAt: "desc" },
-            take: 10,
-        }),
-    ]);
+    const [donations, donationTotal, kiddushRequests, haftarahRequests, eventNotifications, generalInquiries, aliyahRequests] =
+        await Promise.all([
+            prisma.transaction.findMany({
+                where: { memberId: member.id },
+                orderBy: { createdAt: "desc" },
+                take: 100,
+                select: { id: true, amount: true, targetFund: true, isRecurring: true, createdAt: true },
+            }),
+            prisma.transaction.aggregate({ where: { memberId: member.id }, _sum: { amount: true } }),
+            prisma.kiddushDonationRequest.findMany({
+                where: { memberId: member.id },
+                orderBy: { createdAt: "desc" },
+                take: 10,
+            }),
+            prisma.haftarahRequest.findMany({
+                where: { memberId: member.id },
+                orderBy: { createdAt: "desc" },
+                take: 10,
+            }),
+            prisma.eventNotification.findMany({
+                where: { memberId: member.id },
+                orderBy: { createdAt: "desc" },
+                take: 10,
+            }),
+            prisma.generalInquiry.findMany({
+                where: { memberId: member.id },
+                orderBy: { createdAt: "desc" },
+                take: 10,
+            }),
+            prisma.aliyahRequest.findMany({
+                where: { memberId: member.id },
+                orderBy: { createdAt: "desc" },
+                take: 10,
+            }),
+        ]);
     const totalDonated = donationTotal._sum.amount ?? 0;
 
     return (
@@ -59,6 +75,9 @@ export default async function ProfilePage() {
                 totalDonated={totalDonated}
                 kiddushRequests={kiddushRequests}
                 haftarahRequests={haftarahRequests}
+                eventNotifications={eventNotifications}
+                generalInquiries={generalInquiries}
+                aliyahRequests={aliyahRequests}
             />
         </>
     );

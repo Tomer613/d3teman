@@ -2,10 +2,16 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Gift, CheckCircle2, Circle } from "lucide-react";
+import { Gift, CheckCircle2, Circle, UserCircle2 } from "lucide-react";
 import { HalachicStatus } from "@/types";
 import { addYahrzeit, removeYahrzeit, updateProfile } from "@/app/actions/profile";
-import { submitKiddushDonationRequest, submitHaftarahRequest } from "@/app/actions/requests";
+import {
+    submitKiddushDonationRequest,
+    submitHaftarahRequest,
+    submitEventNotification,
+    submitGeneralInquiry,
+    submitAliyahRequest,
+} from "@/app/actions/requests";
 import { HEBREW_MONTHS, YAHRZEIT_RELATIONS } from "@/lib/yahrzeit";
 import { LinkButton } from "@/components/ui/Button";
 import ProgressBar from "@/components/ui/ProgressBar";
@@ -61,6 +67,30 @@ interface HaftarahRequestRecord {
     createdAt: Date;
 }
 
+interface EventNotificationRecord {
+    id: string;
+    category: string;
+    eventType: string;
+    eventDate: Date;
+    status: string;
+    createdAt: Date;
+}
+
+interface GeneralInquiryRecord {
+    id: string;
+    subject: string;
+    status: string;
+    createdAt: Date;
+}
+
+interface AliyahRequestRecord {
+    id: string;
+    parsha: string;
+    aliyahType: string;
+    status: string;
+    createdAt: Date;
+}
+
 interface ProfileClientProps {
     member: ProfileMember;
     yahrzeits: YahrzeitRecord[];
@@ -68,7 +98,42 @@ interface ProfileClientProps {
     totalDonated: number;
     kiddushRequests: KiddushRequestRecord[];
     haftarahRequests: HaftarahRequestRecord[];
+    eventNotifications: EventNotificationRecord[];
+    generalInquiries: GeneralInquiryRecord[];
+    aliyahRequests: AliyahRequestRecord[];
 }
+
+const EVENT_CATEGORY_OPTIONS: { value: string; label: string; eventTypes: { value: string; label: string }[] }[] = [
+    {
+        value: "simcha",
+        label: "שמחה",
+        eventTypes: [
+            { value: "birth", label: "לידה" },
+            { value: "bar_bat_mitzvah", label: "בר/בת מצווה" },
+            { value: "wedding", label: "חתונה" },
+            { value: "other", label: "אחר" },
+        ],
+    },
+    {
+        value: "aveilut",
+        label: "אבלות",
+        eventTypes: [
+            { value: "loss", label: "פטירה" },
+            { value: "yahrzeit", label: "יארצייט" },
+            { value: "other", label: "אחר" },
+        ],
+    },
+];
+
+const ALIYAH_TYPE_OPTIONS = [
+    { value: "no_preference", label: "ללא העדפה" },
+    { value: "shlishi", label: "שלישי" },
+    { value: "revii", label: "רביעי" },
+    { value: "chamishi", label: "חמישי" },
+    { value: "shishi", label: "שישי" },
+    { value: "shevii", label: "שביעי" },
+    { value: "maftir", label: "מפטיר" },
+];
 
 const STATUS_LABELS: Record<string, { label: string; variant: "neutral" | "success" | "danger" }> = {
     pending: { label: "ממתין לאישור", variant: "neutral" },
@@ -83,6 +148,9 @@ export default function ProfileClient({
     totalDonated,
     kiddushRequests,
     haftarahRequests,
+    eventNotifications,
+    generalInquiries,
+    aliyahRequests,
 }: ProfileClientProps) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
@@ -240,6 +308,94 @@ export default function ProfileClient({
         });
     };
 
+    // Aliyah request form
+    const [isAliyahFormOpen, setIsAliyahFormOpen] = useState(false);
+    const [aliyahForm, setAliyahForm] = useState({ parsha: "", aliyahType: "no_preference", occasion: "", notes: "" });
+    const [aliyahError, setAliyahError] = useState<string | null>(null);
+    const [isSubmittingAliyah, startSubmittingAliyah] = useTransition();
+
+    const handleSubmitAliyah = (e: React.FormEvent) => {
+        e.preventDefault();
+        setAliyahError(null);
+        startSubmittingAliyah(async () => {
+            const result = await submitAliyahRequest({
+                parsha: aliyahForm.parsha,
+                aliyahType: aliyahForm.aliyahType,
+                occasion: aliyahForm.occasion,
+                notes: aliyahForm.notes,
+            });
+            if (!result.success) {
+                setAliyahError(result.error);
+                return;
+            }
+            setAliyahForm({ parsha: "", aliyahType: "no_preference", occasion: "", notes: "" });
+            setIsAliyahFormOpen(false);
+            router.refresh();
+        });
+    };
+
+    // Event notification form (simcha / aveilut)
+    const [isEventFormOpen, setIsEventFormOpen] = useState(false);
+    const [eventForm, setEventForm] = useState({
+        category: "simcha",
+        eventType: "birth",
+        description: "",
+        eventDate: "",
+        notes: "",
+    });
+    const [eventError, setEventError] = useState<string | null>(null);
+    const [isSubmittingEvent, startSubmittingEvent] = useTransition();
+
+    const handleEventCategoryChange = (category: string) => {
+        const firstEventType = EVENT_CATEGORY_OPTIONS.find((c) => c.value === category)?.eventTypes[0]?.value ?? "";
+        setEventForm({ ...eventForm, category, eventType: firstEventType });
+    };
+
+    const handleSubmitEvent = (e: React.FormEvent) => {
+        e.preventDefault();
+        setEventError(null);
+        startSubmittingEvent(async () => {
+            const result = await submitEventNotification({
+                category: eventForm.category,
+                eventType: eventForm.eventType,
+                description: eventForm.description,
+                eventDate: eventForm.eventDate,
+                notes: eventForm.notes,
+            });
+            if (!result.success) {
+                setEventError(result.error);
+                return;
+            }
+            setEventForm({ category: "simcha", eventType: "birth", description: "", eventDate: "", notes: "" });
+            setIsEventFormOpen(false);
+            router.refresh();
+        });
+    };
+
+    // General inquiry form
+    const [isInquiryFormOpen, setIsInquiryFormOpen] = useState(false);
+    const [inquiryForm, setInquiryForm] = useState({ subject: "", message: "" });
+    const [inquiryError, setInquiryError] = useState<string | null>(null);
+    const [isSubmittingInquiry, startSubmittingInquiry] = useTransition();
+
+    const handleSubmitInquiry = (e: React.FormEvent) => {
+        e.preventDefault();
+        setInquiryError(null);
+        startSubmittingInquiry(async () => {
+            const result = await submitGeneralInquiry({
+                subject: inquiryForm.subject,
+                message: inquiryForm.message,
+            });
+            if (!result.success) {
+                setInquiryError(result.error);
+                return;
+            }
+            setInquiryForm({ subject: "", message: "" });
+            setIsInquiryFormOpen(false);
+            router.refresh();
+        });
+    };
+
     // Form state for adding a new yahrzeit
     const [newYahrzeit, setNewYahrzeit] = useState({
         deceasedName: "",
@@ -334,6 +490,589 @@ export default function ProfileClient({
                     </div>
                 )}
 
+                {/* Section: Requests to the gabay */}
+                <div className="bg-surface p-6 rounded-2xl border border-border shadow-xs space-y-4">
+                    <div>
+                        <h2 className="text-lg font-bold text-text">בקשות ופניות לגבאי</h2>
+                        <p className="text-xs text-text-muted">
+                            הבקשות יישלחו לצוות הגבאים לאישור, ויוצגו כאן עם הסטטוס העדכני
+                        </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setIsKiddushFormOpen((open) => !open)}
+                            className="px-3.5 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent-hover text-xs font-bold rounded-lg transition-colors"
+                        >
+                            + תרום קידוש
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setIsHaftarahFormOpen((open) => !open)}
+                            className="px-3.5 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent-hover text-xs font-bold rounded-lg transition-colors"
+                        >
+                            + שריין הפטרה
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setIsAliyahFormOpen((open) => !open)}
+                            className="px-3.5 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent-hover text-xs font-bold rounded-lg transition-colors"
+                        >
+                            + בקש עלייה
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setIsEventFormOpen((open) => !open)}
+                            className="px-3.5 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent-hover text-xs font-bold rounded-lg transition-colors"
+                        >
+                            + עדכון על אירוע
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setIsInquiryFormOpen((open) => !open)}
+                            className="px-3.5 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent-hover text-xs font-bold rounded-lg transition-colors"
+                        >
+                            + פנייה כללית
+                        </button>
+                    </div>
+
+                    {isKiddushFormOpen && (
+                        <form onSubmit={handleSubmitKiddush} className="p-4 bg-accent/5 rounded-xl border border-accent/20 space-y-3">
+                            <h3 className="text-xs font-bold text-accent-hover uppercase">בקשת תרומת קידוש</h3>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs font-medium text-text">סיבת התרומה</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="לדוגמה: יום הולדת, יארצייט, שמחה משפחתית"
+                                        value={kiddushForm.occasion}
+                                        onChange={(e) => setKiddushForm({ ...kiddushForm, occasion: e.target.value })}
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-text">שבת מבוקשת</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="לדוגמה: פרשת בשלח, כ״ג בשבט"
+                                        value={kiddushForm.preferredDate}
+                                        onChange={(e) => setKiddushForm({ ...kiddushForm, preferredDate: e.target.value })}
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-text">סכום משוער (אופציונלי)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={kiddushForm.amount}
+                                    onChange={(e) => setKiddushForm({ ...kiddushForm, amount: e.target.value })}
+                                    className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-text">הערות נוספות</label>
+                                <textarea
+                                    rows={2}
+                                    value={kiddushForm.notes}
+                                    onChange={(e) => setKiddushForm({ ...kiddushForm, notes: e.target.value })}
+                                    className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                />
+                            </div>
+
+                            {kiddushError && (
+                                <div className="px-3.5 py-2.5 bg-danger-bg border border-danger-border rounded-xl text-xs font-medium text-danger">
+                                    {kiddushError}
+                                </div>
+                            )}
+
+                            <div className="flex justify-end gap-2 pt-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsKiddushFormOpen(false)}
+                                    className="px-3 py-1.5 text-xs text-text-muted hover:bg-background rounded-lg"
+                                >
+                                    ביטול
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmittingKiddush}
+                                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover disabled:bg-border text-white text-xs font-bold rounded-lg"
+                                >
+                                    {isSubmittingKiddush ? "שולח..." : "שליחת בקשה"}
+                                </button>
+                            </div>
+                        </form>
+                    )}
+
+                    {isHaftarahFormOpen && (
+                        <form onSubmit={handleSubmitHaftarah} className="p-4 bg-accent/5 rounded-xl border border-accent/20 space-y-3">
+                            <h3 className="text-xs font-bold text-accent-hover uppercase">בקשת שריון הפטרה</h3>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs font-medium text-text">פרשה / מועד מבוקש</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="לדוגמה: פרשת יתרו"
+                                        value={haftarahForm.parsha}
+                                        onChange={(e) => setHaftarahForm({ ...haftarahForm, parsha: e.target.value })}
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-text">סיבה (אופציונלי)</label>
+                                    <input
+                                        type="text"
+                                        placeholder="לדוגמה: בר מצווה, יארצייט"
+                                        value={haftarahForm.occasion}
+                                        onChange={(e) => setHaftarahForm({ ...haftarahForm, occasion: e.target.value })}
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-text">הערות נוספות</label>
+                                <textarea
+                                    rows={2}
+                                    value={haftarahForm.notes}
+                                    onChange={(e) => setHaftarahForm({ ...haftarahForm, notes: e.target.value })}
+                                    className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                />
+                            </div>
+
+                            {haftarahError && (
+                                <div className="px-3.5 py-2.5 bg-danger-bg border border-danger-border rounded-xl text-xs font-medium text-danger">
+                                    {haftarahError}
+                                </div>
+                            )}
+
+                            <div className="flex justify-end gap-2 pt-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsHaftarahFormOpen(false)}
+                                    className="px-3 py-1.5 text-xs text-text-muted hover:bg-background rounded-lg"
+                                >
+                                    ביטול
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmittingHaftarah}
+                                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover disabled:bg-border text-white text-xs font-bold rounded-lg"
+                                >
+                                    {isSubmittingHaftarah ? "שולח..." : "שליחת בקשה"}
+                                </button>
+                            </div>
+                        </form>
+                    )}
+
+                    {isAliyahFormOpen && (
+                        <form onSubmit={handleSubmitAliyah} className="p-4 bg-accent/5 rounded-xl border border-accent/20 space-y-3">
+                            <h3 className="text-xs font-bold text-accent-hover uppercase">בקשת עלייה לתורה</h3>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs font-medium text-text">פרשה / שבת מבוקשת</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="לדוגמה: פרשת יתרו"
+                                        value={aliyahForm.parsha}
+                                        onChange={(e) => setAliyahForm({ ...aliyahForm, parsha: e.target.value })}
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-text">עלייה מבוקשת</label>
+                                    <select
+                                        value={aliyahForm.aliyahType}
+                                        onChange={(e) => setAliyahForm({ ...aliyahForm, aliyahType: e.target.value })}
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                    >
+                                        {ALIYAH_TYPE_OPTIONS.map((o) => (
+                                            <option key={o.value} value={o.value}>{o.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-text">סיבה (אופציונלי)</label>
+                                <input
+                                    type="text"
+                                    placeholder="לדוגמה: בר מצווה, יארצייט"
+                                    value={aliyahForm.occasion}
+                                    onChange={(e) => setAliyahForm({ ...aliyahForm, occasion: e.target.value })}
+                                    className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-text">הערות נוספות</label>
+                                <textarea
+                                    rows={2}
+                                    value={aliyahForm.notes}
+                                    onChange={(e) => setAliyahForm({ ...aliyahForm, notes: e.target.value })}
+                                    className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                />
+                            </div>
+
+                            {aliyahError && (
+                                <div className="px-3.5 py-2.5 bg-danger-bg border border-danger-border rounded-xl text-xs font-medium text-danger">
+                                    {aliyahError}
+                                </div>
+                            )}
+
+                            <div className="flex justify-end gap-2 pt-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAliyahFormOpen(false)}
+                                    className="px-3 py-1.5 text-xs text-text-muted hover:bg-background rounded-lg"
+                                >
+                                    ביטול
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmittingAliyah}
+                                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover disabled:bg-border text-white text-xs font-bold rounded-lg"
+                                >
+                                    {isSubmittingAliyah ? "שולח..." : "שליחת בקשה"}
+                                </button>
+                            </div>
+                        </form>
+                    )}
+
+                    {isEventFormOpen && (
+                        <form onSubmit={handleSubmitEvent} className="p-4 bg-accent/5 rounded-xl border border-accent/20 space-y-3">
+                            <h3 className="text-xs font-bold text-accent-hover uppercase">עדכון על אירוע שמחה או אבלות</h3>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs font-medium text-text">סוג האירוע</label>
+                                    <select
+                                        value={eventForm.category}
+                                        onChange={(e) => handleEventCategoryChange(e.target.value)}
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                    >
+                                        {EVENT_CATEGORY_OPTIONS.map((c) => (
+                                            <option key={c.value} value={c.value}>{c.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-text">פרטי הסוג</label>
+                                    <select
+                                        value={eventForm.eventType}
+                                        onChange={(e) => setEventForm({ ...eventForm, eventType: e.target.value })}
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                    >
+                                        {EVENT_CATEGORY_OPTIONS.find((c) => c.value === eventForm.category)?.eventTypes.map((t) => (
+                                            <option key={t.value} value={t.value}>{t.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-text">תאריך האירוע</label>
+                                <input
+                                    type="date"
+                                    required
+                                    value={eventForm.eventDate}
+                                    onChange={(e) => setEventForm({ ...eventForm, eventDate: e.target.value })}
+                                    className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-text">פרטי האירוע</label>
+                                <textarea
+                                    required
+                                    rows={2}
+                                    placeholder="לדוגמה: נולד לנו בן, לרגל בר המצווה של..."
+                                    value={eventForm.description}
+                                    onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
+                                    className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-text">הערות נוספות (אופציונלי)</label>
+                                <textarea
+                                    rows={2}
+                                    value={eventForm.notes}
+                                    onChange={(e) => setEventForm({ ...eventForm, notes: e.target.value })}
+                                    className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                />
+                            </div>
+
+                            {eventError && (
+                                <div className="px-3.5 py-2.5 bg-danger-bg border border-danger-border rounded-xl text-xs font-medium text-danger">
+                                    {eventError}
+                                </div>
+                            )}
+
+                            <div className="flex justify-end gap-2 pt-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsEventFormOpen(false)}
+                                    className="px-3 py-1.5 text-xs text-text-muted hover:bg-background rounded-lg"
+                                >
+                                    ביטול
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmittingEvent}
+                                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover disabled:bg-border text-white text-xs font-bold rounded-lg"
+                                >
+                                    {isSubmittingEvent ? "שולח..." : "שליחת עדכון"}
+                                </button>
+                            </div>
+                        </form>
+                    )}
+
+                    {isInquiryFormOpen && (
+                        <form onSubmit={handleSubmitInquiry} className="p-4 bg-accent/5 rounded-xl border border-accent/20 space-y-3">
+                            <h3 className="text-xs font-bold text-accent-hover uppercase">פנייה כללית לגבאי</h3>
+
+                            <div>
+                                <label className="block text-xs font-medium text-text">נושא הפנייה</label>
+                                <input
+                                    type="text"
+                                    required
+                                    placeholder="לדוגמה: בקשה למקום חניה, שאלה על שיעור תורה"
+                                    value={inquiryForm.subject}
+                                    onChange={(e) => setInquiryForm({ ...inquiryForm, subject: e.target.value })}
+                                    className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-text">תוכן הפנייה</label>
+                                <textarea
+                                    required
+                                    rows={3}
+                                    placeholder="פרטו כאן את בקשתכם או שאלתכם..."
+                                    value={inquiryForm.message}
+                                    onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })}
+                                    className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                />
+                            </div>
+
+                            {inquiryError && (
+                                <div className="px-3.5 py-2.5 bg-danger-bg border border-danger-border rounded-xl text-xs font-medium text-danger">
+                                    {inquiryError}
+                                </div>
+                            )}
+
+                            <div className="flex justify-end gap-2 pt-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsInquiryFormOpen(false)}
+                                    className="px-3 py-1.5 text-xs text-text-muted hover:bg-background rounded-lg"
+                                >
+                                    ביטול
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmittingInquiry}
+                                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover disabled:bg-border text-white text-xs font-bold rounded-lg"
+                                >
+                                    {isSubmittingInquiry ? "שולח..." : "שליחת פנייה"}
+                                </button>
+                            </div>
+                        </form>
+                    )}
+
+                    {(kiddushRequests.length > 0 || haftarahRequests.length > 0 || aliyahRequests.length > 0 || eventNotifications.length > 0 || generalInquiries.length > 0) && (
+                        <div className="pt-2">
+                            <h3 className="text-xs font-bold text-text-muted uppercase mb-2">הבקשות האחרונות שלי</h3>
+                            <div className="divide-y divide-border">
+                                {kiddushRequests.map((r) => (
+                                    <div key={r.id} className="py-2.5 flex items-center justify-between gap-3 text-sm">
+                                        <div className="min-w-0">
+                                            <span className="font-semibold text-text">תרומת קידוש</span>
+                                            <span className="text-xs text-text-muted mr-2">
+                                                {r.occasion} · {r.preferredDate}
+                                            </span>
+                                        </div>
+                                        <Badge variant={STATUS_LABELS[r.status]?.variant ?? "neutral"}>
+                                            {STATUS_LABELS[r.status]?.label ?? r.status}
+                                        </Badge>
+                                    </div>
+                                ))}
+                                {haftarahRequests.map((r) => (
+                                    <div key={r.id} className="py-2.5 flex items-center justify-between gap-3 text-sm">
+                                        <div className="min-w-0">
+                                            <span className="font-semibold text-text">שריון הפטרה</span>
+                                            <span className="text-xs text-text-muted mr-2">{r.parsha}</span>
+                                        </div>
+                                        <Badge variant={STATUS_LABELS[r.status]?.variant ?? "neutral"}>
+                                            {STATUS_LABELS[r.status]?.label ?? r.status}
+                                        </Badge>
+                                    </div>
+                                ))}
+                                {aliyahRequests.map((r) => (
+                                    <div key={r.id} className="py-2.5 flex items-center justify-between gap-3 text-sm">
+                                        <div className="min-w-0">
+                                            <span className="font-semibold text-text">בקשת עלייה</span>
+                                            <span className="text-xs text-text-muted mr-2">{r.parsha}</span>
+                                        </div>
+                                        <Badge variant={STATUS_LABELS[r.status]?.variant ?? "neutral"}>
+                                            {STATUS_LABELS[r.status]?.label ?? r.status}
+                                        </Badge>
+                                    </div>
+                                ))}
+                                {eventNotifications.map((r) => (
+                                    <div key={r.id} className="py-2.5 flex items-center justify-between gap-3 text-sm">
+                                        <div className="min-w-0">
+                                            <span className="font-semibold text-text">עדכון אירוע</span>
+                                            <span className="text-xs text-text-muted mr-2">
+                                                {EVENT_CATEGORY_OPTIONS.find((c) => c.value === r.category)?.label ?? r.category} ·{" "}
+                                                {new Date(r.eventDate).toLocaleDateString("he-IL")}
+                                            </span>
+                                        </div>
+                                        <Badge variant={STATUS_LABELS[r.status]?.variant ?? "neutral"}>
+                                            {STATUS_LABELS[r.status]?.label ?? r.status}
+                                        </Badge>
+                                    </div>
+                                ))}
+                                {generalInquiries.map((r) => (
+                                    <div key={r.id} className="py-2.5 flex items-center justify-between gap-3 text-sm">
+                                        <div className="min-w-0">
+                                            <span className="font-semibold text-text">פנייה כללית</span>
+                                            <span className="text-xs text-text-muted mr-2">{r.subject}</span>
+                                        </div>
+                                        <Badge variant={STATUS_LABELS[r.status]?.variant ?? "neutral"}>
+                                            {STATUS_LABELS[r.status]?.label ?? r.status}
+                                        </Badge>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Section: Halachic Status */}
+                <div className="bg-surface p-6 rounded-2xl border border-border shadow-xs space-y-4">
+                    <div>
+                        <h2 className="text-lg font-bold text-text">מעמד הלכתי</h2>
+                        <p className="text-xs text-text-muted">לצורך סדר עליות בתורה</p>
+                    </div>
+                    <div>
+                        <select
+                            value={halachicStatus}
+                            onChange={(e) => setHalachicStatus(e.target.value as HalachicStatus)}
+                            className="w-full sm:w-1/2 px-3.5 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:bg-surface"
+                        >
+                            <option value="yisrael">ישראל</option>
+                            <option value="kohen">כהן</option>
+                            <option value="levi">לוי</option>
+                        </select>
+                    </div>
+                </div>
+
+                {/* Section: My Donations */}
+                <div className="bg-surface p-6 rounded-2xl border border-border shadow-xs space-y-4">
+                    <div className="flex items-center justify-between pb-2 border-b border-border">
+                        <div>
+                            <h2 className="text-lg font-bold text-text">היסטוריית תרומות</h2>
+                            <p className="text-xs text-text-muted">תרומות שסונכרנו ממערכת נדרים פלוס</p>
+                        </div>
+                        <LinkButton href="/donate" variant="ghost" size="sm">
+                            <Gift className="size-4" aria-hidden="true" />
+                            <span>תרומה נוספת</span>
+                        </LinkButton>
+                    </div>
+
+                    {donations.length === 0 ? (
+                        <p className="text-sm text-text-muted py-4 text-center">
+                            עדיין לא נרשמו תרומות תחת כתובת המייל או מספר הטלפון שלך.
+                        </p>
+                    ) : (
+                        <>
+                            <div className="p-4 bg-primary/10 rounded-xl border border-primary/20">
+                                <span className="text-xs text-primary">סך כל התרומות</span>
+                                <p className="text-2xl font-extrabold text-primary">₪{totalDonated.toLocaleString()}</p>
+                            </div>
+                            <div className="divide-y divide-border">
+                                {donations.map((d) => (
+                                    <div key={d.id} className="py-2.5 flex items-center justify-between text-sm">
+                                        <div>
+                                            <span className="font-semibold text-text">₪{d.amount.toLocaleString()}</span>
+                                            <span className="text-xs text-text-muted mr-2">{d.targetFund}</span>
+                                            {d.isRecurring && (
+                                                <span className="mr-2 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-accent/10 text-accent-hover">
+                                                    הוראת קבע
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span className="text-xs text-text-muted">
+                                            {new Date(d.createdAt).toLocaleDateString("he-IL")}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                {/* Section: Privacy Settings */}
+                <div className="bg-surface p-6 rounded-2xl border border-border shadow-xs space-y-4">
+                    <div>
+                        <h2 className="text-lg font-bold text-text">הגדרות פרטיות</h2>
+                        <p className="text-xs text-text-muted">שליטה על מה שמוצג לחברי הקהילה באלפון ובתקשורת</p>
+                    </div>
+                    <div className="space-y-2">
+                        <label className="flex items-center gap-2 text-sm text-text cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={showPhoneInDirectory}
+                                onChange={(e) => setShowPhoneInDirectory(e.target.checked)}
+                                className="rounded-md border-border text-primary focus:ring-primary"
+                            />
+                            הצג את מספר הטלפון שלי לחברי הקהילה
+                        </label>
+                        <label className="flex items-center gap-2 text-sm text-text cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={showAddressInDirectory}
+                                onChange={(e) => setShowAddressInDirectory(e.target.checked)}
+                                className="rounded-md border-border text-primary focus:ring-primary"
+                            />
+                            הצג את כתובת המגורים שלי באלפון
+                        </label>
+                        <label className="flex items-center gap-2 text-sm text-text cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={receiveNewsletter}
+                                onChange={(e) => setReceiveNewsletter(e.target.checked)}
+                                className="rounded-md border-border text-primary focus:ring-primary"
+                            />
+                            קבלת ניוזלטר קהילתי במייל
+                        </label>
+                    </div>
+                </div>
+
+                {/* Decorative divider marking the start of the saved-profile region */}
+                <div className="flex items-center gap-3 py-1" aria-hidden="true">
+                    <div className="h-px flex-1 bg-border" />
+                    <span className="flex items-center gap-1.5 text-[11px] font-semibold text-text-muted tracking-wide">
+                        <UserCircle2 className="size-3.5 text-accent" />
+                        הפרופיל שלי
+                    </span>
+                    <div className="h-px flex-1 bg-border" />
+                </div>
+
                 {/* Profile Completion Meter */}
                 {displayedChecks.length > 0 && (
                     <div className="bg-surface p-5 rounded-2xl border border-border shadow-xs space-y-3">
@@ -357,7 +1096,7 @@ export default function ProfileClient({
                     </div>
                 )}
 
-                {/* Section 0: Personal Details */}
+                {/* Section: Personal Details */}
                 <div className="bg-surface p-6 rounded-2xl border border-border shadow-xs space-y-4">
                     <div>
                         <h2 className="text-lg font-bold text-text">פרטים אישיים</h2>
@@ -409,65 +1148,6 @@ export default function ProfileClient({
                                 onChange={(e) => setCity(e.target.value)}
                                 className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:bg-surface"
                             />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Section 1: Halachic Status & Directory Visibility */}
-                <div className="bg-surface p-6 rounded-2xl border border-border shadow-xs space-y-6">
-                    <h2 className="text-lg font-bold text-text pb-2 border-b border-border">
-                        מעמד הלכתי והגדרות פרטיות
-                    </h2>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-xs font-medium text-text mb-1">
-                                מעמד הלכתי (לצורך סדר עליות בתורה)
-                            </label>
-                            <select
-                                value={halachicStatus}
-                                onChange={(e) => setHalachicStatus(e.target.value as HalachicStatus)}
-                                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:bg-surface"
-                            >
-                                <option value="yisrael">ישראל</option>
-                                <option value="kohen">כהן</option>
-                                <option value="levi">לוי</option>
-                            </select>
-                        </div>
-
-                        <div className="space-y-3 pt-1">
-                            <label className="block text-xs font-medium text-text">
-                                הצגת פרטים באלפון הקהילתי
-                            </label>
-                            <div className="space-y-2">
-                                <label className="flex items-center gap-2 text-sm text-text cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={showPhoneInDirectory}
-                                        onChange={(e) => setShowPhoneInDirectory(e.target.checked)}
-                                        className="rounded-md border-border text-primary focus:ring-primary"
-                                    />
-                                    הצג את מספר הטלפון שלי לחברי הקהילה
-                                </label>
-                                <label className="flex items-center gap-2 text-sm text-text cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={showAddressInDirectory}
-                                        onChange={(e) => setShowAddressInDirectory(e.target.checked)}
-                                        className="rounded-md border-border text-primary focus:ring-primary"
-                                    />
-                                    הצג את כתובת המגורים שלי באלפון
-                                </label>
-                                <label className="flex items-center gap-2 text-sm text-text cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={receiveNewsletter}
-                                        onChange={(e) => setReceiveNewsletter(e.target.checked)}
-                                        className="rounded-md border-border text-primary focus:ring-primary"
-                                    />
-                                    קבלת ניוזלטר קהילתי במייל
-                                </label>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -653,248 +1333,6 @@ export default function ProfileClient({
                             </div>
                         ))}
                     </div>
-                </div>
-
-                {/* Section 4: My Donations */}
-                <div className="bg-surface p-6 rounded-2xl border border-border shadow-xs space-y-4">
-                    <div className="flex items-center justify-between pb-2 border-b border-border">
-                        <div>
-                            <h2 className="text-lg font-bold text-text">היסטוריית תרומות</h2>
-                            <p className="text-xs text-text-muted">תרומות שסונכרנו ממערכת נדרים פלוס</p>
-                        </div>
-                        <LinkButton href="/donate" variant="ghost" size="sm">
-                            <Gift className="size-4" aria-hidden="true" />
-                            <span>תרומה נוספת</span>
-                        </LinkButton>
-                    </div>
-
-                    {donations.length === 0 ? (
-                        <p className="text-sm text-text-muted py-4 text-center">
-                            עדיין לא נרשמו תרומות תחת כתובת המייל או מספר הטלפון שלך.
-                        </p>
-                    ) : (
-                        <>
-                            <div className="p-4 bg-primary/10 rounded-xl border border-primary/20">
-                                <span className="text-xs text-primary">סך כל התרומות</span>
-                                <p className="text-2xl font-extrabold text-primary">₪{totalDonated.toLocaleString()}</p>
-                            </div>
-                            <div className="divide-y divide-border">
-                                {donations.map((d) => (
-                                    <div key={d.id} className="py-2.5 flex items-center justify-between text-sm">
-                                        <div>
-                                            <span className="font-semibold text-text">₪{d.amount.toLocaleString()}</span>
-                                            <span className="text-xs text-text-muted mr-2">{d.targetFund}</span>
-                                            {d.isRecurring && (
-                                                <span className="mr-2 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-accent/10 text-accent-hover">
-                                                    הוראת קבע
-                                                </span>
-                                            )}
-                                        </div>
-                                        <span className="text-xs text-text-muted">
-                                            {new Date(d.createdAt).toLocaleDateString("he-IL")}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        </>
-                    )}
-                </div>
-
-                {/* Section 5: Requests to the gabay */}
-                <div className="bg-surface p-6 rounded-2xl border border-border shadow-xs space-y-4">
-                    <div>
-                        <h2 className="text-lg font-bold text-text">בקשות ופניות לגבאי</h2>
-                        <p className="text-xs text-text-muted">
-                            הבקשות יישלחו לצוות הגבאים לאישור, ויוצגו כאן עם הסטטוס העדכני
-                        </p>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                        <button
-                            type="button"
-                            onClick={() => setIsKiddushFormOpen((open) => !open)}
-                            className="px-3.5 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent-hover text-xs font-bold rounded-lg transition-colors"
-                        >
-                            + תרום קידוש
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setIsHaftarahFormOpen((open) => !open)}
-                            className="px-3.5 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent-hover text-xs font-bold rounded-lg transition-colors"
-                        >
-                            + שריין הפטרה
-                        </button>
-                    </div>
-
-                    {isKiddushFormOpen && (
-                        <form onSubmit={handleSubmitKiddush} className="p-4 bg-accent/5 rounded-xl border border-accent/20 space-y-3">
-                            <h3 className="text-xs font-bold text-accent-hover uppercase">בקשת תרומת קידוש</h3>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-xs font-medium text-text">סיבת התרומה</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        placeholder="לדוגמה: יום הולדת, יארצייט, שמחה משפחתית"
-                                        value={kiddushForm.occasion}
-                                        onChange={(e) => setKiddushForm({ ...kiddushForm, occasion: e.target.value })}
-                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-medium text-text">שבת מבוקשת</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        placeholder="לדוגמה: פרשת בשלח, כ״ג בשבט"
-                                        value={kiddushForm.preferredDate}
-                                        onChange={(e) => setKiddushForm({ ...kiddushForm, preferredDate: e.target.value })}
-                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-medium text-text">סכום משוער (אופציונלי)</label>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    value={kiddushForm.amount}
-                                    onChange={(e) => setKiddushForm({ ...kiddushForm, amount: e.target.value })}
-                                    className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-medium text-text">הערות נוספות</label>
-                                <textarea
-                                    rows={2}
-                                    value={kiddushForm.notes}
-                                    onChange={(e) => setKiddushForm({ ...kiddushForm, notes: e.target.value })}
-                                    className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
-                                />
-                            </div>
-
-                            {kiddushError && (
-                                <div className="px-3.5 py-2.5 bg-danger-bg border border-danger-border rounded-xl text-xs font-medium text-danger">
-                                    {kiddushError}
-                                </div>
-                            )}
-
-                            <div className="flex justify-end gap-2 pt-1">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsKiddushFormOpen(false)}
-                                    className="px-3 py-1.5 text-xs text-text-muted hover:bg-background rounded-lg"
-                                >
-                                    ביטול
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={isSubmittingKiddush}
-                                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover disabled:bg-border text-white text-xs font-bold rounded-lg"
-                                >
-                                    {isSubmittingKiddush ? "שולח..." : "שליחת בקשה"}
-                                </button>
-                            </div>
-                        </form>
-                    )}
-
-                    {isHaftarahFormOpen && (
-                        <form onSubmit={handleSubmitHaftarah} className="p-4 bg-accent/5 rounded-xl border border-accent/20 space-y-3">
-                            <h3 className="text-xs font-bold text-accent-hover uppercase">בקשת שריון הפטרה</h3>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-xs font-medium text-text">פרשה / מועד מבוקש</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        placeholder="לדוגמה: פרשת יתרו"
-                                        value={haftarahForm.parsha}
-                                        onChange={(e) => setHaftarahForm({ ...haftarahForm, parsha: e.target.value })}
-                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-medium text-text">סיבה (אופציונלי)</label>
-                                    <input
-                                        type="text"
-                                        placeholder="לדוגמה: בר מצווה, יארצייט"
-                                        value={haftarahForm.occasion}
-                                        onChange={(e) => setHaftarahForm({ ...haftarahForm, occasion: e.target.value })}
-                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-medium text-text">הערות נוספות</label>
-                                <textarea
-                                    rows={2}
-                                    value={haftarahForm.notes}
-                                    onChange={(e) => setHaftarahForm({ ...haftarahForm, notes: e.target.value })}
-                                    className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
-                                />
-                            </div>
-
-                            {haftarahError && (
-                                <div className="px-3.5 py-2.5 bg-danger-bg border border-danger-border rounded-xl text-xs font-medium text-danger">
-                                    {haftarahError}
-                                </div>
-                            )}
-
-                            <div className="flex justify-end gap-2 pt-1">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsHaftarahFormOpen(false)}
-                                    className="px-3 py-1.5 text-xs text-text-muted hover:bg-background rounded-lg"
-                                >
-                                    ביטול
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={isSubmittingHaftarah}
-                                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover disabled:bg-border text-white text-xs font-bold rounded-lg"
-                                >
-                                    {isSubmittingHaftarah ? "שולח..." : "שליחת בקשה"}
-                                </button>
-                            </div>
-                        </form>
-                    )}
-
-                    {(kiddushRequests.length > 0 || haftarahRequests.length > 0) && (
-                        <div className="pt-2">
-                            <h3 className="text-xs font-bold text-text-muted uppercase mb-2">הבקשות האחרונות שלי</h3>
-                            <div className="divide-y divide-border">
-                                {kiddushRequests.map((r) => (
-                                    <div key={r.id} className="py-2.5 flex items-center justify-between gap-3 text-sm">
-                                        <div className="min-w-0">
-                                            <span className="font-semibold text-text">תרומת קידוש</span>
-                                            <span className="text-xs text-text-muted mr-2">
-                                                {r.occasion} · {r.preferredDate}
-                                            </span>
-                                        </div>
-                                        <Badge variant={STATUS_LABELS[r.status]?.variant ?? "neutral"}>
-                                            {STATUS_LABELS[r.status]?.label ?? r.status}
-                                        </Badge>
-                                    </div>
-                                ))}
-                                {haftarahRequests.map((r) => (
-                                    <div key={r.id} className="py-2.5 flex items-center justify-between gap-3 text-sm">
-                                        <div className="min-w-0">
-                                            <span className="font-semibold text-text">שריון הפטרה</span>
-                                            <span className="text-xs text-text-muted mr-2">{r.parsha}</span>
-                                        </div>
-                                        <Badge variant={STATUS_LABELS[r.status]?.variant ?? "neutral"}>
-                                            {STATUS_LABELS[r.status]?.label ?? r.status}
-                                        </Badge>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
                 </div>
 
             </div>

@@ -22,6 +22,9 @@ export async function getAdminDashboardData() {
             totalAllTime,
             pendingKiddushCount,
             pendingHaftarahCount,
+            pendingEventCount,
+            pendingInquiryCount,
+            pendingAliyahCount,
         ] = await Promise.all([
                 prisma.joinRequest.findMany({
                     where: { isProcessed: false },
@@ -45,6 +48,9 @@ export async function getAdminDashboardData() {
                 prisma.transaction.aggregate({ _sum: { amount: true } }),
                 prisma.kiddushDonationRequest.count({ where: { status: "pending" } }),
                 prisma.haftarahRequest.count({ where: { status: "pending" } }),
+                prisma.eventNotification.count({ where: { status: "pending" } }),
+                prisma.generalInquiry.count({ where: { status: "pending" } }),
+                prisma.aliyahRequest.count({ where: { status: "pending" } }),
             ]);
 
         const fundBreakdown = fundBreakdownRaw.map((f: (typeof fundBreakdownRaw)[number]) => ({
@@ -60,7 +66,8 @@ export async function getAdminDashboardData() {
             fundBreakdown,
             recurringCount,
             emailConfigured: isEmailConfigured(),
-            pendingMemberRequestsCount: pendingKiddushCount + pendingHaftarahCount,
+            pendingMemberRequestsCount:
+                pendingKiddushCount + pendingHaftarahCount + pendingEventCount + pendingInquiryCount + pendingAliyahCount,
         };
     } catch (error) {
         console.error("[Get Admin Data Error]:", error);
@@ -77,30 +84,47 @@ export async function getAdminDashboardData() {
     }
 }
 
-// Fetch pending Kiddush-donation and Haftarah requests for the /admin/requests review page
+// Fetch pending Kiddush-donation, Haftarah, event-notification, general-inquiry,
+// and Aliyah requests for the /admin/requests review page
 export async function getRequestsDashboardData() {
     try {
         await requireAdmin();
 
         const memberSelect = { firstName: true, lastName: true, phone: true, email: true } as const;
 
-        const [kiddushRequests, haftarahRequests] = await Promise.all([
-            prisma.kiddushDonationRequest.findMany({
-                where: { status: "pending" },
-                orderBy: { createdAt: "desc" },
-                include: { member: { select: memberSelect } },
-            }),
-            prisma.haftarahRequest.findMany({
-                where: { status: "pending" },
-                orderBy: { createdAt: "desc" },
-                include: { member: { select: memberSelect } },
-            }),
-        ]);
+        const [kiddushRequests, haftarahRequests, eventNotifications, generalInquiries, aliyahRequests] =
+            await Promise.all([
+                prisma.kiddushDonationRequest.findMany({
+                    where: { status: "pending" },
+                    orderBy: { createdAt: "desc" },
+                    include: { member: { select: memberSelect } },
+                }),
+                prisma.haftarahRequest.findMany({
+                    where: { status: "pending" },
+                    orderBy: { createdAt: "desc" },
+                    include: { member: { select: memberSelect } },
+                }),
+                prisma.eventNotification.findMany({
+                    where: { status: "pending" },
+                    orderBy: { createdAt: "desc" },
+                    include: { member: { select: memberSelect } },
+                }),
+                prisma.generalInquiry.findMany({
+                    where: { status: "pending" },
+                    orderBy: { createdAt: "desc" },
+                    include: { member: { select: memberSelect } },
+                }),
+                prisma.aliyahRequest.findMany({
+                    where: { status: "pending" },
+                    orderBy: { createdAt: "desc" },
+                    include: { member: { select: memberSelect } },
+                }),
+            ]);
 
-        return { kiddushRequests, haftarahRequests };
+        return { kiddushRequests, haftarahRequests, eventNotifications, generalInquiries, aliyahRequests };
     } catch (error) {
         console.error("[Get Requests Dashboard Data Error]:", error);
-        return { kiddushRequests: [], haftarahRequests: [] };
+        return { kiddushRequests: [], haftarahRequests: [], eventNotifications: [], generalInquiries: [], aliyahRequests: [] };
     }
 }
 
@@ -174,6 +198,117 @@ export async function updateHaftarahRequestNotes(requestId: string, notes: strin
         return { success: true as const };
     } catch (error) {
         console.error("[Update Haftarah Request Notes Error]:", error);
+        return { success: false as const, error: "Failed to save note" };
+    }
+}
+
+// Approve or reject an event notification (simcha/mourning)
+export async function reviewEventNotification(requestId: string, status: "approved" | "rejected") {
+    try {
+        await requireAdmin();
+
+        await prisma.eventNotification.update({
+            where: { id: requestId },
+            data: { status },
+        });
+
+        revalidatePath("/admin/requests");
+        revalidatePath("/profile");
+        return { success: true as const };
+    } catch (error) {
+        console.error("[Review Event Notification Error]:", error);
+        return { success: false as const, error: "Failed to update request" };
+    }
+}
+
+// Gabay-only scratch notes on a pending event notification
+export async function updateEventNotificationNotes(requestId: string, notes: string) {
+    try {
+        await requireAdmin();
+
+        await prisma.eventNotification.update({
+            where: { id: requestId },
+            data: { adminNotes: notes.trim() || null },
+        });
+
+        revalidatePath("/admin/requests");
+        return { success: true as const };
+    } catch (error) {
+        console.error("[Update Event Notification Notes Error]:", error);
+        return { success: false as const, error: "Failed to save note" };
+    }
+}
+
+// Approve or reject a general inquiry
+export async function reviewGeneralInquiry(requestId: string, status: "approved" | "rejected") {
+    try {
+        await requireAdmin();
+
+        await prisma.generalInquiry.update({
+            where: { id: requestId },
+            data: { status },
+        });
+
+        revalidatePath("/admin/requests");
+        revalidatePath("/profile");
+        return { success: true as const };
+    } catch (error) {
+        console.error("[Review General Inquiry Error]:", error);
+        return { success: false as const, error: "Failed to update request" };
+    }
+}
+
+// Gabay-only scratch notes on a pending general inquiry
+export async function updateGeneralInquiryNotes(requestId: string, notes: string) {
+    try {
+        await requireAdmin();
+
+        await prisma.generalInquiry.update({
+            where: { id: requestId },
+            data: { adminNotes: notes.trim() || null },
+        });
+
+        revalidatePath("/admin/requests");
+        return { success: true as const };
+    } catch (error) {
+        console.error("[Update General Inquiry Notes Error]:", error);
+        return { success: false as const, error: "Failed to save note" };
+    }
+}
+
+// Approve or reject an Aliyah request
+export async function reviewAliyahRequest(requestId: string, status: "approved" | "rejected") {
+    try {
+        await requireAdmin();
+
+        await prisma.aliyahRequest.update({
+            where: { id: requestId },
+            data: { status },
+        });
+
+        revalidatePath("/admin/requests");
+        revalidatePath("/profile");
+        return { success: true as const };
+    } catch (error) {
+        console.error("[Review Aliyah Request Error]:", error);
+        return { success: false as const, error: "Failed to update request" };
+    }
+}
+
+// Gabay-only scratch notes on a pending Aliyah request
+export async function updateAliyahRequestNotes(requestId: string, notes: string) {
+    try {
+        await requireAdmin();
+
+        await prisma.aliyahRequest.update({
+            where: { id: requestId },
+            data: { adminNotes: notes.trim() || null },
+        });
+
+        revalidatePath("/admin/requests");
+        return { success: true as const };
+    } catch (error) {
+        console.error("[Update Aliyah Request Notes Error]:", error);
         return { success: false as const, error: "Failed to save note" };
     }
 }
