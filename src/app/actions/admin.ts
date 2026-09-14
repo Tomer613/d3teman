@@ -13,8 +13,16 @@ export async function getAdminDashboardData() {
     try {
         await requireAdmin();
 
-        const [pendingRequests, members, recentTransactions, fundBreakdownRaw, recurringCount, totalAllTime] =
-            await Promise.all([
+        const [
+            pendingRequests,
+            members,
+            recentTransactions,
+            fundBreakdownRaw,
+            recurringCount,
+            totalAllTime,
+            pendingKiddushCount,
+            pendingHaftarahCount,
+        ] = await Promise.all([
                 prisma.joinRequest.findMany({
                     where: { isProcessed: false },
                     orderBy: { createdAt: "desc" },
@@ -35,6 +43,8 @@ export async function getAdminDashboardData() {
                 }),
                 prisma.transaction.count({ where: { isRecurring: true } }),
                 prisma.transaction.aggregate({ _sum: { amount: true } }),
+                prisma.kiddushDonationRequest.count({ where: { status: "pending" } }),
+                prisma.haftarahRequest.count({ where: { status: "pending" } }),
             ]);
 
         const fundBreakdown = fundBreakdownRaw.map((f: (typeof fundBreakdownRaw)[number]) => ({
@@ -50,6 +60,7 @@ export async function getAdminDashboardData() {
             fundBreakdown,
             recurringCount,
             emailConfigured: isEmailConfigured(),
+            pendingMemberRequestsCount: pendingKiddushCount + pendingHaftarahCount,
         };
     } catch (error) {
         console.error("[Get Admin Data Error]:", error);
@@ -61,7 +72,109 @@ export async function getAdminDashboardData() {
             fundBreakdown: [],
             recurringCount: 0,
             emailConfigured: false,
+            pendingMemberRequestsCount: 0,
         };
+    }
+}
+
+// Fetch pending Kiddush-donation and Haftarah requests for the /admin/requests review page
+export async function getRequestsDashboardData() {
+    try {
+        await requireAdmin();
+
+        const memberSelect = { firstName: true, lastName: true, phone: true, email: true } as const;
+
+        const [kiddushRequests, haftarahRequests] = await Promise.all([
+            prisma.kiddushDonationRequest.findMany({
+                where: { status: "pending" },
+                orderBy: { createdAt: "desc" },
+                include: { member: { select: memberSelect } },
+            }),
+            prisma.haftarahRequest.findMany({
+                where: { status: "pending" },
+                orderBy: { createdAt: "desc" },
+                include: { member: { select: memberSelect } },
+            }),
+        ]);
+
+        return { kiddushRequests, haftarahRequests };
+    } catch (error) {
+        console.error("[Get Requests Dashboard Data Error]:", error);
+        return { kiddushRequests: [], haftarahRequests: [] };
+    }
+}
+
+// Approve or reject a Kiddush-donation request
+export async function reviewKiddushDonationRequest(requestId: string, status: "approved" | "rejected") {
+    try {
+        await requireAdmin();
+
+        await prisma.kiddushDonationRequest.update({
+            where: { id: requestId },
+            data: { status },
+        });
+
+        revalidatePath("/admin/requests");
+        revalidatePath("/profile");
+        return { success: true as const };
+    } catch (error) {
+        console.error("[Review Kiddush Donation Request Error]:", error);
+        return { success: false as const, error: "Failed to update request" };
+    }
+}
+
+// Gabay-only scratch notes on a pending Kiddush-donation request
+export async function updateKiddushDonationRequestNotes(requestId: string, notes: string) {
+    try {
+        await requireAdmin();
+
+        await prisma.kiddushDonationRequest.update({
+            where: { id: requestId },
+            data: { adminNotes: notes.trim() || null },
+        });
+
+        revalidatePath("/admin/requests");
+        return { success: true as const };
+    } catch (error) {
+        console.error("[Update Kiddush Donation Request Notes Error]:", error);
+        return { success: false as const, error: "Failed to save note" };
+    }
+}
+
+// Approve or reject a Haftarah-reservation request
+export async function reviewHaftarahRequest(requestId: string, status: "approved" | "rejected") {
+    try {
+        await requireAdmin();
+
+        await prisma.haftarahRequest.update({
+            where: { id: requestId },
+            data: { status },
+        });
+
+        revalidatePath("/admin/requests");
+        revalidatePath("/profile");
+        return { success: true as const };
+    } catch (error) {
+        console.error("[Review Haftarah Request Error]:", error);
+        return { success: false as const, error: "Failed to update request" };
+    }
+}
+
+// Gabay-only scratch notes on a pending Haftarah request
+export async function updateHaftarahRequestNotes(requestId: string, notes: string) {
+    try {
+        await requireAdmin();
+
+        await prisma.haftarahRequest.update({
+            where: { id: requestId },
+            data: { adminNotes: notes.trim() || null },
+        });
+
+        revalidatePath("/admin/requests");
+        return { success: true as const };
+    } catch (error) {
+        console.error("[Update Haftarah Request Notes Error]:", error);
+        return { success: false as const, error: "Failed to save note" };
     }
 }
 

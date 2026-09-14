@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { PartyPopper, Mail, Users } from "lucide-react";
+import Link from "next/link";
+import { PartyPopper, Mail, Users, ClipboardList } from "lucide-react";
 import { approveJoinRequest, rejectJoinRequest, updateMemberRole, setMemberApproval } from "@/app/actions/admin";
 import { LinkButton } from "@/components/ui/Button";
 import JoinRequestCard, { type PendingRequest } from "./JoinRequestCard";
@@ -48,6 +49,7 @@ interface AdminDashboardClientProps {
     viewerRole: string;
     viewerId: string;
     emailConfigured: boolean;
+    pendingMemberRequestsCount: number;
 }
 
 // Generates a random, readable initial password for a newly-approved member.
@@ -67,6 +69,7 @@ export default function AdminDashboardClient({
     viewerRole,
     viewerId,
     emailConfigured,
+    pendingMemberRequestsCount,
 }: AdminDashboardClientProps) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
@@ -160,6 +163,10 @@ export default function AdminDashboardClient({
                         </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
+                        <LinkButton href="/admin/requests" variant="secondary" size="sm">
+                            <ClipboardList className="size-4" aria-hidden="true" />
+                            <span>בקשות חברים{pendingMemberRequestsCount > 0 ? ` (${pendingMemberRequestsCount})` : ""}</span>
+                        </LinkButton>
                         <LinkButton href="/admin/events" variant="secondary" size="sm">
                             <PartyPopper className="size-4" aria-hidden="true" />
                             <span>אירועים ושמחות</span>
@@ -176,11 +183,15 @@ export default function AdminDashboardClient({
                 </div>
 
                 {/* Stats Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div className="bg-surface p-5 rounded-2xl border border-border shadow-xs">
                         <div className="text-xs text-text-muted">בקשות ממתינות לאישור</div>
                         <div className="text-2xl font-bold text-accent mt-1">{pendingRequests.length}</div>
                     </div>
+                    <Link href="/admin/requests" className="bg-surface p-5 rounded-2xl border border-border shadow-xs hover:bg-background/50 transition-colors">
+                        <div className="text-xs text-text-muted">בקשות חברים ממתינות</div>
+                        <div className="text-2xl font-bold text-accent mt-1">{pendingMemberRequestsCount}</div>
+                    </Link>
                     <div className="bg-surface p-5 rounded-2xl border border-border shadow-xs">
                         <div className="text-xs text-text-muted">חברי קהילה רשומים</div>
                         <div className="text-2xl font-bold text-text mt-1">{members.length}</div>

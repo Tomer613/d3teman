@@ -15,6 +15,11 @@ function clampChildCount(value: number): number {
 }
 
 export interface UpdateProfileInput {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    street: string;
+    city: string;
     halachicStatus: string;
     showPhoneInDirectory: boolean;
     showAddressInDirectory: boolean;
@@ -35,6 +40,15 @@ export async function updateProfile(data: UpdateProfileInput) {
         await prisma.member.update({
             where: { id: session.sub },
             data: {
+                // Empty values are allowed here on purpose - they're exactly the
+                // "not yet filled in" state the profile-completion checklist
+                // surfaces, and a member shouldn't be blocked from saving other
+                // changes just because one of these is still blank.
+                firstName: data.firstName.trim(),
+                lastName: data.lastName.trim(),
+                phone: data.phone.trim(),
+                street: data.street.trim(),
+                city: data.city.trim(),
                 halachicStatus: data.halachicStatus,
                 showPhoneInDirectory: !!data.showPhoneInDirectory,
                 showAddressInDirectory: !!data.showAddressInDirectory,
