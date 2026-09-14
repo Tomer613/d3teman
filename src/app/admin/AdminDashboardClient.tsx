@@ -4,7 +4,13 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { PartyPopper, Mail, Users, ClipboardList } from "lucide-react";
-import { approveJoinRequest, rejectJoinRequest, updateMemberRole, setMemberApproval } from "@/app/actions/admin";
+import {
+    approveJoinRequest,
+    rejectJoinRequest,
+    updateMemberRole,
+    setMemberApproval,
+    resetMemberPassword,
+} from "@/app/actions/admin";
 import { LinkButton } from "@/components/ui/Button";
 import JoinRequestCard, { type PendingRequest } from "./JoinRequestCard";
 
@@ -78,6 +84,8 @@ export default function AdminDashboardClient({
     const [approveError, setApproveError] = useState<string | null>(null);
     const [rejectError, setRejectError] = useState<string | null>(null);
     const [memberActionError, setMemberActionError] = useState<string | null>(null);
+    const [resetPasswordResult, setResetPasswordResult] = useState<{ name: string; password: string } | null>(null);
+    const [resetPasswordError, setResetPasswordError] = useState<string | null>(null);
 
     const handleRoleChange = (memberId: string, newRole: string) => {
         setMemberActionError(null);
@@ -100,6 +108,21 @@ export default function AdminDashboardClient({
                 return;
             }
             router.refresh();
+        });
+    };
+
+    const handleResetPassword = (memberId: string, memberName: string) => {
+        setResetPasswordError(null);
+        setProcessingId(memberId);
+        startTransition(async () => {
+            const result = await resetMemberPassword(memberId);
+            if (!result.success) {
+                setResetPasswordError(result.error);
+                setProcessingId(null);
+                return;
+            }
+            setResetPasswordResult({ name: memberName, password: result.password });
+            setProcessingId(null);
         });
     };
 
@@ -313,6 +336,40 @@ export default function AdminDashboardClient({
                         </div>
                     )}
 
+                    {resetPasswordError && (
+                        <div className="mx-6 mt-4 px-3.5 py-2.5 bg-danger-bg border border-danger-border rounded-xl text-xs font-medium text-danger">
+                            {resetPasswordError}
+                        </div>
+                    )}
+
+                    {resetPasswordResult && (
+                        <div className="mx-6 mt-4 p-3 bg-success/10 border border-success/30 rounded-xl space-y-2">
+                            <p className="text-xs font-semibold text-success">
+                                סיסמה חדשה נוצרה עבור {resetPasswordResult.name} - יש למסור אותה באופן אישי
+                                (טלפון/וואטסאפ). בכניסה הבאה הוא/היא יתבקשו לקבוע סיסמה קבועה. הסיסמה לא תוצג שוב.
+                            </p>
+                            <div className="flex items-center gap-2">
+                                <code className="flex-1 px-2.5 py-1.5 bg-surface border border-success/40 rounded-lg text-sm font-mono text-success select-all">
+                                    {resetPasswordResult.password}
+                                </code>
+                                <button
+                                    type="button"
+                                    onClick={() => navigator.clipboard.writeText(resetPasswordResult.password)}
+                                    className="px-2.5 py-1.5 bg-surface hover:bg-success/20 border border-success/40 text-success text-xs font-semibold rounded-lg transition-colors"
+                                >
+                                    העתק
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setResetPasswordResult(null)}
+                                    className="px-2.5 py-1.5 text-xs text-text-muted hover:bg-background rounded-lg transition-colors"
+                                >
+                                    סגור
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     {members.length === 0 ? (
                         <div className="p-8 text-center text-sm text-text-muted">
                             עדיין לא אושרו חברים. אשר את הבקשה הראשונה למעלה!
@@ -375,19 +432,29 @@ export default function AdminDashboardClient({
                                                 </span>
                                             </td>
                                             <td className="px-6 py-3">
-                                                {m.id !== viewerId && (m.role !== "super_admin" || viewerRole === "super_admin") && (
+                                                <div className="flex items-center gap-2">
                                                     <button
                                                         type="button"
-                                                        onClick={() => handleToggleApproval(m.id, m.isApproved)}
+                                                        onClick={() => handleResetPassword(m.id, `${m.firstName} ${m.lastName}`)}
                                                         disabled={isPending}
-                                                        className={`px-3 py-1 rounded-lg font-semibold transition-colors disabled:opacity-50 ${m.isApproved
-                                                            ? "bg-danger-bg hover:opacity-80 text-danger"
-                                                            : "bg-success/10 hover:bg-success/20 text-success"
-                                                            }`}
+                                                        className="px-3 py-1 rounded-lg font-semibold transition-colors disabled:opacity-50 bg-primary/10 hover:bg-primary/20 text-primary"
                                                     >
-                                                        {m.isApproved ? "השבתה" : "הפעלה"}
+                                                        {processingId === m.id ? "מאפס..." : "איפוס סיסמה"}
                                                     </button>
-                                                )}
+                                                    {m.id !== viewerId && (m.role !== "super_admin" || viewerRole === "super_admin") && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleToggleApproval(m.id, m.isApproved)}
+                                                            disabled={isPending}
+                                                            className={`px-3 py-1 rounded-lg font-semibold transition-colors disabled:opacity-50 ${m.isApproved
+                                                                ? "bg-danger-bg hover:opacity-80 text-danger"
+                                                                : "bg-success/10 hover:bg-success/20 text-success"
+                                                                }`}
+                                                        >
+                                                            {m.isApproved ? "השבתה" : "הפעלה"}
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}

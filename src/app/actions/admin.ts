@@ -205,6 +205,7 @@ export async function approveJoinRequest(requestId: string, initialPassword: str
                 data: {
                     email: request.email,
                     passwordHash,
+                    mustChangePassword: true,
                     firstName: request.firstName,
                     lastName: request.lastName,
                     phone: request.phone,
@@ -244,6 +245,29 @@ export async function rejectJoinRequest(requestId: string) {
     } catch (error) {
         console.error("[Reject Join Request Error]:", error);
         return { success: false as const, error: "Failed to dismiss request" };
+    }
+}
+
+// Generates a new one-time password for an existing member (e.g. after a
+// "can't log in" report) and forces them to set a real one at next login -
+// same pattern as the initial password issued on join-request approval.
+export async function resetMemberPassword(memberId: string) {
+    try {
+        await requireAdmin();
+
+        const initialPassword = crypto.randomUUID().replace(/-/g, "").slice(0, 12);
+        const passwordHash = await hashPassword(initialPassword);
+
+        await prisma.member.update({
+            where: { id: memberId },
+            data: { passwordHash, mustChangePassword: true },
+        });
+
+        revalidatePath("/admin");
+        return { success: true as const, password: initialPassword };
+    } catch (error) {
+        console.error("[Reset Member Password Error]:", error);
+        return { success: false as const, error: "Failed to reset password" };
     }
 }
 

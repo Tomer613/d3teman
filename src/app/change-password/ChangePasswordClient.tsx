@@ -3,19 +3,26 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { login } from "@/app/actions/auth";
+import { changePassword } from "@/app/actions/auth";
 import { COMMUNITY_NAME, COMMUNITY_TAGLINE } from "@/lib/branding";
 import CommunityLogo from "@/components/CommunityLogo";
 import DecorativePattern from "@/components/ui/DecorativePattern";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
-import Button, { LinkButton } from "@/components/ui/Button";
+import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
 
-export default function LoginPage() {
+interface ChangePasswordClientProps {
+    // True when the account still carries a temporary/reset password and
+    // this page was reached via the proxy's forced redirect (no way back
+    // to /profile or /admin until a new password is set).
+    forced: boolean;
+}
+
+export default function ChangePasswordClient({ forced }: ChangePasswordClientProps) {
     const router = useRouter();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,9 +30,14 @@ export default function LoginPage() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError(null);
-        setIsSubmitting(true);
 
-        const result = await login(new FormData(e.currentTarget));
+        if (newPassword !== confirmPassword) {
+            setError("הסיסמאות אינן תואמות");
+            return;
+        }
+
+        setIsSubmitting(true);
+        const result = await changePassword(newPassword);
 
         if (!result.success) {
             setError(result.error);
@@ -33,11 +45,7 @@ export default function LoginPage() {
             return;
         }
 
-        if (result.mustChangePassword) {
-            router.push("/change-password");
-        } else {
-            router.push(result.role === "member" ? "/profile" : "/admin");
-        }
+        router.push(result.role === "member" ? "/profile" : "/admin");
         router.refresh();
     };
 
@@ -49,11 +57,11 @@ export default function LoginPage() {
                 <CommunityLogo size="md" className="mx-auto mb-4" />
                 <h1 className="text-lg font-bold tracking-tight text-text">{COMMUNITY_NAME}</h1>
                 <p className="mt-1 text-sm text-text-muted">{COMMUNITY_TAGLINE}</p>
-                <h2 className="mt-4 text-xl font-bold tracking-tight text-text">
-                    כניסה לפורטל הקהילה
-                </h2>
+                <h2 className="mt-4 text-xl font-bold tracking-tight text-text">קביעת סיסמה חדשה</h2>
                 <p className="mt-2 text-sm text-text-muted">
-                    הכניסה באמצעות מייל וסיסמה ראשונית שנמסרו ע&quot;י הגבאים
+                    {forced
+                        ? "מטעמי אבטחה יש להחליף את הסיסמה הזמנית שקיבלת לפני המשך השימוש במערכת"
+                        : "בחר/י סיסמה חדשה לחשבונך"}
                 </p>
             </div>
 
@@ -63,23 +71,13 @@ export default function LoginPage() {
                         {error && <Alert variant="error">{error}</Alert>}
 
                         <Input
-                            label="כתובת מייל"
-                            type="email"
-                            name="email"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="name@example.com"
-                        />
-
-                        <Input
-                            label="סיסמה"
+                            label="סיסמה חדשה"
                             type={showPassword ? "text" : "password"}
-                            name="password"
                             required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••"
+                            minLength={8}
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="לפחות 8 תווים"
                             rightElement={
                                 <button
                                     type="button"
@@ -97,17 +95,20 @@ export default function LoginPage() {
                             }
                         />
 
-                        <Button type="submit" variant="primary" fullWidth isLoading={isSubmitting} loadingLabel="מתחבר...">
-                            התחברות
+                        <Input
+                            label="אימות סיסמה חדשה"
+                            type={showPassword ? "text" : "password"}
+                            required
+                            minLength={8}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="הקלד/י שוב את הסיסמה החדשה"
+                        />
+
+                        <Button type="submit" variant="primary" fullWidth isLoading={isSubmitting} loadingLabel="שומר...">
+                            שמירת סיסמה חדשה
                         </Button>
                     </form>
-
-                    <div className="mt-6 pt-6 border-t border-border text-center space-y-2">
-                        <p className="text-xs text-text-muted">עדיין אין לכם גישה למערכת?</p>
-                        <LinkButton href="/join-request" variant="ghost" size="sm">
-                            הגשת בקשת הצטרפות לגבאים ←
-                        </LinkButton>
-                    </div>
                 </Card>
             </div>
         </div>

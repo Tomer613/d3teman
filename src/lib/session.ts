@@ -20,6 +20,10 @@ export interface SessionPayload {
     sub: string;
     role: string;
     email: string;
+    // Baked into the JWT at login/password-change time (not re-checked from
+    // the DB on every request like role/isApproved) so the edge proxy can
+    // redirect to /change-password without a database call.
+    mustChangePassword: boolean;
 }
 
 function getSecretKey() {
@@ -49,7 +53,12 @@ export async function verifySessionToken(token: string): Promise<SessionPayload 
         ) {
             return null;
         }
-        return { sub: payload.sub, role: payload.role, email: payload.email };
+        return {
+            sub: payload.sub,
+            role: payload.role,
+            email: payload.email,
+            mustChangePassword: !!payload.mustChangePassword,
+        };
     } catch {
         return null;
     }

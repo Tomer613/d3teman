@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Gift, Users, UserRound, ShieldCheck, LogOut } from "lucide-react";
+import { Gift, Users, UserRound, ShieldCheck, LogOut, KeyRound } from "lucide-react";
 import { COMMUNITY_NAME, COMMUNITY_TAGLINE } from "@/lib/branding";
 import { ADMIN_ROLES } from "@/lib/session";
 import { requireSession, requireSessionOrRedirect } from "@/lib/auth";
@@ -70,6 +70,10 @@ export default async function GatedHeader({ optional = false }: GatedHeaderProps
                             <span>אזור ניהול</span>
                         </LinkButton>
                     )}
+                    <LinkButton href="/change-password" variant="ghost" size="sm">
+                        <KeyRound className="size-4" aria-hidden="true" />
+                        <span>שינוי סיסמה</span>
+                    </LinkButton>
                     <form action={logout}>
                         <button
                             type="submit"

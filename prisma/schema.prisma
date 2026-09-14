@@ -13,6 +13,7 @@ model Member {
   id                     String   @id @default(cuid())
   email                  String   @unique
   passwordHash           String?
+  mustChangePassword     Boolean  @default(false) // forces the change-password flow after a fresh/reset temporary password
   firstName              String
   lastName               String
   phone                  String
