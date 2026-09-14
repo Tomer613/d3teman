@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin, requireSession } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 const EVENT_TYPES = new Set(["brit_yitzchak", "shabbat_chatan", "bar_mitzvah", "wedding", "general"]);
@@ -16,10 +16,13 @@ export interface CommunityEventRecord {
     location: string | null;
 }
 
-// Public read (no auth required) - the homepage shows upcoming events to
-// anyone, including visitors who haven't logged in yet.
+// Members-only read: the homepage is gated behind login, so this requires a
+// session too - defense-in-depth alongside the page-level
+// requireSessionOrRedirect() check, same pattern as getDirectoryMembers().
 export async function getUpcomingEvents(limit = 6): Promise<CommunityEventRecord[]> {
     try {
+        await requireSession();
+
         // eventDate is stored from a date-only <input type="date">, which JS
         // parses as UTC midnight - comparing against the current instant
         // (new Date()) would drop "today's" event a couple of hours into

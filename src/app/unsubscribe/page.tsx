@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { unsubscribeFromNewsletter } from "@/app/actions/unsubscribe";
+import Card from "@/components/ui/Card";
+import { LinkButton } from "@/components/ui/Button";
 
 export const dynamic = "force-dynamic";
 
@@ -14,38 +15,35 @@ export default async function UnsubscribePage({ searchParams }: UnsubscribePageP
         : { success: false as const, error: "Missing unsubscribe token" };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-            <div className="max-w-md w-full bg-white p-8 rounded-2xl border border-slate-200 shadow-xs text-center space-y-4">
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
+            <Card padding="lg" className="max-w-md w-full text-center space-y-4">
                 {result.success ? (
                     <>
-                        <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+                        <div className="w-12 h-12 bg-success/10 text-success rounded-full flex items-center justify-center mx-auto text-xl font-bold">
                             ✓
                         </div>
-                        <h2 className="text-xl font-bold text-slate-900">הוסרת מרשימת התפוצה</h2>
-                        <p className="text-sm text-slate-600 leading-relaxed">
+                        <h2 className="text-xl font-bold text-text">הוסרת מרשימת התפוצה</h2>
+                        <p className="text-sm text-text-muted leading-relaxed">
                             לא תקבל/י יותר עדכוני ניוזלטר במייל. ניתן לשנות זאת בכל עת מהאזור האישי.
                         </p>
                     </>
                 ) : (
                     <>
-                        <div className="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+                        <div className="w-12 h-12 bg-danger-bg text-danger rounded-full flex items-center justify-center mx-auto text-xl font-bold">
                             ✕
                         </div>
-                        <h2 className="text-xl font-bold text-slate-900">הקישור אינו תקין</h2>
-                        <p className="text-sm text-slate-600 leading-relaxed">
+                        <h2 className="text-xl font-bold text-text">הקישור אינו תקין</h2>
+                        <p className="text-sm text-text-muted leading-relaxed">
                             ניתן לעדכן את הגדרות קבלת הניוזלטר מהאזור האישי לאחר התחברות.
                         </p>
                     </>
                 )}
                 <div className="pt-4">
-                    <Link
-                        href="/"
-                        className="inline-block px-5 py-2.5 bg-slate-100 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-200 transition-colors"
-                    >
-                        חזרה לדף הבית
-                    </Link>
+                    <LinkButton href="/login" variant="secondary" size="sm">
+                        חזרה למסך הכניסה
+                    </LinkButton>
                 </div>
-            </div>
+            </Card>
         </div>
     );
 }

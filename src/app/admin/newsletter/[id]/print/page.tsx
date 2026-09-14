@@ -28,21 +28,21 @@ export default async function NewsletterPrintPage({ params }: NewsletterPrintPag
     const items = parseItems(newsletter.items);
 
     return (
-        <div className="min-h-screen bg-white py-10 px-6 print:p-0">
+        <div className="min-h-screen bg-surface py-10 px-6 print:p-0">
             <div className="max-w-2xl mx-auto space-y-8 print:max-w-none">
-                <div className="text-center border-b-2 border-amber-800 pb-4 space-y-1">
-                    <h1 className="text-xl font-bold text-amber-900">{COMMUNITY_NAME}</h1>
-                    <h2 className="text-lg font-semibold text-slate-800">{newsletter.subject}</h2>
+                <div className="text-center border-b-2 border-primary pb-4 space-y-1">
+                    <h1 className="text-xl font-bold text-primary">{COMMUNITY_NAME}</h1>
+                    <h2 className="text-lg font-semibold text-text">{newsletter.subject}</h2>
                 </div>
 
                 <div className="space-y-6">
                     {items.map((item, index) => (
                         <div key={index} className="space-y-1.5">
-                            <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800">
+                            <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-accent/10 text-accent-hover">
                                 {item.category}
                             </span>
-                            <h3 className="text-base font-bold text-slate-900">{item.title}</h3>
-                            <p className="text-sm text-slate-700 leading-relaxed">{item.body}</p>
+                            <h3 className="text-base font-bold text-text">{item.title}</h3>
+                            <p className="text-sm text-text leading-relaxed">{item.body}</p>
                             {item.imageUrl && (
                                 // eslint-disable-next-line @next/next/no-img-element -- print output, next/image optimization is irrelevant here
                                 <img src={item.imageUrl} alt={item.title} className="max-w-full rounded-lg mt-1" />
@@ -51,7 +51,7 @@ export default async function NewsletterPrintPage({ params }: NewsletterPrintPag
                     ))}
                 </div>
 
-                <div className="text-center text-xs text-slate-400 border-t border-slate-200 pt-4">
+                <div className="text-center text-xs text-text-muted border-t border-border pt-4">
                     {COMMUNITY_NAME} • {COMMUNITY_ADDRESS_LINE}
                 </div>
 

@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="he" dir="rtl" className={rubik.variable}>
-      <body className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased">
+      <body className="min-h-screen bg-background text-text font-sans antialiased">
         {children}
       </body>
     </html>

@@ -153,50 +153,50 @@ export default function AdminDashboardClient({
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-6xl mx-auto space-y-6">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface p-6 rounded-2xl border border-border shadow-xs">
                     <div>
                         <div className="flex items-center gap-2">
-                            <span className="px-2.5 py-0.5 text-xs font-semibold bg-amber-100 text-amber-800 rounded-full">
+                            <span className="px-2.5 py-0.5 text-xs font-semibold bg-accent/10 text-accent-hover rounded-full">
                                 מורשה גבאי
                             </span>
-                            <h1 className="text-xl font-bold text-slate-900">לוח ניהול קהילתי</h1>
+                            <h1 className="text-xl font-bold text-text">לוח ניהול קהילתי</h1>
                         </div>
-                        <p className="text-xs text-slate-500 mt-1">
+                        <p className="text-xs text-text-muted mt-1">
                             אישור מצטרפים חדשים, מעקב גבייה וסנכרון תרומות
                         </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
                         <Link
                             href="/admin/events"
-                            className="px-3.5 py-2 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                            className="px-3.5 py-2 text-xs font-medium text-text bg-background hover:bg-border rounded-xl transition-colors"
                         >
                             אירועים ושמחות
                         </Link>
                         <Link
                             href="/admin/newsletter"
-                            className="px-3.5 py-2 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                            className="px-3.5 py-2 text-xs font-medium text-text bg-background hover:bg-border rounded-xl transition-colors"
                         >
                             ניוזלטר
                         </Link>
                         <Link
                             href="/directory"
-                            className="px-3.5 py-2 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                            className="px-3.5 py-2 text-xs font-medium text-text bg-background hover:bg-border rounded-xl transition-colors"
                         >
                             ספר הקהילה
                         </Link>
                         <Link
                             href="/"
-                            className="px-3.5 py-2 text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-xl transition-colors"
+                            className="px-3.5 py-2 text-xs font-medium text-accent-hover bg-accent/10 hover:bg-accent/20 rounded-xl transition-colors"
                         >
                             חזרה לדף הבית
                         </Link>
                         <button
                             type="button"
                             onClick={() => startTransition(() => logout())}
-                            className="px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                            className="px-3.5 py-2 text-xs font-medium text-text-muted hover:bg-background rounded-xl transition-colors"
                         >
                             התנתקות
                         </button>
@@ -205,87 +205,87 @@ export default function AdminDashboardClient({
 
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-                        <div className="text-xs text-slate-500">בקשות ממתינות לאישור</div>
-                        <div className="text-2xl font-bold text-amber-600 mt-1">{pendingRequests.length}</div>
+                    <div className="bg-surface p-5 rounded-2xl border border-border shadow-xs">
+                        <div className="text-xs text-text-muted">בקשות ממתינות לאישור</div>
+                        <div className="text-2xl font-bold text-accent mt-1">{pendingRequests.length}</div>
                     </div>
-                    <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-                        <div className="text-xs text-slate-500">חברי קהילה רשומים</div>
-                        <div className="text-2xl font-bold text-slate-900 mt-1">{members.length}</div>
+                    <div className="bg-surface p-5 rounded-2xl border border-border shadow-xs">
+                        <div className="text-xs text-text-muted">חברי קהילה רשומים</div>
+                        <div className="text-2xl font-bold text-text mt-1">{members.length}</div>
                     </div>
-                    <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-                        <div className="text-xs text-slate-500">סה&quot;כ תרומות (נדרים פלוס)</div>
-                        <div className="text-2xl font-bold text-emerald-600 mt-1">₪{totalIncome.toLocaleString()}</div>
+                    <div className="bg-surface p-5 rounded-2xl border border-border shadow-xs">
+                        <div className="text-xs text-text-muted">סה&quot;כ תרומות (נדרים פלוס)</div>
+                        <div className="text-2xl font-bold text-success mt-1">₪{totalIncome.toLocaleString()}</div>
                     </div>
-                    <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-                        <div className="text-xs text-slate-500">הוראות קבע</div>
-                        <div className="text-2xl font-bold text-sky-600 mt-1">{recurringCount}</div>
+                    <div className="bg-surface p-5 rounded-2xl border border-border shadow-xs">
+                        <div className="text-xs text-text-muted">הוראות קבע</div>
+                        <div className="text-2xl font-bold text-primary mt-1">{recurringCount}</div>
                     </div>
                 </div>
 
                 {/* Pending Requests Section */}
-                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                    <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                        <h2 className="text-sm font-bold text-slate-900">
+                <div className="bg-surface rounded-2xl border border-border shadow-xs overflow-hidden">
+                    <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+                        <h2 className="text-sm font-bold text-text">
                             בקשות הצטרפות ממתינות ({pendingRequests.length})
                         </h2>
-                        {isPending && <span className="text-xs text-slate-400">מעדכן נתונים...</span>}
+                        {isPending && <span className="text-xs text-text-muted">מעדכן נתונים...</span>}
                     </div>
 
                     {rejectError && (
-                        <div className="mx-6 mt-4 px-3.5 py-2.5 bg-rose-50 border border-rose-200 rounded-xl text-xs font-medium text-rose-700">
+                        <div className="mx-6 mt-4 px-3.5 py-2.5 bg-danger-bg border border-danger-border rounded-xl text-xs font-medium text-danger">
                             {rejectError}
                         </div>
                     )}
 
                     {pendingRequests.length === 0 ? (
-                        <div className="p-8 text-center text-sm text-slate-400">
+                        <div className="p-8 text-center text-sm text-text-muted">
                             אין כרגע בקשות הצטרפות ממתינות
                         </div>
                     ) : (
-                        <div className="divide-y divide-slate-100">
+                        <div className="divide-y divide-border">
                             {pendingRequests.map((req) => (
                                 <div
                                     key={req.id}
-                                    className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/50 transition-colors"
+                                    className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-background/50 transition-colors"
                                 >
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                            <span className="font-semibold text-slate-900 text-sm">
+                                            <span className="font-semibold text-text text-sm">
                                                 {req.firstName} {req.lastName}
                                             </span>
-                                            <span className="text-xs text-slate-400">({req.address}, {req.city})</span>
+                                            <span className="text-xs text-text-muted">({req.address}, {req.city})</span>
                                         </div>
-                                        <div className="text-xs text-slate-600 flex flex-wrap gap-x-4 gap-y-1">
+                                        <div className="text-xs text-text-muted flex flex-wrap gap-x-4 gap-y-1">
                                             <span>טלפון: {req.phone}</span>
                                             <span>מייל: {req.email}</span>
                                         </div>
                                         {req.about && (
-                                            <p className="text-xs text-slate-500 bg-slate-50 p-2 rounded-lg mt-1 border border-slate-100">
+                                            <p className="text-xs text-text-muted bg-background p-2 rounded-lg mt-1 border border-border">
                                                 &quot;{req.about}&quot;
                                             </p>
                                         )}
                                     </div>
 
                                     {pendingApproval?.id === req.id ? (
-                                        <div className="w-full md:w-80 p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2">
-                                            <p className="text-xs font-semibold text-emerald-900">
+                                        <div className="w-full md:w-80 p-3 bg-success/10 border border-success/30 rounded-xl space-y-2">
+                                            <p className="text-xs font-semibold text-success">
                                                 סיסמה ראשונית שנוצרה - יש למסור אותה לחבר החדש (טלפון/וואטסאפ). הסיסמה לא תוצג שוב.
                                             </p>
                                             <div className="flex items-center gap-2">
-                                                <code className="flex-1 px-2.5 py-1.5 bg-white border border-emerald-300 rounded-lg text-sm font-mono text-emerald-900 select-all">
+                                                <code className="flex-1 px-2.5 py-1.5 bg-surface border border-success/40 rounded-lg text-sm font-mono text-success select-all">
                                                     {pendingApproval.password}
                                                 </code>
                                                 <button
                                                     type="button"
                                                     onClick={() => navigator.clipboard.writeText(pendingApproval.password)}
-                                                    className="px-2.5 py-1.5 bg-white hover:bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-semibold rounded-lg transition-colors"
+                                                    className="px-2.5 py-1.5 bg-surface hover:bg-success/20 border border-success/40 text-success text-xs font-semibold rounded-lg transition-colors"
                                                 >
                                                     העתק
                                                 </button>
                                             </div>
                                             {approveError && (
-                                                <p className="text-xs font-medium text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-2.5 py-1.5">
+                                                <p className="text-xs font-medium text-danger bg-danger-bg border border-danger-border rounded-lg px-2.5 py-1.5">
                                                     {approveError}
                                                 </p>
                                             )}
@@ -294,7 +294,7 @@ export default function AdminDashboardClient({
                                                     type="button"
                                                     onClick={() => handleConfirmApprove(req.id, pendingApproval.password)}
                                                     disabled={processingId === req.id}
-                                                    className="flex-1 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white text-xs font-semibold rounded-xl transition-colors"
+                                                    className="flex-1 px-3 py-2 bg-primary hover:bg-primary-hover disabled:bg-border text-white text-xs font-semibold rounded-xl transition-colors"
                                                 >
                                                     {processingId === req.id ? "מאשר..." : "אשר ושמור"}
                                                 </button>
@@ -302,7 +302,7 @@ export default function AdminDashboardClient({
                                                     type="button"
                                                     onClick={handleCancelApprove}
                                                     disabled={processingId === req.id}
-                                                    className="px-3 py-2 text-slate-600 hover:bg-slate-100 text-xs font-semibold rounded-xl transition-colors"
+                                                    className="px-3 py-2 text-text-muted hover:bg-background text-xs font-semibold rounded-xl transition-colors"
                                                 >
                                                     ביטול
                                                 </button>
@@ -313,14 +313,14 @@ export default function AdminDashboardClient({
                                             <button
                                                 onClick={() => handleStartApprove(req.id)}
                                                 disabled={processingId === req.id}
-                                                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors"
+                                                className="px-4 py-2 bg-primary hover:bg-primary-hover disabled:bg-border text-white text-xs font-semibold rounded-xl shadow-xs transition-colors"
                                             >
                                                 אשר חבר קהילה
                                             </button>
                                             <button
                                                 onClick={() => handleReject(req.id)}
                                                 disabled={processingId === req.id}
-                                                className="px-3 py-2 bg-rose-50 hover:bg-rose-100 disabled:bg-slate-100 text-rose-700 text-xs font-semibold rounded-xl border border-rose-200 transition-colors"
+                                                className="px-3 py-2 bg-danger-bg hover:opacity-80 disabled:opacity-50 text-danger text-xs font-semibold rounded-xl border border-danger-border transition-colors"
                                             >
                                                 דחה
                                             </button>
@@ -333,27 +333,27 @@ export default function AdminDashboardClient({
                 </div>
 
                 {/* Existing Members Section */}
-                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                    <div className="px-6 py-4 border-b border-slate-100">
-                        <h2 className="text-sm font-bold text-slate-900">
+                <div className="bg-surface rounded-2xl border border-border shadow-xs overflow-hidden">
+                    <div className="px-6 py-4 border-b border-border">
+                        <h2 className="text-sm font-bold text-text">
                             חברי קהילה במערכת ({members.length})
                         </h2>
                     </div>
 
                     {memberActionError && (
-                        <div className="mx-6 mt-4 px-3.5 py-2.5 bg-rose-50 border border-rose-200 rounded-xl text-xs font-medium text-rose-700">
+                        <div className="mx-6 mt-4 px-3.5 py-2.5 bg-danger-bg border border-danger-border rounded-xl text-xs font-medium text-danger">
                             {memberActionError}
                         </div>
                     )}
 
                     {members.length === 0 ? (
-                        <div className="p-8 text-center text-sm text-slate-400">
+                        <div className="p-8 text-center text-sm text-text-muted">
                             עדיין לא אושרו חברים. אשר את הבקשה הראשונה למעלה!
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full text-right text-xs">
-                                <thead className="bg-slate-50 text-slate-500 font-medium">
+                                <thead className="bg-background text-text-muted font-medium">
                                     <tr>
                                         <th className="px-6 py-3">שם מלא</th>
                                         <th className="px-6 py-3">טלפון</th>
@@ -364,16 +364,16 @@ export default function AdminDashboardClient({
                                         <th className="px-6 py-3">פעולות</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100 text-slate-700">
+                                <tbody className="divide-y divide-border text-text">
                                     {members.map((m) => (
-                                        <tr key={m.id} className="hover:bg-slate-50/50">
-                                            <td className="px-6 py-3 font-semibold text-slate-900">
+                                        <tr key={m.id} className="hover:bg-background/50">
+                                            <td className="px-6 py-3 font-semibold text-text">
                                                 {m.firstName} {m.lastName}
                                             </td>
                                             <td className="px-6 py-3">{m.phone}</td>
                                             <td className="px-6 py-3">{m.email}</td>
                                             <td className="px-6 py-3">
-                                                <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">
+                                                <span className="px-2 py-0.5 rounded-md bg-background text-text">
                                                     {m.halachicStatus === "kohen"
                                                         ? "כהן"
                                                         : m.halachicStatus === "levi"
@@ -387,21 +387,21 @@ export default function AdminDashboardClient({
                                                         value={m.role}
                                                         disabled={isPending}
                                                         onChange={(e) => handleRoleChange(m.id, e.target.value)}
-                                                        className="px-2 py-1 bg-white border border-slate-300 rounded-lg text-xs disabled:bg-slate-100"
+                                                        className="px-2 py-1 bg-surface border border-border rounded-lg text-xs disabled:bg-background"
                                                     >
                                                         {Object.entries(ROLE_LABELS).map(([value, label]) => (
                                                             <option key={value} value={value}>{label}</option>
                                                         ))}
                                                     </select>
                                                 ) : (
-                                                    <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">
+                                                    <span className="px-2 py-0.5 rounded-md bg-background text-text">
                                                         {ROLE_LABELS[m.role] ?? m.role}
                                                     </span>
                                                 )}
                                             </td>
                                             <td className="px-6 py-3">
                                                 <span
-                                                    className={`px-2 py-0.5 rounded-md ${m.isApproved ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-500"
+                                                    className={`px-2 py-0.5 rounded-md ${m.isApproved ? "bg-success/10 text-success" : "bg-background text-text-muted"
                                                         }`}
                                                 >
                                                     {m.isApproved ? "פעיל" : "לא פעיל"}
@@ -414,8 +414,8 @@ export default function AdminDashboardClient({
                                                         onClick={() => handleToggleApproval(m.id, m.isApproved)}
                                                         disabled={isPending}
                                                         className={`px-3 py-1 rounded-lg font-semibold transition-colors disabled:opacity-50 ${m.isApproved
-                                                            ? "bg-rose-50 hover:bg-rose-100 text-rose-700"
-                                                            : "bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
+                                                            ? "bg-danger-bg hover:opacity-80 text-danger"
+                                                            : "bg-success/10 hover:bg-success/20 text-success"
                                                             }`}
                                                     >
                                                         {m.isApproved ? "השבתה" : "הפעלה"}
@@ -432,34 +432,34 @@ export default function AdminDashboardClient({
 
                 {/* Donations Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                        <div className="px-6 py-4 border-b border-slate-100">
-                            <h2 className="text-sm font-bold text-slate-900">התפלגות תרומות לפי יעד</h2>
+                    <div className="bg-surface rounded-2xl border border-border shadow-xs overflow-hidden">
+                        <div className="px-6 py-4 border-b border-border">
+                            <h2 className="text-sm font-bold text-text">התפלגות תרומות לפי יעד</h2>
                         </div>
                         {fundBreakdown.length === 0 ? (
-                            <div className="p-6 text-center text-xs text-slate-400">אין עדיין תרומות רשומות</div>
+                            <div className="p-6 text-center text-xs text-text-muted">אין עדיין תרומות רשומות</div>
                         ) : (
-                            <div className="divide-y divide-slate-100">
+                            <div className="divide-y divide-border">
                                 {fundBreakdown.map((f) => (
                                     <div key={f.targetFund} className="px-6 py-3 flex items-center justify-between text-xs">
-                                        <span className="text-slate-700">{f.targetFund}</span>
-                                        <span className="font-bold text-slate-900">₪{f.total.toLocaleString()}</span>
+                                        <span className="text-text">{f.targetFund}</span>
+                                        <span className="font-bold text-text">₪{f.total.toLocaleString()}</span>
                                     </div>
                                 ))}
                             </div>
                         )}
                     </div>
 
-                    <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                        <div className="px-6 py-4 border-b border-slate-100">
-                            <h2 className="text-sm font-bold text-slate-900">תרומות אחרונות</h2>
+                    <div className="lg:col-span-2 bg-surface rounded-2xl border border-border shadow-xs overflow-hidden">
+                        <div className="px-6 py-4 border-b border-border">
+                            <h2 className="text-sm font-bold text-text">תרומות אחרונות</h2>
                         </div>
                         {transactions.length === 0 ? (
-                            <div className="p-6 text-center text-xs text-slate-400">אין עדיין תרומות רשומות</div>
+                            <div className="p-6 text-center text-xs text-text-muted">אין עדיין תרומות רשומות</div>
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-right text-xs">
-                                    <thead className="bg-slate-50 text-slate-500 font-medium">
+                                    <thead className="bg-background text-text-muted font-medium">
                                         <tr>
                                             <th className="px-6 py-3">תורם</th>
                                             <th className="px-6 py-3">סכום</th>
@@ -468,20 +468,20 @@ export default function AdminDashboardClient({
                                             <th className="px-6 py-3">תאריך</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-100 text-slate-700">
+                                    <tbody className="divide-y divide-border text-text">
                                         {transactions.map((tx) => (
-                                            <tr key={tx.id} className="hover:bg-slate-50/50">
-                                                <td className="px-6 py-3 font-semibold text-slate-900">{tx.clientName}</td>
+                                            <tr key={tx.id} className="hover:bg-background/50">
+                                                <td className="px-6 py-3 font-semibold text-text">{tx.clientName}</td>
                                                 <td className="px-6 py-3">₪{tx.amount.toLocaleString()}</td>
                                                 <td className="px-6 py-3">{tx.targetFund}</td>
                                                 <td className="px-6 py-3">
                                                     {tx.isRecurring ? (
-                                                        <span className="px-2 py-0.5 rounded-md bg-sky-100 text-sky-800">הוראת קבע</span>
+                                                        <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary">הוראת קבע</span>
                                                     ) : (
-                                                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">חד פעמי</span>
+                                                        <span className="px-2 py-0.5 rounded-md bg-background text-text-muted">חד פעמי</span>
                                                     )}
                                                 </td>
-                                                <td className="px-6 py-3 text-slate-500">
+                                                <td className="px-6 py-3 text-text-muted">
                                                     {new Date(tx.createdAt).toLocaleDateString("he-IL")}
                                                 </td>
                                             </tr>

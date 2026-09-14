@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { requireSession } from "@/lib/auth";
+import { requireSessionOrRedirect } from "@/lib/auth";
 import { getDirectoryMembers } from "@/app/actions/directory";
 import DirectoryClient from "./DirectoryClient";
 
@@ -7,11 +6,7 @@ import DirectoryClient from "./DirectoryClient";
 export const dynamic = "force-dynamic";
 
 export default async function DirectoryPage() {
-    try {
-        await requireSession();
-    } catch {
-        redirect("/login");
-    }
+    await requireSessionOrRedirect();
 
     const members = await getDirectoryMembers();
 

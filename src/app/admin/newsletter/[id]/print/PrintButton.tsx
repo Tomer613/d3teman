@@ -5,7 +5,7 @@ export default function PrintButton() {
         <button
             type="button"
             onClick={() => window.print()}
-            className="print:hidden px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-xl shadow-xs transition-colors"
+            className="print:hidden px-5 py-2.5 bg-primary hover:bg-primary-hover text-white text-sm font-semibold rounded-xl shadow-xs transition-colors"
         >
             הדפסה / שמירה כ-PDF
         </button>

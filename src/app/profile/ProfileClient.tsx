@@ -141,19 +141,19 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-background py-10 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto space-y-8">
 
                 {/* Top Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <Link href="/" className="text-xs font-semibold text-amber-700 hover:text-amber-800">
+                        <Link href="/" className="text-xs font-semibold text-primary hover:text-primary-hover">
                             ← חזרה לדף הבית
                         </Link>
-                        <h1 className="text-2xl font-bold text-slate-900 mt-1">
+                        <h1 className="text-2xl font-bold text-text mt-1">
                             האזור האישי של {member.firstName} {member.lastName}
                         </h1>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-text-muted">
                             הפרטים מסייעים לגבאים בשיבוץ עליות, תיאום השכבות ופעילות קהילתית
                         </p>
                     </div>
@@ -162,14 +162,14 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                             type="button"
                             onClick={handleSaveProfile}
                             disabled={isPending}
-                            className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 disabled:bg-slate-300 text-white text-sm font-semibold rounded-xl shadow-xs transition-colors"
+                            className="px-5 py-2.5 bg-primary hover:bg-primary-hover disabled:bg-border text-white text-sm font-semibold rounded-xl shadow-xs transition-colors"
                         >
                             {isPending ? "שומר..." : "שמירת כל השינויים"}
                         </button>
                         <button
                             type="button"
                             onClick={() => startTransition(() => logout())}
-                            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-xl transition-colors"
+                            className="px-4 py-2.5 bg-surface border border-border hover:bg-background text-text text-sm font-medium rounded-xl transition-colors"
                         >
                             התנתקות
                         </button>
@@ -179,8 +179,8 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                 {saveMessage && (
                     <div
                         className={`px-4 py-2.5 rounded-xl text-sm font-medium border ${saveMessage.type === "success"
-                            ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-                            : "bg-rose-50 border-rose-200 text-rose-700"
+                            ? "bg-success/10 border-success/30 text-success"
+                            : "bg-danger-bg border-danger-border text-danger"
                             }`}
                     >
                         {saveMessage.text}
@@ -188,20 +188,20 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                 )}
 
                 {/* Section 1: Halachic Status & Directory Visibility */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-6">
-                    <h2 className="text-lg font-bold text-slate-900 pb-2 border-b border-slate-100">
+                <div className="bg-surface p-6 rounded-2xl border border-border shadow-xs space-y-6">
+                    <h2 className="text-lg font-bold text-text pb-2 border-b border-border">
                         מעמד הלכתי והגדרות פרטיות
                     </h2>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-xs font-medium text-slate-700 mb-1">
+                            <label className="block text-xs font-medium text-text mb-1">
                                 מעמד הלכתי (לצורך סדר עליות בתורה)
                             </label>
                             <select
                                 value={halachicStatus}
                                 onChange={(e) => setHalachicStatus(e.target.value as HalachicStatus)}
-                                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600 focus:bg-white"
+                                className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:bg-surface"
                             >
                                 <option value="yisrael">ישראל</option>
                                 <option value="kohen">כהן</option>
@@ -210,34 +210,34 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                         </div>
 
                         <div className="space-y-3 pt-1">
-                            <label className="block text-xs font-medium text-slate-700">
+                            <label className="block text-xs font-medium text-text">
                                 הצגת פרטים באלפון הקהילתי
                             </label>
                             <div className="space-y-2">
-                                <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                                <label className="flex items-center gap-2 text-sm text-text cursor-pointer">
                                     <input
                                         type="checkbox"
                                         checked={showPhoneInDirectory}
                                         onChange={(e) => setShowPhoneInDirectory(e.target.checked)}
-                                        className="rounded-md border-slate-300 text-amber-600 focus:ring-amber-500"
+                                        className="rounded-md border-border text-primary focus:ring-primary"
                                     />
                                     הצג את מספר הטלפון שלי לחברי הקהילה
                                 </label>
-                                <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                                <label className="flex items-center gap-2 text-sm text-text cursor-pointer">
                                     <input
                                         type="checkbox"
                                         checked={showAddressInDirectory}
                                         onChange={(e) => setShowAddressInDirectory(e.target.checked)}
-                                        className="rounded-md border-slate-300 text-amber-600 focus:ring-amber-500"
+                                        className="rounded-md border-border text-primary focus:ring-primary"
                                     />
                                     הצג את כתובת המגורים שלי באלפון
                                 </label>
-                                <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                                <label className="flex items-center gap-2 text-sm text-text cursor-pointer">
                                     <input
                                         type="checkbox"
                                         checked={receiveNewsletter}
                                         onChange={(e) => setReceiveNewsletter(e.target.checked)}
-                                        className="rounded-md border-slate-300 text-amber-600 focus:ring-amber-500"
+                                        className="rounded-md border-border text-primary focus:ring-primary"
                                     />
                                     קבלת ניוזלטר קהילתי במייל
                                 </label>
@@ -247,54 +247,54 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                 </div>
 
                 {/* Section 2: Children Age Groups */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+                <div className="bg-surface p-6 rounded-2xl border border-border shadow-xs space-y-4">
                     <div>
-                        <h2 className="text-lg font-bold text-slate-900">ילדים במשפחה</h2>
-                        <p className="text-xs text-slate-500">לצורך חלוקת תרגום, לימוד מארי ופעילויות שבת</p>
+                        <h2 className="text-lg font-bold text-text">ילדים במשפחה</h2>
+                        <p className="text-xs text-text-muted">לצורך חלוקת תרגום, לימוד מארי ופעילויות שבת</p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70">
-                            <label className="block text-xs font-semibold text-slate-600">גיל הרך / פעוטות (0-5)</label>
+                        <div className="p-4 bg-background rounded-xl border border-border">
+                            <label className="block text-xs font-semibold text-text-muted">גיל הרך / פעוטות (0-5)</label>
                             <input
                                 type="number"
                                 min="0"
                                 value={childrenAges.toddler}
                                 onChange={(e) => setChildrenAges({ ...childrenAges, toddler: Number(e.target.value) })}
-                                className="mt-2 w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-center font-bold"
+                                className="mt-2 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm text-center font-bold"
                             />
                         </div>
 
-                        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70">
-                            <label className="block text-xs font-semibold text-slate-600">גיל יסודי / תרגום (6-12)</label>
+                        <div className="p-4 bg-background rounded-xl border border-border">
+                            <label className="block text-xs font-semibold text-text-muted">גיל יסודי / תרגום (6-12)</label>
                             <input
                                 type="number"
                                 min="0"
                                 value={childrenAges.elementary}
                                 onChange={(e) => setChildrenAges({ ...childrenAges, elementary: Number(e.target.value) })}
-                                className="mt-2 w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-center font-bold"
+                                className="mt-2 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm text-center font-bold"
                             />
                         </div>
 
-                        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70">
-                            <label className="block text-xs font-semibold text-slate-600">נוער (13 ומעלה)</label>
+                        <div className="p-4 bg-background rounded-xl border border-border">
+                            <label className="block text-xs font-semibold text-text-muted">נוער (13 ומעלה)</label>
                             <input
                                 type="number"
                                 min="0"
                                 value={childrenAges.teen}
                                 onChange={(e) => setChildrenAges({ ...childrenAges, teen: Number(e.target.value) })}
-                                className="mt-2 w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-center font-bold"
+                                className="mt-2 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm text-center font-bold"
                             />
                         </div>
                     </div>
                 </div>
 
                 {/* Section 3: Memorials & Yahrzeits */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div className="bg-surface p-6 rounded-2xl border border-border shadow-xs space-y-4">
+                    <div className="flex items-center justify-between pb-2 border-b border-border">
                         <div>
-                            <h2 className="text-lg font-bold text-slate-900">ימי זיכרון והשכבות (יארצייט)</h2>
-                            <p className="text-xs text-slate-500">
+                            <h2 className="text-lg font-bold text-text">ימי זיכרון והשכבות (יארצייט)</h2>
+                            <p className="text-xs text-text-muted">
                                 פרטים אלו משמשים את הגבאים לתזכורות, הזכרת נשמות בשבת וקדישים
                             </p>
                         </div>
@@ -302,7 +302,7 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                             <button
                                 type="button"
                                 onClick={() => setIsAddingYahrzeit(true)}
-                                className="px-3.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold rounded-lg transition-colors"
+                                className="px-3.5 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent-hover text-xs font-bold rounded-lg transition-colors"
                             >
                                 + הוסף יום זיכרון
                             </button>
@@ -310,35 +310,35 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                     </div>
 
                     {yahrzeitError && (
-                        <div className="px-3.5 py-2.5 bg-rose-50 border border-rose-200 rounded-xl text-xs font-medium text-rose-700">
+                        <div className="px-3.5 py-2.5 bg-danger-bg border border-danger-border rounded-xl text-xs font-medium text-danger">
                             {yahrzeitError}
                         </div>
                     )}
 
                     {/* Add Entry Form */}
                     {isAddingYahrzeit && (
-                        <form onSubmit={handleAddYahrzeit} className="p-4 bg-amber-50/50 rounded-xl border border-amber-200/60 space-y-4">
-                            <h3 className="text-xs font-bold text-amber-900 uppercase">הוספת נפטר/ת חדש/ה</h3>
+                        <form onSubmit={handleAddYahrzeit} className="p-4 bg-accent/5 rounded-xl border border-accent/20 space-y-4">
+                            <h3 className="text-xs font-bold text-accent-hover uppercase">הוספת נפטר/ת חדש/ה</h3>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-700">שם הנפטר/ת להשכבה</label>
+                                    <label className="block text-xs font-medium text-text">שם הנפטר/ת להשכבה</label>
                                     <input
                                         type="text"
                                         required
                                         placeholder="לדוגמה: שלום בן יחיא"
                                         value={newYahrzeit.deceasedName}
                                         onChange={(e) => setNewYahrzeit({ ...newYahrzeit, deceasedName: e.target.value })}
-                                        className="mt-1 w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm"
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-700">קרבה</label>
+                                    <label className="block text-xs font-medium text-text">קרבה</label>
                                     <select
                                         value={newYahrzeit.relation}
                                         onChange={(e) => setNewYahrzeit({ ...newYahrzeit, relation: e.target.value })}
-                                        className="mt-1 w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm"
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
                                     >
                                         {YAHRZEIT_RELATIONS.map((r) => (
                                             <option key={r.value} value={r.value}>{r.label}</option>
@@ -349,23 +349,23 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
 
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 items-end">
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-700">יום עברי</label>
+                                    <label className="block text-xs font-medium text-text">יום עברי</label>
                                     <input
                                         type="number"
                                         min="1"
                                         max="30"
                                         value={newYahrzeit.day}
                                         onChange={(e) => setNewYahrzeit({ ...newYahrzeit, day: Number(e.target.value) })}
-                                        className="mt-1 w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm"
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-700">חודש עברי</label>
+                                    <label className="block text-xs font-medium text-text">חודש עברי</label>
                                     <select
                                         value={newYahrzeit.month}
                                         onChange={(e) => setNewYahrzeit({ ...newYahrzeit, month: e.target.value })}
-                                        className="mt-1 w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm"
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
                                     >
                                         {HEBREW_MONTHS.map((m) => (
                                             <option key={m} value={m}>{m}</option>
@@ -374,12 +374,12 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                                 </div>
 
                                 <div className="col-span-2 sm:col-span-1 pb-2">
-                                    <label className="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
+                                    <label className="flex items-center gap-2 text-xs text-text cursor-pointer">
                                         <input
                                             type="checkbox"
                                             checked={newYahrzeit.diedAfterSunset}
                                             onChange={(e) => setNewYahrzeit({ ...newYahrzeit, diedAfterSunset: e.target.checked })}
-                                            className="rounded-md border-slate-300 text-amber-600 focus:ring-amber-500"
+                                            className="rounded-md border-border text-primary focus:ring-primary"
                                         />
                                         נפטר/ה לאחר השקיעה
                                     </label>
@@ -390,14 +390,14 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                                 <button
                                     type="button"
                                     onClick={() => setIsAddingYahrzeit(false)}
-                                    className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg"
+                                    className="px-3 py-1.5 text-xs text-text-muted hover:bg-background rounded-lg"
                                 >
                                     ביטול
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={isPending}
-                                    className="px-4 py-1.5 bg-amber-700 hover:bg-amber-800 disabled:bg-slate-300 text-white text-xs font-bold rounded-lg"
+                                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover disabled:bg-border text-white text-xs font-bold rounded-lg"
                                 >
                                     {isPending ? "מוסיף..." : "הוספה לרשימה"}
                                 </button>
@@ -406,12 +406,12 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                     )}
 
                     {/* List of registered yahrzeits */}
-                    <div className="divide-y divide-slate-100">
+                    <div className="divide-y divide-border">
                         {yahrzeits.map((item) => (
                             <div key={item.id} className="py-3 flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm font-bold text-slate-800">{item.deceasedName}</p>
-                                    <p className="text-xs text-slate-500">
+                                    <p className="text-sm font-bold text-text">{item.deceasedName}</p>
+                                    <p className="text-xs text-text-muted">
                                         {item.hebrewDay} ב{item.hebrewMonth}
                                         {item.diedAfterSunset ? " (לאחר השקיעה)" : ""} • {item.notes || "ללא הערה"}
                                     </p>
@@ -420,7 +420,7 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                                     type="button"
                                     onClick={() => handleRemoveYahrzeit(item.id)}
                                     disabled={removingId === item.id}
-                                    className="text-xs text-rose-600 hover:text-rose-800 disabled:text-slate-400 p-1"
+                                    className="text-xs text-danger hover:opacity-80 disabled:text-text-muted p-1"
                                 >
                                     {removingId === item.id ? "מסיר..." : "הסרה"}
                                 </button>
@@ -430,43 +430,43 @@ export default function ProfileClient({ member, yahrzeits, donations, totalDonat
                 </div>
 
                 {/* Section 4: My Donations */}
-                <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div className="bg-surface p-6 rounded-2xl border border-border shadow-xs space-y-4">
+                    <div className="flex items-center justify-between pb-2 border-b border-border">
                         <div>
-                            <h2 className="text-lg font-bold text-slate-900">היסטוריית תרומות</h2>
-                            <p className="text-xs text-slate-500">תרומות שסונכרנו ממערכת נדרים פלוס</p>
+                            <h2 className="text-lg font-bold text-text">היסטוריית תרומות</h2>
+                            <p className="text-xs text-text-muted">תרומות שסונכרנו ממערכת נדרים פלוס</p>
                         </div>
                         <Link
                             href="/donate"
-                            className="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold rounded-lg transition-colors"
+                            className="px-3.5 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold rounded-lg transition-colors"
                         >
                             תרומה נוספת
                         </Link>
                     </div>
 
                     {donations.length === 0 ? (
-                        <p className="text-sm text-slate-400 py-4 text-center">
+                        <p className="text-sm text-text-muted py-4 text-center">
                             עדיין לא נרשמו תרומות תחת כתובת המייל או מספר הטלפון שלך.
                         </p>
                     ) : (
                         <>
-                            <div className="p-4 bg-emerald-50/60 rounded-xl border border-emerald-200/70">
-                                <span className="text-xs text-emerald-800">סך כל התרומות</span>
-                                <p className="text-2xl font-extrabold text-emerald-900">₪{totalDonated.toLocaleString()}</p>
+                            <div className="p-4 bg-primary/10 rounded-xl border border-primary/20">
+                                <span className="text-xs text-primary">סך כל התרומות</span>
+                                <p className="text-2xl font-extrabold text-primary">₪{totalDonated.toLocaleString()}</p>
                             </div>
-                            <div className="divide-y divide-slate-100">
+                            <div className="divide-y divide-border">
                                 {donations.map((d) => (
                                     <div key={d.id} className="py-2.5 flex items-center justify-between text-sm">
                                         <div>
-                                            <span className="font-semibold text-slate-800">₪{d.amount.toLocaleString()}</span>
-                                            <span className="text-xs text-slate-500 mr-2">{d.targetFund}</span>
+                                            <span className="font-semibold text-text">₪{d.amount.toLocaleString()}</span>
+                                            <span className="text-xs text-text-muted mr-2">{d.targetFund}</span>
                                             {d.isRecurring && (
-                                                <span className="mr-2 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-sky-100 text-sky-800">
+                                                <span className="mr-2 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-accent/10 text-accent-hover">
                                                     הוראת קבע
                                                 </span>
                                             )}
                                         </div>
-                                        <span className="text-xs text-slate-400">
+                                        <span className="text-xs text-text-muted">
                                             {new Date(d.createdAt).toLocaleDateString("he-IL")}
                                         </span>
                                     </div>

@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -35,7 +36,13 @@ export async function getSession(): Promise<SessionPayload | null> {
 // Re-reads role/approval from the database rather than trusting the JWT's
 // claims for its full lifetime - otherwise a demoted or de-approved member
 // would keep their old access for up to 30 days, until the token expires.
-export async function requireSession(): Promise<SessionPayload> {
+//
+// Wrapped in React's cache() so the DB re-check is deduped within a single
+// request - pages that call this directly and then call one or more actions
+// that also call it (e.g. the homepage's page-level guard plus
+// getUpcomingEvents()/getCommunityStats()) hit the database once, not once
+// per call.
+export const requireSession = cache(async function requireSession(): Promise<SessionPayload> {
     const session = await getSession();
     if (!session) {
         throw new Error("Not authorized");
@@ -51,7 +58,7 @@ export async function requireSession(): Promise<SessionPayload> {
     }
 
     return { ...session, role: member.role };
-}
+});
 
 // Throws unless the caller has an active admin-capable session.
 export async function requireAdmin(): Promise<SessionPayload> {
@@ -68,6 +75,18 @@ export async function requireAdmin(): Promise<SessionPayload> {
 export async function requireAdminOrRedirect(): Promise<SessionPayload> {
     try {
         return await requireAdmin();
+    } catch {
+        redirect("/login");
+    }
+}
+
+// For member-only Server Component pages: redirects to /login instead of
+// throwing, so every members-only route (homepage, directory, ...) gets the
+// same behavior on a missing/expired/no-longer-approved session without
+// repeating the try/catch at each call site.
+export async function requireSessionOrRedirect(): Promise<SessionPayload> {
+    try {
+        return await requireSession();
     } catch {
         redirect("/login");
     }

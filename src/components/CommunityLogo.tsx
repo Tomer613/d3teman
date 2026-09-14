@@ -24,7 +24,7 @@ export default function CommunityLogo({ size = "sm", className = "" }: Community
 
     if (imageFailed) {
         return (
-            <div className={`${baseClasses} bg-amber-600 text-white font-bold`}>
+            <div className={`${baseClasses} bg-primary text-white font-bold`}>
                 {LOGO_INITIAL}
             </div>
         );
@@ -37,7 +37,7 @@ export default function CommunityLogo({ size = "sm", className = "" }: Community
             width={px}
             height={px}
             onError={() => setImageFailed(true)}
-            className={`${baseClasses} object-cover bg-amber-600`}
+            className={`${baseClasses} object-cover bg-primary`}
         />
     );
 }

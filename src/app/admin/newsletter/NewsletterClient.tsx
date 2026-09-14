@@ -146,17 +146,17 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
     };
 
     return (
-        <div className="min-h-screen bg-slate-100 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto space-y-6">
 
                 {/* Navigation & Actions */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <Link href="/admin" className="text-xs font-semibold text-amber-700 hover:text-amber-800">
+                        <Link href="/admin" className="text-xs font-semibold text-primary hover:text-primary-hover">
                             ← חזרה לפאנל ניהול
                         </Link>
-                        <h1 className="text-2xl font-bold text-slate-900 mt-1">עורך ניוזלטר קהילתי</h1>
-                        <p className="text-sm text-slate-500">עריכת תכנים והפצה בתבנית מייל ממותגת</p>
+                        <h1 className="text-2xl font-bold text-text mt-1">עורך ניוזלטר קהילתי</h1>
+                        <p className="text-sm text-text-muted">עריכת תכנים והפצה בתבנית מייל ממותגת</p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
@@ -164,7 +164,7 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                             type="button"
                             onClick={handleSaveDraft}
                             disabled={isPending}
-                            className="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 disabled:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
+                            className="px-4 py-2 bg-surface border border-border hover:bg-background disabled:bg-background text-text text-xs font-semibold rounded-xl transition-colors"
                         >
                             שמירת טיוטה
                         </button>
@@ -172,7 +172,7 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                             <Link
                                 href={`/admin/newsletter/${currentId}/print`}
                                 target="_blank"
-                                className="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
+                                className="px-4 py-2 bg-surface border border-border hover:bg-background text-text text-xs font-semibold rounded-xl transition-colors"
                             >
                                 הדפסה / PDF
                             </Link>
@@ -181,7 +181,7 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                             type="button"
                             onClick={handleCopyForWhatsApp}
                             disabled={items.length === 0}
-                            className="px-4 py-2 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 text-emerald-800 text-xs font-semibold rounded-xl transition-colors"
+                            className="px-4 py-2 bg-success/10 border border-success/30 hover:bg-success/20 disabled:bg-background disabled:text-text-muted disabled:border-border text-success text-xs font-semibold rounded-xl transition-colors"
                         >
                             העתקה לוואטסאפ
                         </button>
@@ -189,7 +189,7 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                             type="button"
                             onClick={handleSendTest}
                             disabled={isPending || !emailConfigured}
-                            className="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 disabled:bg-slate-100 disabled:text-slate-400 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
+                            className="px-4 py-2 bg-surface border border-border hover:bg-background disabled:bg-background disabled:text-text-muted text-text text-xs font-semibold rounded-xl transition-colors"
                         >
                             שליחת בדיקה אליי
                         </button>
@@ -197,7 +197,7 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                             type="button"
                             onClick={() => setConfirmingSend(true)}
                             disabled={isPending || !emailConfigured || items.length === 0}
-                            className="px-5 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-slate-300 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
+                            className="px-5 py-2 bg-accent hover:bg-accent-hover disabled:bg-border text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
                         >
                             שיגור תפוצה לקהילה ✉
                         </button>
@@ -205,7 +205,7 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                 </div>
 
                 {!emailConfigured && (
-                    <div className="px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-xs font-medium text-amber-800">
+                    <div className="px-4 py-3 bg-accent/10 border border-accent/20 rounded-xl text-xs font-medium text-accent-hover">
                         שליחת מיילים אינה מוגדרת עדיין (חסר RESEND_API_KEY) - ניתן לערוך ולשמור טיוטות, אך לא לשלוח.
                     </div>
                 )}
@@ -213,8 +213,8 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                 {statusMessage && (
                     <div
                         className={`px-4 py-3 rounded-xl text-xs font-medium border ${statusMessage.type === "success"
-                            ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-                            : "bg-rose-50 border-rose-200 text-rose-700"
+                            ? "bg-success/10 border-success/30 text-success"
+                            : "bg-danger-bg border-danger-border text-danger"
                             }`}
                     >
                         {statusMessage.text}
@@ -222,8 +222,8 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                 )}
 
                 {confirmingSend && (
-                    <div className="px-4 py-4 bg-white border border-amber-300 rounded-xl shadow-xs space-y-3">
-                        <p className="text-sm font-semibold text-slate-900">
+                    <div className="px-4 py-4 bg-surface border border-accent/40 rounded-xl shadow-xs space-y-3">
+                        <p className="text-sm font-semibold text-text">
                             לשלוח את הניוזלטר ל-{recipientCount} נמענים רשומים? פעולה זו אינה הפיכה.
                         </p>
                         <div className="flex items-center gap-2">
@@ -231,7 +231,7 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                                 type="button"
                                 onClick={handleConfirmSend}
                                 disabled={isPending}
-                                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-slate-300 text-white text-xs font-bold rounded-xl transition-colors"
+                                className="px-4 py-2 bg-accent hover:bg-accent-hover disabled:bg-border text-white text-xs font-bold rounded-xl transition-colors"
                             >
                                 {isPending ? "שולח..." : "כן, שלח עכשיו"}
                             </button>
@@ -239,7 +239,7 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                                 type="button"
                                 onClick={() => setConfirmingSend(false)}
                                 disabled={isPending}
-                                className="px-4 py-2 text-slate-600 hover:bg-slate-100 text-xs font-semibold rounded-xl transition-colors"
+                                className="px-4 py-2 text-text-muted hover:bg-background text-xs font-semibold rounded-xl transition-colors"
                             >
                                 ביטול
                             </button>
@@ -254,27 +254,27 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                     <div className="lg:col-span-5 space-y-6">
 
                         {/* Delivery Settings */}
-                        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
-                            <h2 className="text-sm font-bold text-slate-900 pb-2 border-b border-slate-100">
+                        <div className="bg-surface p-5 rounded-2xl border border-border shadow-xs space-y-4">
+                            <h2 className="text-sm font-bold text-text pb-2 border-b border-border">
                                 הגדרות תפוצה
                             </h2>
 
                             <div>
-                                <label className="block text-xs font-medium text-slate-700 mb-1">נושא המייל (Subject)</label>
+                                <label className="block text-xs font-medium text-text mb-1">נושא המייל (Subject)</label>
                                 <input
                                     type="text"
                                     value={subject}
                                     onChange={(e) => setSubject(e.target.value)}
-                                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600 focus:bg-white"
+                                    className="w-full px-3 py-2 bg-background border border-border rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:bg-surface"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-medium text-slate-700 mb-1">קבוצת תפוצה</label>
+                                <label className="block text-xs font-medium text-text mb-1">קבוצת תפוצה</label>
                                 <select
                                     value={targetGroup}
                                     onChange={(e) => setTargetGroup(e.target.value as typeof targetGroup)}
-                                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600 focus:bg-white"
+                                    className="w-full px-3 py-2 bg-background border border-border rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-primary focus:bg-surface"
                                 >
                                     <option value="all">כלל חברי הקהילה הרשומים ({recipientCount})</option>
                                     <option value="board" disabled>ועד מנהל בלבד (בקרוב)</option>
@@ -284,14 +284,14 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                         </div>
 
                         {/* Modular Items List */}
-                        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
-                            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                                <h2 className="text-sm font-bold text-slate-900">אייטמים בניוזלטר ({items.length})</h2>
+                        <div className="bg-surface p-5 rounded-2xl border border-border shadow-xs space-y-4">
+                            <div className="flex items-center justify-between pb-2 border-b border-border">
+                                <h2 className="text-sm font-bold text-text">אייטמים בניוזלטר ({items.length})</h2>
                                 {!isAddingItem && (
                                     <button
                                         type="button"
                                         onClick={() => setIsAddingItem(true)}
-                                        className="px-3 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold rounded-lg transition-colors"
+                                        className="px-3 py-1 bg-accent/10 hover:bg-accent/20 text-accent-hover text-xs font-bold rounded-lg transition-colors"
                                     >
                                         + הוסף אייטם
                                     </button>
@@ -300,15 +300,15 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
 
                             {/* Add Item Form */}
                             {isAddingItem && (
-                                <form onSubmit={handleAddItem} className="p-4 bg-amber-50/60 rounded-xl border border-amber-200 space-y-3">
-                                    <h3 className="text-xs font-bold text-amber-900">אייטם חדש</h3>
+                                <form onSubmit={handleAddItem} className="p-4 bg-accent/5 rounded-xl border border-accent/20 space-y-3">
+                                    <h3 className="text-xs font-bold text-accent-hover">אייטם חדש</h3>
 
                                     <div>
-                                        <label className="block text-xs font-medium text-slate-700">קטגוריה</label>
+                                        <label className="block text-xs font-medium text-text">קטגוריה</label>
                                         <select
                                             value={newItem.category}
                                             onChange={(e) => setNewItem({ ...newItem, category: e.target.value as NewsletterCategory })}
-                                            className="mt-1 w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
+                                            className="mt-1 w-full px-2.5 py-1.5 bg-surface border border-border rounded-lg text-xs"
                                         >
                                             {CATEGORIES.map((c) => (
                                                 <option key={c} value={c}>{c === "השכבות" ? "השכבות וימי זיכרון" : c}</option>
@@ -317,35 +317,35 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-medium text-slate-700">כותרת</label>
+                                        <label className="block text-xs font-medium text-text">כותרת</label>
                                         <input
                                             type="text"
                                             required
                                             value={newItem.title}
                                             onChange={(e) => setNewItem({ ...newItem, title: e.target.value })}
-                                            className="mt-1 w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
+                                            className="mt-1 w-full px-2.5 py-1.5 bg-surface border border-border rounded-lg text-xs"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-medium text-slate-700">תוכן ההודעה</label>
+                                        <label className="block text-xs font-medium text-text">תוכן ההודעה</label>
                                         <textarea
                                             rows={3}
                                             required
                                             value={newItem.body}
                                             onChange={(e) => setNewItem({ ...newItem, body: e.target.value })}
-                                            className="mt-1 w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
+                                            className="mt-1 w-full px-2.5 py-1.5 bg-surface border border-border rounded-lg text-xs"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-medium text-slate-700">קישור לתמונה (אופציונלי)</label>
+                                        <label className="block text-xs font-medium text-text">קישור לתמונה (אופציונלי)</label>
                                         <input
                                             type="url"
                                             placeholder="https://..."
                                             value={newItem.imageUrl}
                                             onChange={(e) => setNewItem({ ...newItem, imageUrl: e.target.value })}
-                                            className="mt-1 w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
+                                            className="mt-1 w-full px-2.5 py-1.5 bg-surface border border-border rounded-lg text-xs"
                                         />
                                     </div>
 
@@ -353,13 +353,13 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                                         <button
                                             type="button"
                                             onClick={() => { setIsAddingItem(false); setNewItem(emptyNewItem); }}
-                                            className="px-3 py-1 text-xs text-slate-600 hover:bg-slate-100 rounded-lg"
+                                            className="px-3 py-1 text-xs text-text-muted hover:bg-background rounded-lg"
                                         >
                                             ביטול
                                         </button>
                                         <button
                                             type="submit"
-                                            className="px-3 py-1 bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold rounded-lg"
+                                            className="px-3 py-1 bg-accent hover:bg-accent-hover text-white text-xs font-bold rounded-lg"
                                         >
                                             הוסף למייל
                                         </button>
@@ -372,16 +372,16 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                                 {items.map((item, index) => (
                                     <div
                                         key={index}
-                                        className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center justify-between text-xs"
+                                        className="p-3 bg-background rounded-xl border border-border flex items-center justify-between text-xs"
                                     >
                                         <div>
-                                            <span className="font-semibold text-amber-800 ml-2">[{item.category}]</span>
-                                            <span className="font-bold text-slate-800">{item.title}</span>
+                                            <span className="font-semibold text-accent-hover ml-2">[{item.category}]</span>
+                                            <span className="font-bold text-text">{item.title}</span>
                                         </div>
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveItem(index)}
-                                            className="text-rose-600 hover:text-rose-800 font-semibold"
+                                            className="text-danger hover:opacity-80 font-semibold"
                                         >
                                             מחק
                                         </button>
@@ -391,35 +391,35 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                         </div>
 
                         {/* Past Newsletters */}
-                        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
-                            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                                <h2 className="text-sm font-bold text-slate-900">ניוזלטרים קודמים</h2>
+                        <div className="bg-surface p-5 rounded-2xl border border-border shadow-xs space-y-3">
+                            <div className="flex items-center justify-between pb-2 border-b border-border">
+                                <h2 className="text-sm font-bold text-text">ניוזלטרים קודמים</h2>
                                 {currentId && (
                                     <button
                                         type="button"
                                         onClick={resetEditor}
-                                        className="text-xs font-semibold text-amber-700 hover:text-amber-800"
+                                        className="text-xs font-semibold text-primary hover:text-primary-hover"
                                     >
                                         + טיוטה חדשה
                                     </button>
                                 )}
                             </div>
                             {newsletters.length === 0 ? (
-                                <p className="text-xs text-slate-400 py-2">אין עדיין ניוזלטרים שמורים.</p>
+                                <p className="text-xs text-text-muted py-2">אין עדיין ניוזלטרים שמורים.</p>
                             ) : (
-                                <div className="divide-y divide-slate-100">
+                                <div className="divide-y divide-border">
                                     {newsletters.map((n) => (
                                         <div key={n.id} className="py-2.5 flex items-center justify-between text-xs">
                                             <div>
-                                                <span className="font-semibold text-slate-800">{n.subject}</span>
+                                                <span className="font-semibold text-text">{n.subject}</span>
                                                 <span
                                                     className={`mr-2 px-2 py-0.5 rounded-full text-[10px] font-semibold ${n.status === "sent"
-                                                        ? "bg-emerald-100 text-emerald-800"
+                                                        ? "bg-success/10 text-success"
                                                         : n.status === "sending"
-                                                            ? "bg-amber-100 text-amber-800"
+                                                            ? "bg-accent/10 text-accent-hover"
                                                             : n.status === "failed"
-                                                                ? "bg-rose-100 text-rose-700"
-                                                                : "bg-slate-100 text-slate-600"
+                                                                ? "bg-danger-bg text-danger"
+                                                                : "bg-background text-text-muted"
                                                         }`}
                                                 >
                                                     {n.status === "sent"
@@ -436,7 +436,7 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                                                     type="button"
                                                     onClick={() => loadDraft(n)}
                                                     disabled={n.status === "sending"}
-                                                    className="text-amber-700 hover:text-amber-800 disabled:text-slate-300 font-semibold"
+                                                    className="text-primary hover:text-primary-hover disabled:text-text-muted font-semibold"
                                                 >
                                                     טעינה
                                                 </button>
@@ -444,7 +444,7 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                                                     <button
                                                         type="button"
                                                         onClick={() => handleDeleteDraft(n.id)}
-                                                        className="text-rose-600 hover:text-rose-800 font-semibold"
+                                                        className="text-danger hover:opacity-80 font-semibold"
                                                     >
                                                         מחיקה
                                                     </button>
@@ -460,35 +460,35 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
 
                     {/* Email Live Preview Column */}
                     <div className="lg:col-span-7">
-                        <div className="bg-slate-200/70 p-4 sm:p-6 rounded-3xl border border-slate-300/80 shadow-inner">
-                            <div className="text-center pb-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        <div className="bg-border/60 p-4 sm:p-6 rounded-3xl border border-border shadow-inner">
+                            <div className="text-center pb-3 text-xs font-semibold text-text-muted uppercase tracking-wider">
                                 תצוגה מקדימה של המייל (Email Client Preview)
                             </div>
 
                             {/* Simulated Email Canvas */}
-                            <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-md overflow-hidden border border-slate-200 text-slate-800 font-sans">
+                            <div className="max-w-xl mx-auto bg-surface rounded-2xl shadow-md overflow-hidden border border-border text-text font-sans">
 
                                 {/* Email Header */}
-                                <div className="bg-amber-800 text-white p-6 text-center">
-                                    <div className="w-12 h-12 rounded-2xl bg-white text-amber-800 font-extrabold text-2xl flex items-center justify-center mx-auto mb-2 shadow-xs">
+                                <div className="bg-primary text-white p-6 text-center">
+                                    <div className="w-12 h-12 rounded-2xl bg-surface text-primary font-extrabold text-2xl flex items-center justify-center mx-auto mb-2 shadow-xs">
                                         {LOGO_INITIAL}
                                     </div>
                                     <h2 className="text-xl font-bold tracking-tight">{COMMUNITY_NAME}</h2>
-                                    <p className="text-amber-200 text-xs mt-1">{subject}</p>
+                                    <p className="text-white/80 text-xs mt-1">{subject}</p>
                                 </div>
 
                                 {/* Email Content Body */}
-                                <div className="p-6 space-y-6 divide-y divide-slate-100">
+                                <div className="p-6 space-y-6 divide-y divide-border">
                                     {items.map((item, index) => (
                                         <div key={index} className="pt-5 first:pt-0 space-y-2">
-                                            <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800">
+                                            <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-accent/10 text-accent-hover">
                                                 {item.category}
                                             </span>
-                                            <h3 className="text-base font-bold text-slate-900">{item.title}</h3>
-                                            <p className="text-xs text-slate-600 leading-relaxed">{item.body}</p>
+                                            <h3 className="text-base font-bold text-text">{item.title}</h3>
+                                            <p className="text-xs text-text-muted leading-relaxed">{item.body}</p>
 
                                             {item.imageUrl && (
-                                                <div className="mt-2 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 h-40 flex items-center justify-center text-xs text-slate-400">
+                                                <div className="mt-2 rounded-xl overflow-hidden bg-background border border-border h-40 flex items-center justify-center text-xs text-text-muted">
                                                     תמונה מצורפת: {item.imageUrl}
                                                 </div>
                                             )}
@@ -496,17 +496,17 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                                     ))}
 
                                     {items.length === 0 && (
-                                        <p className="text-center text-xs text-slate-400 py-8">
+                                        <p className="text-center text-xs text-text-muted py-8">
                                             הניוזלטר ריק. הוסף אייטמים משמאל כדי לראותם כאן.
                                         </p>
                                     )}
                                 </div>
 
                                 {/* Email Footer */}
-                                <div className="bg-slate-50 p-6 text-center border-t border-slate-100 space-y-2 text-xs text-slate-400">
-                                    <p className="font-medium text-slate-600">{COMMUNITY_NAME} • {COMMUNITY_ADDRESS_LINE}</p>
+                                <div className="bg-background p-6 text-center border-t border-border space-y-2 text-xs text-text-muted">
+                                    <p className="font-medium text-text-muted">{COMMUNITY_NAME} • {COMMUNITY_ADDRESS_LINE}</p>
                                     <p>נשלח אליך מאחר שאתה רשום בפורטל הקהילה.</p>
-                                    <div className="pt-2 text-[10px] text-slate-400">
+                                    <div className="pt-2 text-[10px] text-text-muted">
                                         <span className="underline cursor-pointer">עדכון הגדרות קבלה</span> •{" "}
                                         <span className="underline cursor-pointer">הסרה מרשימת תפוצה</span>
                                     </div>

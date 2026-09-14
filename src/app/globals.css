@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #0e4a47;
+  --color-primary-hover: #0b3b39;
+  --color-accent: #c08a34;
+  --color-accent-hover: #a5741f;
+  --color-background: #faf7f0;
+  --color-surface: #ffffff;
+  --color-text: #1f2a28;
+  --color-text-muted: #5b6b68;
+  --color-border: #e5dfd0;
+  --color-success: #3f7d5c;
+  --color-danger: #b4483a;
+  --color-danger-bg: #f6e7e3;
+  --color-danger-border: #e3c4bb;
+}
+
 body {
   font-family: var(--font-rubik), system-ui, sans-serif;
 }

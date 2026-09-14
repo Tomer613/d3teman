@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { COMMUNITY_NAME } from "@/lib/branding";
+import Card from "@/components/ui/Card";
+import { LinkButton } from "@/components/ui/Button";
 
 function getDonateUrl(): string | null {
     const url = process.env.NEDARIM_DONATE_URL;
@@ -13,59 +15,61 @@ export default function DonatePage() {
     const donateUrl = getDonateUrl();
 
     return (
-        <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto space-y-8">
                 <div className="text-center">
-                    <Link href="/" className="inline-block text-xs font-semibold text-amber-700 hover:text-amber-800 mb-2">
-                        ← חזרה לדף הבית
+                    <Link href="/login" className="inline-block text-xs font-semibold text-primary hover:text-primary-hover mb-2">
+                        ← חזרה למסך הכניסה
                     </Link>
-                    <h1 className="text-2xl font-bold text-slate-900">תרומה ל{COMMUNITY_NAME}</h1>
-                    <p className="text-sm text-slate-500 mt-1">
+                    <h1 className="text-2xl font-bold text-text">תרומה ל{COMMUNITY_NAME}</h1>
+                    <p className="text-sm text-text-muted mt-1">
                         כל תרומה, גדולה כקטנה, תומכת בפעילות בית הכנסת ובקהילה
                     </p>
                 </div>
 
-                <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200/80 shadow-xs space-y-6">
+                <Card padding="lg" className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="p-5 bg-amber-50/60 rounded-xl border border-amber-200/70">
-                            <h2 className="text-sm font-bold text-amber-900">תרומה חד פעמית</h2>
-                            <p className="text-xs text-amber-800/80 mt-1 leading-relaxed">
+                        <div className="p-5 bg-accent/10 rounded-xl border border-accent/20">
+                            <h2 className="text-sm font-bold text-accent-hover">תרומה חד פעמית</h2>
+                            <p className="text-xs text-text-muted mt-1 leading-relaxed">
                                 תרומה בכל סכום לתמיכה מיידית בפעילות הקהילה
                             </p>
                         </div>
-                        <div className="p-5 bg-emerald-50/60 rounded-xl border border-emerald-200/70">
-                            <h2 className="text-sm font-bold text-emerald-900">הוראת קבע</h2>
-                            <p className="text-xs text-emerald-800/80 mt-1 leading-relaxed">
+                        <div className="p-5 bg-primary/10 rounded-xl border border-primary/20">
+                            <h2 className="text-sm font-bold text-primary">הוראת קבע</h2>
+                            <p className="text-xs text-text-muted mt-1 leading-relaxed">
                                 תרומה חודשית קבועה המאפשרת לקהילה תכנון ויציבות תקציבית
                             </p>
                         </div>
                     </div>
 
                     {donateUrl ? (
-                        <a
+                        <LinkButton
                             href={donateUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="block w-full text-center py-3.5 px-4 bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm rounded-xl shadow-xs transition-colors"
+                            variant="accent"
+                            size="lg"
+                            fullWidth
                         >
                             מעבר לדף התרומה המאובטח (נדרים פלוס)
-                        </a>
+                        </LinkButton>
                     ) : (
-                        <div className="px-4 py-3.5 bg-slate-100 border border-slate-200 rounded-xl text-center text-xs font-medium text-slate-500">
+                        <div className="px-4 py-3.5 bg-background border border-border rounded-xl text-center text-xs font-medium text-text-muted">
                             עמוד התרומות בהקמה - יעודכן בקרוב
                         </div>
                     )}
 
-                    <p className="text-xs text-slate-400 text-center leading-relaxed">
+                    <p className="text-xs text-text-muted text-center leading-relaxed">
                         התרומה מתבצעת באמצעות מערכת נדרים פלוס המאובטחת. ניתן לצפות בהיסטוריית התרומות שלך
                         {" "}
-                        <Link href="/profile" className="text-amber-700 hover:text-amber-800 font-medium">
+                        <Link href="/login" className="text-primary hover:text-primary-hover font-medium">
                             באזור האישי
                         </Link>
                         {" "}
                         (לאחר התחברות).
                     </p>
-                </div>
+                </Card>
             </div>
         </div>
     );

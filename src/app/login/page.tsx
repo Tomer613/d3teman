@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { login } from "@/app/actions/auth";
+import { COMMUNITY_NAME, COMMUNITY_TAGLINE } from "@/lib/branding";
 import CommunityLogo from "@/components/CommunityLogo";
+import DecorativePattern from "@/components/ui/DecorativePattern";
+import Card from "@/components/ui/Card";
+import Input from "@/components/ui/Input";
+import Button, { LinkButton } from "@/components/ui/Button";
+import Alert from "@/components/ui/Alert";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -31,78 +36,58 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
+        <div className="relative min-h-screen bg-background flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+            <DecorativePattern variant="grid" className="absolute inset-0" />
+
+            <div className="relative sm:mx-auto sm:w-full sm:max-w-md text-center">
                 <CommunityLogo size="md" className="mx-auto mb-4" />
-                <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+                <h1 className="text-lg font-bold tracking-tight text-text">{COMMUNITY_NAME}</h1>
+                <p className="mt-1 text-sm text-text-muted">{COMMUNITY_TAGLINE}</p>
+                <h2 className="mt-4 text-xl font-bold tracking-tight text-text">
                     כניסה לפורטל הקהילה
                 </h2>
-                <p className="mt-2 text-sm text-slate-500">
+                <p className="mt-2 text-sm text-text-muted">
                     הכניסה באמצעות מייל וסיסמה ראשונית שנמסרו ע&quot;י הגבאים
                 </p>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-6 shadow-xs border border-slate-200/80 rounded-2xl sm:px-10">
+            <div className="relative mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+                <Card padding="lg">
                     <form className="space-y-5" onSubmit={handleSubmit}>
-                        {error && (
-                            <div className="px-3.5 py-2.5 bg-rose-50 border border-rose-200 rounded-xl text-xs font-medium text-rose-700">
-                                {error}
-                            </div>
-                        )}
+                        {error && <Alert variant="error">{error}</Alert>}
 
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700">
-                                כתובת מייל
-                            </label>
-                            <input
-                                type="email"
-                                name="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="mt-1 block w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600 focus:bg-white transition-all"
-                                placeholder="name@example.com"
-                            />
-                        </div>
+                        <Input
+                            label="כתובת מייל"
+                            type="email"
+                            name="email"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="name@example.com"
+                        />
 
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700">
-                                סיסמה
-                            </label>
-                            <input
-                                type="password"
-                                name="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="mt-1 block w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-600 focus:bg-white transition-all"
-                                placeholder="••••••••"
-                            />
-                        </div>
+                        <Input
+                            label="סיסמה"
+                            type="password"
+                            name="password"
+                            required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="••••••••"
+                        />
 
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="w-full flex justify-center py-2.5 px-4 rounded-xl shadow-xs text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 disabled:bg-slate-300 focus:outline-hidden focus:ring-2 focus:ring-amber-500 transition-colors"
-                        >
-                            {isSubmitting ? "מתחבר..." : "התחברות"}
-                        </button>
+                        <Button type="submit" variant="primary" fullWidth isLoading={isSubmitting} loadingLabel="מתחבר...">
+                            התחברות
+                        </Button>
                     </form>
 
-                    {/* Invitation-only redirect */}
-                    <div className="mt-6 pt-6 border-t border-slate-100 text-center space-y-2">
-                        <p className="text-xs text-slate-500">
-                            עדיין אין לכם גישה למערכת?
-                        </p>
-                        <Link
-                            href="/join-request"
-                            className="inline-block text-sm font-medium text-amber-700 hover:text-amber-800"
-                        >
+                    <div className="mt-6 pt-6 border-t border-border text-center space-y-2">
+                        <p className="text-xs text-text-muted">עדיין אין לכם גישה למערכת?</p>
+                        <LinkButton href="/join-request" variant="ghost" size="sm">
                             הגשת בקשת הצטרפות לגבאים ←
-                        </Link>
+                        </LinkButton>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
     );
