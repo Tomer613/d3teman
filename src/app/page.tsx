@@ -31,7 +31,7 @@ export default async function HomePage() {
         </section>
 
         {/* Community stats */}
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Card>
             <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">משפחות בקהילה</p>
             <p className="text-3xl font-extrabold text-text mt-2">{stats.familyCount}</p>
@@ -43,18 +43,12 @@ export default async function HomePage() {
             <p className="text-3xl font-extrabold text-text mt-2">{stats.streetCount} רחובות</p>
             <p className="text-xs text-text-muted font-medium mt-1">פריסת הקהילה בשכונה</p>
           </Card>
-
-          <Card>
-            <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">שמחות קרובות</p>
-            <p className="text-3xl font-extrabold text-accent mt-2">{events.length}</p>
-            <p className="text-xs text-text-muted font-medium mt-1">אירועים מתוכננים בשבועות הקרובים</p>
-          </Card>
         </section>
 
         {/* Community events & celebrations */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-text">שמחות ואירועים קרובים</h2>
+            <h2 className="text-xl font-bold text-text">שמחות ואירועים קרובים ({events.length})</h2>
             <span className="text-xs text-text-muted">מעודכן ללוח השבועי</span>
           </div>
 
