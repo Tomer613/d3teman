@@ -171,6 +171,23 @@ export default function ProfileClient({
     });
     const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
+    // Whether the "save all changes" button should show at all - only once
+    // any field diverges from the last-saved member record, so the button
+    // isn't dangling there begging to be clicked when nothing changed.
+    const isDirty =
+        firstName !== member.firstName ||
+        lastName !== member.lastName ||
+        phone !== member.phone ||
+        street !== member.street ||
+        city !== member.city ||
+        halachicStatus !== member.halachicStatus ||
+        showPhoneInDirectory !== member.showPhoneInDirectory ||
+        showAddressInDirectory !== member.showAddressInDirectory ||
+        receiveNewsletter !== member.receiveNewsletter ||
+        childrenAges.toddler !== member.toddlerChildren ||
+        childrenAges.elementary !== member.elementaryChildren ||
+        childrenAges.teen !== member.teenChildren;
+
     // Profile completion checklist: covers both fields that are optional at
     // registration (children, yahrzeit) and fields that ARE required at
     // registration but can still end up empty (a gabay can create/edit a
@@ -257,8 +274,13 @@ export default function ProfileClient({
         });
     };
 
+    // Which single gabay-request form is open, tab-style - opening one closes
+    // any other, instead of letting them stack up the card indefinitely.
+    const [openRequestForm, setOpenRequestForm] = useState<
+        "kiddush" | "haftarah" | "aliyah" | "event" | "inquiry" | null
+    >(null);
+
     // Kiddush donation request form
-    const [isKiddushFormOpen, setIsKiddushFormOpen] = useState(false);
     const [kiddushForm, setKiddushForm] = useState({ occasion: "", preferredDate: "", amount: "", notes: "" });
     const [kiddushError, setKiddushError] = useState<string | null>(null);
     const [isSubmittingKiddush, startSubmittingKiddush] = useTransition();
@@ -278,13 +300,12 @@ export default function ProfileClient({
                 return;
             }
             setKiddushForm({ occasion: "", preferredDate: "", amount: "", notes: "" });
-            setIsKiddushFormOpen(false);
+            setOpenRequestForm(null);
             router.refresh();
         });
     };
 
     // Haftarah reservation request form
-    const [isHaftarahFormOpen, setIsHaftarahFormOpen] = useState(false);
     const [haftarahForm, setHaftarahForm] = useState({ parsha: "", occasion: "", notes: "" });
     const [haftarahError, setHaftarahError] = useState<string | null>(null);
     const [isSubmittingHaftarah, startSubmittingHaftarah] = useTransition();
@@ -303,13 +324,12 @@ export default function ProfileClient({
                 return;
             }
             setHaftarahForm({ parsha: "", occasion: "", notes: "" });
-            setIsHaftarahFormOpen(false);
+            setOpenRequestForm(null);
             router.refresh();
         });
     };
 
     // Aliyah request form
-    const [isAliyahFormOpen, setIsAliyahFormOpen] = useState(false);
     const [aliyahForm, setAliyahForm] = useState({ parsha: "", aliyahType: "no_preference", occasion: "", notes: "" });
     const [aliyahError, setAliyahError] = useState<string | null>(null);
     const [isSubmittingAliyah, startSubmittingAliyah] = useTransition();
@@ -329,13 +349,12 @@ export default function ProfileClient({
                 return;
             }
             setAliyahForm({ parsha: "", aliyahType: "no_preference", occasion: "", notes: "" });
-            setIsAliyahFormOpen(false);
+            setOpenRequestForm(null);
             router.refresh();
         });
     };
 
     // Event notification form (simcha / aveilut)
-    const [isEventFormOpen, setIsEventFormOpen] = useState(false);
     const [eventForm, setEventForm] = useState({
         category: "simcha",
         eventType: "birth",
@@ -367,13 +386,12 @@ export default function ProfileClient({
                 return;
             }
             setEventForm({ category: "simcha", eventType: "birth", description: "", eventDate: "", notes: "" });
-            setIsEventFormOpen(false);
+            setOpenRequestForm(null);
             router.refresh();
         });
     };
 
     // General inquiry form
-    const [isInquiryFormOpen, setIsInquiryFormOpen] = useState(false);
     const [inquiryForm, setInquiryForm] = useState({ subject: "", message: "" });
     const [inquiryError, setInquiryError] = useState<string | null>(null);
     const [isSubmittingInquiry, startSubmittingInquiry] = useTransition();
@@ -391,7 +409,7 @@ export default function ProfileClient({
                 return;
             }
             setInquiryForm({ subject: "", message: "" });
-            setIsInquiryFormOpen(false);
+            setOpenRequestForm(null);
             router.refresh();
         });
     };
@@ -469,14 +487,16 @@ export default function ProfileClient({
                             הפרטים מסייעים לגבאים בשיבוץ עליות, תיאום השכבות ופעילות קהילתית
                         </p>
                     </div>
-                    <button
-                        type="button"
-                        onClick={handleSaveProfile}
-                        disabled={isPending}
-                        className="px-5 py-2.5 bg-primary hover:bg-primary-hover disabled:bg-border text-white text-sm font-semibold rounded-xl shadow-xs transition-colors shrink-0"
-                    >
-                        {isPending ? "שומר..." : "שמירת כל השינויים"}
-                    </button>
+                    {(isDirty || isPending) && (
+                        <button
+                            type="button"
+                            onClick={handleSaveProfile}
+                            disabled={isPending}
+                            className="px-5 py-2.5 bg-primary hover:bg-primary-hover disabled:bg-border text-white text-sm font-semibold rounded-xl shadow-xs transition-colors shrink-0"
+                        >
+                            {isPending ? "שומר..." : "שמירת כל השינויים"}
+                        </button>
+                    )}
                 </div>
 
                 {saveMessage && (
@@ -502,42 +522,42 @@ export default function ProfileClient({
                     <div className="flex flex-wrap gap-2">
                         <button
                             type="button"
-                            onClick={() => setIsKiddushFormOpen((open) => !open)}
-                            className="px-3.5 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent-hover text-xs font-bold rounded-lg transition-colors"
+                            onClick={() => setOpenRequestForm((f) => (f === "kiddush" ? null : "kiddush"))}
+                            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-colors ${openRequestForm === "kiddush" ? "bg-accent/20 text-accent-hover" : "bg-accent/10 hover:bg-accent/20 text-accent-hover"}`}
                         >
                             + תרום קידוש
                         </button>
                         <button
                             type="button"
-                            onClick={() => setIsHaftarahFormOpen((open) => !open)}
-                            className="px-3.5 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent-hover text-xs font-bold rounded-lg transition-colors"
+                            onClick={() => setOpenRequestForm((f) => (f === "haftarah" ? null : "haftarah"))}
+                            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-colors ${openRequestForm === "haftarah" ? "bg-accent/20 text-accent-hover" : "bg-accent/10 hover:bg-accent/20 text-accent-hover"}`}
                         >
                             + שריין הפטרה
                         </button>
                         <button
                             type="button"
-                            onClick={() => setIsAliyahFormOpen((open) => !open)}
-                            className="px-3.5 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent-hover text-xs font-bold rounded-lg transition-colors"
+                            onClick={() => setOpenRequestForm((f) => (f === "aliyah" ? null : "aliyah"))}
+                            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-colors ${openRequestForm === "aliyah" ? "bg-accent/20 text-accent-hover" : "bg-accent/10 hover:bg-accent/20 text-accent-hover"}`}
                         >
                             + בקש עלייה
                         </button>
                         <button
                             type="button"
-                            onClick={() => setIsEventFormOpen((open) => !open)}
-                            className="px-3.5 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent-hover text-xs font-bold rounded-lg transition-colors"
+                            onClick={() => setOpenRequestForm((f) => (f === "event" ? null : "event"))}
+                            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-colors ${openRequestForm === "event" ? "bg-accent/20 text-accent-hover" : "bg-accent/10 hover:bg-accent/20 text-accent-hover"}`}
                         >
                             + עדכון על אירוע
                         </button>
                         <button
                             type="button"
-                            onClick={() => setIsInquiryFormOpen((open) => !open)}
-                            className="px-3.5 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent-hover text-xs font-bold rounded-lg transition-colors"
+                            onClick={() => setOpenRequestForm((f) => (f === "inquiry" ? null : "inquiry"))}
+                            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-colors ${openRequestForm === "inquiry" ? "bg-accent/20 text-accent-hover" : "bg-accent/10 hover:bg-accent/20 text-accent-hover"}`}
                         >
                             + פנייה כללית
                         </button>
                     </div>
 
-                    {isKiddushFormOpen && (
+                    {openRequestForm === "kiddush" && (
                         <form onSubmit={handleSubmitKiddush} className="p-4 bg-accent/5 rounded-xl border border-accent/20 space-y-3">
                             <h3 className="text-xs font-bold text-accent-hover uppercase">בקשת תרומת קידוש</h3>
 
@@ -596,7 +616,7 @@ export default function ProfileClient({
                             <div className="flex justify-end gap-2 pt-1">
                                 <button
                                     type="button"
-                                    onClick={() => setIsKiddushFormOpen(false)}
+                                    onClick={() => setOpenRequestForm(null)}
                                     className="px-3 py-1.5 text-xs text-text-muted hover:bg-background rounded-lg"
                                 >
                                     ביטול
@@ -612,7 +632,7 @@ export default function ProfileClient({
                         </form>
                     )}
 
-                    {isHaftarahFormOpen && (
+                    {openRequestForm === "haftarah" && (
                         <form onSubmit={handleSubmitHaftarah} className="p-4 bg-accent/5 rounded-xl border border-accent/20 space-y-3">
                             <h3 className="text-xs font-bold text-accent-hover uppercase">בקשת שריון הפטרה</h3>
 
@@ -659,7 +679,7 @@ export default function ProfileClient({
                             <div className="flex justify-end gap-2 pt-1">
                                 <button
                                     type="button"
-                                    onClick={() => setIsHaftarahFormOpen(false)}
+                                    onClick={() => setOpenRequestForm(null)}
                                     className="px-3 py-1.5 text-xs text-text-muted hover:bg-background rounded-lg"
                                 >
                                     ביטול
@@ -675,7 +695,7 @@ export default function ProfileClient({
                         </form>
                     )}
 
-                    {isAliyahFormOpen && (
+                    {openRequestForm === "aliyah" && (
                         <form onSubmit={handleSubmitAliyah} className="p-4 bg-accent/5 rounded-xl border border-accent/20 space-y-3">
                             <h3 className="text-xs font-bold text-accent-hover uppercase">בקשת עלייה לתורה</h3>
 
@@ -735,7 +755,7 @@ export default function ProfileClient({
                             <div className="flex justify-end gap-2 pt-1">
                                 <button
                                     type="button"
-                                    onClick={() => setIsAliyahFormOpen(false)}
+                                    onClick={() => setOpenRequestForm(null)}
                                     className="px-3 py-1.5 text-xs text-text-muted hover:bg-background rounded-lg"
                                 >
                                     ביטול
@@ -751,7 +771,7 @@ export default function ProfileClient({
                         </form>
                     )}
 
-                    {isEventFormOpen && (
+                    {openRequestForm === "event" && (
                         <form onSubmit={handleSubmitEvent} className="p-4 bg-accent/5 rounded-xl border border-accent/20 space-y-3">
                             <h3 className="text-xs font-bold text-accent-hover uppercase">עדכון על אירוע שמחה או אבלות</h3>
 
@@ -824,7 +844,7 @@ export default function ProfileClient({
                             <div className="flex justify-end gap-2 pt-1">
                                 <button
                                     type="button"
-                                    onClick={() => setIsEventFormOpen(false)}
+                                    onClick={() => setOpenRequestForm(null)}
                                     className="px-3 py-1.5 text-xs text-text-muted hover:bg-background rounded-lg"
                                 >
                                     ביטול
@@ -840,7 +860,7 @@ export default function ProfileClient({
                         </form>
                     )}
 
-                    {isInquiryFormOpen && (
+                    {openRequestForm === "inquiry" && (
                         <form onSubmit={handleSubmitInquiry} className="p-4 bg-accent/5 rounded-xl border border-accent/20 space-y-3">
                             <h3 className="text-xs font-bold text-accent-hover uppercase">פנייה כללית לגבאי</h3>
 
@@ -877,7 +897,7 @@ export default function ProfileClient({
                             <div className="flex justify-end gap-2 pt-1">
                                 <button
                                     type="button"
-                                    onClick={() => setIsInquiryFormOpen(false)}
+                                    onClick={() => setOpenRequestForm(null)}
                                     className="px-3 py-1.5 text-xs text-text-muted hover:bg-background rounded-lg"
                                 >
                                     ביטול
