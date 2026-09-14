@@ -2,6 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 import { hashPassword, requireAdmin } from "@/lib/auth";
+import { getResendClient, getFromAddress, isEmailConfigured } from "@/lib/resend";
+import { getEmailLogoUrl } from "@/lib/email";
+import { render } from "@react-email/render";
+import JoinRequestReplyEmail from "@/emails/JoinRequestReplyEmail";
 import { revalidatePath } from "next/cache";
 
 // Fetch pending requests, active members, and recent transactions
@@ -45,6 +49,7 @@ export async function getAdminDashboardData() {
             totalIncome: totalAllTime._sum.amount ?? 0,
             fundBreakdown,
             recurringCount,
+            emailConfigured: isEmailConfigured(),
         };
     } catch (error) {
         console.error("[Get Admin Data Error]:", error);
@@ -55,6 +60,7 @@ export async function getAdminDashboardData() {
             totalIncome: 0,
             fundBreakdown: [],
             recurringCount: 0,
+            emailConfigured: false,
         };
     }
 }
@@ -186,5 +192,73 @@ export async function setMemberApproval(memberId: string, isApproved: boolean) {
     } catch (error) {
         console.error("[Set Member Approval Error]:", error);
         return { success: false as const, error: "Failed to update member status" };
+    }
+}
+
+// Sends a one-off personal email to a join-request applicant (e.g. asking a
+// follow-up question) before the gabay decides to approve or reject them.
+// Does not mark the request as processed - this is correspondence, not a
+// decision.
+export async function sendJoinRequestEmail(requestId: string, subject: string, body: string) {
+    try {
+        await requireAdmin();
+
+        if (!isEmailConfigured()) {
+            return { success: false as const, error: "Email sending is not configured yet (RESEND_API_KEY)" };
+        }
+        if (!subject.trim() || !body.trim()) {
+            return { success: false as const, error: "Subject and body are required" };
+        }
+
+        const request = await prisma.joinRequest.findUnique({ where: { id: requestId } });
+        if (!request) {
+            return { success: false as const, error: "Request not found" };
+        }
+
+        const html = await render(
+            JoinRequestReplyEmail({
+                subject,
+                recipientFirstName: request.firstName,
+                body,
+                logoUrl: getEmailLogoUrl(),
+            })
+        );
+
+        const resend = getResendClient();
+        const result = await resend.emails.send({
+            from: getFromAddress(),
+            to: request.email,
+            subject,
+            html,
+        });
+
+        if (result.error) {
+            console.error("[Send Join Request Email Error]:", result.error);
+            return { success: false as const, error: "Failed to send email" };
+        }
+
+        return { success: true as const };
+    } catch (error) {
+        console.error("[Send Join Request Email Error]:", error);
+        return { success: false as const, error: "Failed to send email" };
+    }
+}
+
+// Gabay-only scratch notes on a pending join request (e.g. "waiting to hear
+// back about their address"). Purely internal - never shown to the applicant.
+export async function updateJoinRequestNotes(requestId: string, notes: string) {
+    try {
+        await requireAdmin();
+
+        await prisma.joinRequest.update({
+            where: { id: requestId },
+            data: { adminNotes: notes.trim() || null },
+        });
+
+        revalidatePath("/admin");
+        return { success: true as const };
+    } catch (error) {
+        console.error("[Update Join Request Notes Error]:", error);
+        return { success: false as const, error: "Failed to save note" };
     }
 }

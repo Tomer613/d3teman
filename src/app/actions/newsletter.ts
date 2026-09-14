@@ -1,26 +1,14 @@
 "use server";
 
-import fs from "fs";
-import path from "path";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { getResendClient, getFromAddress, isEmailConfigured } from "@/lib/resend";
 import { createUnsubscribeToken, getAppUrl } from "@/lib/unsubscribe";
-import { LOGO_PATH } from "@/lib/branding";
+import { getEmailLogoUrl } from "@/lib/email";
 import { render } from "@react-email/render";
 import NewsletterEmail from "@/emails/NewsletterEmail";
 import { revalidatePath } from "next/cache";
-
-// Resolves to an absolute logo URL only once a real file has been dropped at
-// public/logo.png - NewsletterEmail falls back to the letter badge otherwise.
-function getEmailLogoUrl(): string | undefined {
-    const logoFilePath = path.join(process.cwd(), "public", LOGO_PATH.replace(/^\//, ""));
-    if (!fs.existsSync(logoFilePath)) {
-        return undefined;
-    }
-    return `${getAppUrl()}${LOGO_PATH}`;
-}
 
 export interface NewsletterItemInput {
     category: string;

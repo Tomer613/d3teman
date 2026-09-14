@@ -5,18 +5,7 @@ import { useRouter } from "next/navigation";
 import { PartyPopper, Mail, Users } from "lucide-react";
 import { approveJoinRequest, rejectJoinRequest, updateMemberRole, setMemberApproval } from "@/app/actions/admin";
 import { LinkButton } from "@/components/ui/Button";
-
-interface PendingRequest {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    address: string;
-    city: string;
-    about: string | null;
-    createdAt: Date;
-}
+import JoinRequestCard, { type PendingRequest } from "./JoinRequestCard";
 
 interface MemberRecord {
     id: string;
@@ -58,6 +47,7 @@ interface AdminDashboardClientProps {
     recurringCount: number;
     viewerRole: string;
     viewerId: string;
+    emailConfigured: boolean;
 }
 
 // Generates a random, readable initial password for a newly-approved member.
@@ -76,6 +66,7 @@ export default function AdminDashboardClient({
     recurringCount,
     viewerRole,
     viewerId,
+    emailConfigured,
 }: AdminDashboardClientProps) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
@@ -160,7 +151,7 @@ export default function AdminDashboardClient({
                     <div>
                         <div className="flex items-center gap-2">
                             <span className="px-2.5 py-0.5 text-xs font-semibold bg-accent/10 text-accent-hover rounded-full">
-                                מורשה גבאי
+                                {ROLE_LABELS[viewerRole] ?? viewerRole}
                             </span>
                             <h1 className="text-xl font-bold text-text">לוח ניהול קהילתי</h1>
                         </div>
@@ -226,88 +217,72 @@ export default function AdminDashboardClient({
                     ) : (
                         <div className="divide-y divide-border">
                             {pendingRequests.map((req) => (
-                                <div
+                                <JoinRequestCard
                                     key={req.id}
-                                    className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-background/50 transition-colors"
-                                >
-                                    <div className="space-y-1">
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-semibold text-text text-sm">
-                                                {req.firstName} {req.lastName}
-                                            </span>
-                                            <span className="text-xs text-text-muted">({req.address}, {req.city})</span>
-                                        </div>
-                                        <div className="text-xs text-text-muted flex flex-wrap gap-x-4 gap-y-1">
-                                            <span>טלפון: {req.phone}</span>
-                                            <span>מייל: {req.email}</span>
-                                        </div>
-                                        {req.about && (
-                                            <p className="text-xs text-text-muted bg-background p-2 rounded-lg mt-1 border border-border">
-                                                &quot;{req.about}&quot;
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    {pendingApproval?.id === req.id ? (
-                                        <div className="w-full md:w-80 p-3 bg-success/10 border border-success/30 rounded-xl space-y-2">
-                                            <p className="text-xs font-semibold text-success">
-                                                סיסמה ראשונית שנוצרה - יש למסור אותה לחבר החדש (טלפון/וואטסאפ). הסיסמה לא תוצג שוב.
-                                            </p>
-                                            <div className="flex items-center gap-2">
-                                                <code className="flex-1 px-2.5 py-1.5 bg-surface border border-success/40 rounded-lg text-sm font-mono text-success select-all">
-                                                    {pendingApproval.password}
-                                                </code>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => navigator.clipboard.writeText(pendingApproval.password)}
-                                                    className="px-2.5 py-1.5 bg-surface hover:bg-success/20 border border-success/40 text-success text-xs font-semibold rounded-lg transition-colors"
-                                                >
-                                                    העתק
-                                                </button>
-                                            </div>
-                                            {approveError && (
-                                                <p className="text-xs font-medium text-danger bg-danger-bg border border-danger-border rounded-lg px-2.5 py-1.5">
-                                                    {approveError}
+                                    request={req}
+                                    emailConfigured={emailConfigured}
+                                    actions={
+                                        pendingApproval?.id === req.id ? (
+                                            <div className="w-full md:w-80 p-3 bg-success/10 border border-success/30 rounded-xl space-y-2 shrink-0">
+                                                <p className="text-xs font-semibold text-success">
+                                                    סיסמה ראשונית שנוצרה - יש למסור אותה לחבר החדש (טלפון/וואטסאפ). הסיסמה לא תוצג שוב.
                                                 </p>
-                                            )}
-                                            <div className="flex items-center gap-2 pt-1">
+                                                <div className="flex items-center gap-2">
+                                                    <code className="flex-1 px-2.5 py-1.5 bg-surface border border-success/40 rounded-lg text-sm font-mono text-success select-all">
+                                                        {pendingApproval.password}
+                                                    </code>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => navigator.clipboard.writeText(pendingApproval.password)}
+                                                        className="px-2.5 py-1.5 bg-surface hover:bg-success/20 border border-success/40 text-success text-xs font-semibold rounded-lg transition-colors"
+                                                    >
+                                                        העתק
+                                                    </button>
+                                                </div>
+                                                {approveError && (
+                                                    <p className="text-xs font-medium text-danger bg-danger-bg border border-danger-border rounded-lg px-2.5 py-1.5">
+                                                        {approveError}
+                                                    </p>
+                                                )}
+                                                <div className="flex items-center gap-2 pt-1">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleConfirmApprove(req.id, pendingApproval.password)}
+                                                        disabled={processingId === req.id}
+                                                        className="flex-1 px-3 py-2 bg-primary hover:bg-primary-hover disabled:bg-border text-white text-xs font-semibold rounded-xl transition-colors"
+                                                    >
+                                                        {processingId === req.id ? "מאשר..." : "אשר ושמור"}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleCancelApprove}
+                                                        disabled={processingId === req.id}
+                                                        className="px-3 py-2 text-text-muted hover:bg-background text-xs font-semibold rounded-xl transition-colors"
+                                                    >
+                                                        ביטול
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-2 shrink-0">
                                                 <button
-                                                    type="button"
-                                                    onClick={() => handleConfirmApprove(req.id, pendingApproval.password)}
+                                                    onClick={() => handleStartApprove(req.id)}
                                                     disabled={processingId === req.id}
-                                                    className="flex-1 px-3 py-2 bg-primary hover:bg-primary-hover disabled:bg-border text-white text-xs font-semibold rounded-xl transition-colors"
+                                                    className="px-4 py-2 bg-primary hover:bg-primary-hover disabled:bg-border text-white text-xs font-semibold rounded-xl shadow-xs transition-colors"
                                                 >
-                                                    {processingId === req.id ? "מאשר..." : "אשר ושמור"}
+                                                    אשר חבר קהילה
                                                 </button>
                                                 <button
-                                                    type="button"
-                                                    onClick={handleCancelApprove}
+                                                    onClick={() => handleReject(req.id)}
                                                     disabled={processingId === req.id}
-                                                    className="px-3 py-2 text-text-muted hover:bg-background text-xs font-semibold rounded-xl transition-colors"
+                                                    className="px-3 py-2 bg-danger-bg hover:opacity-80 disabled:opacity-50 text-danger text-xs font-semibold rounded-xl border border-danger-border transition-colors"
                                                 >
-                                                    ביטול
+                                                    דחה
                                                 </button>
                                             </div>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() => handleStartApprove(req.id)}
-                                                disabled={processingId === req.id}
-                                                className="px-4 py-2 bg-primary hover:bg-primary-hover disabled:bg-border text-white text-xs font-semibold rounded-xl shadow-xs transition-colors"
-                                            >
-                                                אשר חבר קהילה
-                                            </button>
-                                            <button
-                                                onClick={() => handleReject(req.id)}
-                                                disabled={processingId === req.id}
-                                                className="px-3 py-2 bg-danger-bg hover:opacity-80 disabled:opacity-50 text-danger text-xs font-semibold rounded-xl border border-danger-border transition-colors"
-                                            >
-                                                דחה
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
+                                        )
+                                    }
+                                />
                             ))}
                         </div>
                     )}

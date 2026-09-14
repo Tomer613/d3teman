@@ -13,7 +13,7 @@ export default async function AdminDashboardPage() {
     // demoted gabay is rejected immediately rather than for up to 30 days.
     const session = await requireAdminOrRedirect();
 
-    const { pendingRequests, members, recentTransactions, totalIncome, fundBreakdown, recurringCount } =
+    const { pendingRequests, members, recentTransactions, totalIncome, fundBreakdown, recurringCount, emailConfigured } =
         await getAdminDashboardData();
 
     return (
@@ -28,6 +28,7 @@ export default async function AdminDashboardPage() {
                 recurringCount={recurringCount}
                 viewerRole={session.role}
                 viewerId={session.sub}
+                emailConfigured={emailConfigured}
             />
         </>
     );

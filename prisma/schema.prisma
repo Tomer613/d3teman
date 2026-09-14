@@ -60,6 +60,7 @@ model JoinRequest {
   city        String   @default("")
   about       String?
   isProcessed Boolean  @default(false)
+  adminNotes  String? // gabay-only scratch notes while following up before approving/rejecting
   createdAt   DateTime @default(now())
 }
 

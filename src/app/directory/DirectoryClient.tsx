@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { HalachicStatus } from "@/types";
 import { DirectoryMember } from "@/app/actions/directory";
+import { toWhatsAppNumber } from "@/lib/phone";
 import Badge from "@/components/ui/Badge";
 
 interface DirectoryClientProps {
@@ -28,12 +29,6 @@ export default function DirectoryClient({ members }: DirectoryClientProps) {
             return matchesSearch && matchesStatus;
         });
     }, [members, searchQuery, statusFilter]);
-
-    // Clean raw phone number for WhatsApp URL
-    const formatWhatsappNumber = (phone: string) => {
-        const digitsOnly = phone.replace(/\D/g, "");
-        return digitsOnly.startsWith("0") ? `972${digitsOnly.slice(1)}` : digitsOnly;
-    };
 
     const getStatusBadge = (status: HalachicStatus | string) => {
         switch (status) {
@@ -133,7 +128,7 @@ export default function DirectoryClient({ members }: DirectoryClientProps) {
                                             חיוג
                                         </a>
                                         <a
-                                            href={`https://wa.me/${formatWhatsappNumber(member.phone)}`}
+                                            href={`https://wa.me/${toWhatsAppNumber(member.phone)}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="flex-1 py-1.5 px-3 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold rounded-lg text-center transition-colors"

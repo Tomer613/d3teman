@@ -2,10 +2,20 @@ import Link from "next/link";
 import { Gift, Users, UserRound, ShieldCheck, LogOut } from "lucide-react";
 import { COMMUNITY_NAME, COMMUNITY_TAGLINE } from "@/lib/branding";
 import { ADMIN_ROLES } from "@/lib/session";
-import { requireSessionOrRedirect } from "@/lib/auth";
+import { requireSession, requireSessionOrRedirect } from "@/lib/auth";
 import CommunityLogo from "@/components/CommunityLogo";
 import { LinkButton } from "@/components/ui/Button";
 import { logout } from "@/app/actions/auth";
+
+interface GatedHeaderProps {
+    // Pages that must stay reachable by anonymous visitors (donate,
+    // join-request) can still show the full nav to an already-logged-in
+    // visitor by passing `optional` - a session that fails validation then
+    // renders nothing instead of redirecting to /login, so a genuinely
+    // anonymous (or de-approved) visitor never gets bounced off a page that
+    // has to stay public. Default (unset) behavior is unchanged.
+    optional?: boolean;
+}
 
 // Shared sticky, full-width top nav for every members-only page (homepage,
 // directory, profile, admin area). Uses requireSessionOrRedirect() (not
@@ -15,8 +25,17 @@ import { logout } from "@/app/actions/auth";
 // the same graceful way, not crash. Where the page's own guard also calls
 // requireSession()/requireSessionOrRedirect(), the DB check is deduped via
 // React's cache() and costs no extra round-trip.
-export default async function GatedHeader() {
-    const session = await requireSessionOrRedirect();
+export default async function GatedHeader({ optional = false }: GatedHeaderProps) {
+    let session;
+    if (optional) {
+        try {
+            session = await requireSession();
+        } catch {
+            return null;
+        }
+    } else {
+        session = await requireSessionOrRedirect();
+    }
     const isAdmin = ADMIN_ROLES.has(session.role);
 
     return (
