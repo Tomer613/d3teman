@@ -30,9 +30,11 @@ model Member {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
-  yahrzeits       Yahrzeit[]
-  transactions    Transaction[]
-  communityEvents CommunityEvent[]
+  yahrzeits               Yahrzeit[]
+  transactions            Transaction[]
+  communityEvents         CommunityEvent[]
+  kiddushDonationRequests KiddushDonationRequest[]
+  haftarahRequests        HaftarahRequest[]
 }
 
 // Memorial tracking for weekly aliyot and memorial prayers
@@ -81,6 +83,35 @@ model Transaction {
   isRecurring   Boolean  @default(false)
   recurringId   String? // Groups installments of the same standing order, once known
   createdAt     DateTime @default(now())
+}
+
+// Member-submitted request to sponsor Kiddush on a given Shabbat, reviewed by a gabay
+model KiddushDonationRequest {
+  id            String   @id @default(cuid())
+  memberId      String
+  member        Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  occasion      String // e.g. "יום הולדת", "יארצייט", "שמחה משפחתית"
+  preferredDate String // free-text Shabbat/date the member wants to sponsor
+  amount        Float?
+  notes         String?
+  status        String   @default("pending") // pending | approved | rejected
+  adminNotes    String? // gabay-only scratch notes
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Member-submitted request to be called for a Haftarah reading, reviewed by a gabay
+model HaftarahRequest {
+  id         String   @id @default(cuid())
+  memberId   String
+  member     Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  parsha     String // requested parsha / Shabbat
+  occasion   String? // e.g. "בר מצווה", "יארצייט"
+  notes      String?
+  status     String   @default("pending") // pending | approved | rejected
+  adminNotes String? // gabay-only scratch notes
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 // A community newsletter, built in the admin newsletter editor and sent by
