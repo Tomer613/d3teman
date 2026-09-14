@@ -43,14 +43,13 @@ model Member {
 
 // Memorial tracking for weekly aliyot and memorial prayers
 model Yahrzeit {
-  id              String   @id @default(cuid())
-  deceasedName    String
-  relation        String // father | mother | brother | sister | spouse | child | other
-  hebrewDay       Int
-  hebrewMonth     String
-  diedAfterSunset Boolean  @default(false)
-  notes           String?
-  memberId        String
+  id           String   @id @default(cuid())
+  deceasedName String
+  relation     String // father | mother | brother | sister | husband | wife | son | daughter | other
+  hebrewDay    Int
+  hebrewMonth  String
+  notes        String?
+  memberId     String
   member          Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   createdAt       DateTime @default(now())
 }

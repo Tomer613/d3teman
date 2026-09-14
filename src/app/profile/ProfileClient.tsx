@@ -12,7 +12,7 @@ import {
     submitGeneralInquiry,
     submitAliyahRequest,
 } from "@/app/actions/requests";
-import { HEBREW_MONTHS, YAHRZEIT_RELATIONS } from "@/lib/yahrzeit";
+import { HEBREW_MONTHS, YAHRZEIT_RELATIONS, HEBREW_DAYS, getHebrewDayLabel } from "@/lib/yahrzeit";
 import { LinkButton } from "@/components/ui/Button";
 import ProgressBar from "@/components/ui/ProgressBar";
 import Badge from "@/components/ui/Badge";
@@ -23,7 +23,6 @@ interface YahrzeitRecord {
     relation: string;
     hebrewDay: number;
     hebrewMonth: string;
-    diedAfterSunset: boolean;
     notes: string | null;
 }
 
@@ -420,7 +419,6 @@ export default function ProfileClient({
         relation: "father",
         day: 1,
         month: "תשרי",
-        diedAfterSunset: false,
         notes: "",
     });
     const [isAddingYahrzeit, setIsAddingYahrzeit] = useState(false);
@@ -438,7 +436,6 @@ export default function ProfileClient({
                 relation: newYahrzeit.relation,
                 hebrewDay: Number(newYahrzeit.day),
                 hebrewMonth: newYahrzeit.month,
-                diedAfterSunset: newYahrzeit.diedAfterSunset,
                 notes: newYahrzeit.notes,
             });
             if (!result.success) {
@@ -450,7 +447,6 @@ export default function ProfileClient({
                 relation: "father",
                 day: 1,
                 month: "תשרי",
-                diedAfterSunset: false,
                 notes: "",
             });
             setIsAddingYahrzeit(false);
@@ -1008,7 +1004,7 @@ export default function ProfileClient({
                             <h2 className="text-lg font-bold text-text">היסטוריית תרומות</h2>
                             <p className="text-xs text-text-muted">תרומות שסונכרנו ממערכת נדרים פלוס</p>
                         </div>
-                        <LinkButton href="/donate" variant="ghost" size="sm">
+                        <LinkButton href="/donate" variant="secondary" size="sm">
                             <Gift className="size-4" aria-hidden="true" />
                             <span>תרומה נוספת</span>
                         </LinkButton>
@@ -1260,7 +1256,7 @@ export default function ProfileClient({
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-medium text-text">קרבה</label>
+                                    <label className="block text-xs font-medium text-text">זיקה</label>
                                     <select
                                         value={newYahrzeit.relation}
                                         onChange={(e) => setNewYahrzeit({ ...newYahrzeit, relation: e.target.value })}
@@ -1273,17 +1269,18 @@ export default function ProfileClient({
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 items-end">
+                            <div className="grid grid-cols-2 gap-3 items-end">
                                 <div>
                                     <label className="block text-xs font-medium text-text">יום עברי</label>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        max="30"
+                                    <select
                                         value={newYahrzeit.day}
                                         onChange={(e) => setNewYahrzeit({ ...newYahrzeit, day: Number(e.target.value) })}
                                         className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
-                                    />
+                                    >
+                                        {HEBREW_DAYS.map((d) => (
+                                            <option key={d.value} value={d.value}>{d.label}</option>
+                                        ))}
+                                    </select>
                                 </div>
 
                                 <div>
@@ -1297,18 +1294,6 @@ export default function ProfileClient({
                                             <option key={m} value={m}>{m}</option>
                                         ))}
                                     </select>
-                                </div>
-
-                                <div className="col-span-2 sm:col-span-1 pb-2">
-                                    <label className="flex items-center gap-2 text-xs text-text cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={newYahrzeit.diedAfterSunset}
-                                            onChange={(e) => setNewYahrzeit({ ...newYahrzeit, diedAfterSunset: e.target.checked })}
-                                            className="rounded-md border-border text-primary focus:ring-primary"
-                                        />
-                                        נפטר/ה לאחר השקיעה
-                                    </label>
                                 </div>
                             </div>
 
@@ -1338,8 +1323,7 @@ export default function ProfileClient({
                                 <div>
                                     <p className="text-sm font-bold text-text">{item.deceasedName}</p>
                                     <p className="text-xs text-text-muted">
-                                        {item.hebrewDay} ב{item.hebrewMonth}
-                                        {item.diedAfterSunset ? " (לאחר השקיעה)" : ""} • {item.notes || "ללא הערה"}
+                                        {getHebrewDayLabel(item.hebrewDay)} ב{item.hebrewMonth} • {item.notes || "ללא הערה"}
                                     </p>
                                 </div>
                                 <button

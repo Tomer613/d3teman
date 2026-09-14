@@ -73,7 +73,6 @@ export interface AddYahrzeitInput {
     relation: string;
     hebrewDay: number;
     hebrewMonth: string;
-    diedAfterSunset: boolean;
     notes?: string;
 }
 
@@ -101,7 +100,6 @@ export async function addYahrzeit(data: AddYahrzeitInput) {
                 relation: data.relation,
                 hebrewDay: data.hebrewDay,
                 hebrewMonth: data.hebrewMonth,
-                diedAfterSunset: !!data.diedAfterSunset,
                 notes: data.notes?.trim() || null,
                 memberId: session.sub,
             },
