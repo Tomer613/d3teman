@@ -485,8 +485,24 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                                             <p className="text-xs text-text-muted leading-relaxed">{item.body}</p>
 
                                             {item.imageUrl && (
-                                                <div className="mt-2 rounded-xl overflow-hidden bg-background border border-border h-40 flex items-center justify-center text-xs text-text-muted">
-                                                    תמונה מצורפת: {item.imageUrl}
+                                                <div className="mt-2 rounded-xl overflow-hidden bg-background border border-border">
+                                                    {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary user-supplied URL, not a configured Next.js image domain */}
+                                                    <img
+                                                        src={item.imageUrl}
+                                                        alt={item.title || "תמונה מצורפת"}
+                                                        className="w-full h-40 object-cover"
+                                                        onError={(e) => {
+                                                            const target = e.currentTarget;
+                                                            target.style.display = "none";
+                                                            const fallback = target.nextElementSibling as HTMLElement | null;
+                                                            if (fallback) fallback.style.display = "flex";
+                                                        }}
+                                                    />
+                                                    <div
+                                                        className="hidden h-40 items-center justify-center text-xs text-text-muted px-4 text-center"
+                                                    >
+                                                        לא ניתן לטעון את התמונה: {item.imageUrl}
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>
