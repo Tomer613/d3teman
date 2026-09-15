@@ -1,15 +1,17 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
     deleteNewsletterDraft,
+    ingestNewsletterImageUrl,
     NewsletterItemInput,
     NewsletterListItem,
     saveNewsletterDraft,
     sendNewsletter,
     sendTestEmail,
+    uploadNewsletterImage,
 } from "@/app/actions/newsletter";
 import { COMMUNITY_NAME, COMMUNITY_ADDRESS_LINE, LOGO_INITIAL } from "@/lib/branding";
 import { buildWhatsAppMessage } from "@/lib/whatsapp";
@@ -20,6 +22,7 @@ type NewsletterCategory = "שמחות" | "הודעת ועד" | "זמני תפי�
 interface NewsletterClientProps {
     recipientCount: number;
     emailConfigured: boolean;
+    storageConfigured: boolean;
     newsletters: NewsletterListItem[];
 }
 
@@ -27,7 +30,7 @@ const CATEGORIES: NewsletterCategory[] = ["שמחות", "הודעת ועד", "ז
 
 const emptyNewItem = { category: "הודעת ועד" as NewsletterCategory, title: "", body: "", imageUrl: "" };
 
-export default function NewsletterClient({ recipientCount, emailConfigured, newsletters }: NewsletterClientProps) {
+export default function NewsletterClient({ recipientCount, emailConfigured, storageConfigured, newsletters }: NewsletterClientProps) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
@@ -39,6 +42,11 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
     const [isAddingItem, setIsAddingItem] = useState(false);
     const [newItem, setNewItem] = useState(emptyNewItem);
 
+    const [imageUrlDraft, setImageUrlDraft] = useState("");
+    const [isImagePending, setIsImagePending] = useState(false);
+    const [imageError, setImageError] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
     const [confirmingSend, setConfirmingSend] = useState(false);
 
@@ -48,7 +56,45 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
 
         setItems([...items, { ...newItem, imageUrl: newItem.imageUrl || undefined }]);
         setNewItem(emptyNewItem);
+        setImageUrlDraft("");
+        setImageError(null);
         setIsAddingItem(false);
+    };
+
+    const handleFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setImageError(null);
+        setIsImagePending(true);
+        const formData = new FormData();
+        formData.append("file", file);
+        const result = await uploadNewsletterImage(formData);
+        setIsImagePending(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        if (!result.success) {
+            setImageError(result.error);
+            return;
+        }
+        setNewItem((prev) => ({ ...prev, imageUrl: result.url }));
+    };
+
+    const handleIngestUrl = async () => {
+        if (!imageUrlDraft.trim()) return;
+        setImageError(null);
+        setIsImagePending(true);
+        const result = await ingestNewsletterImageUrl(imageUrlDraft.trim());
+        setIsImagePending(false);
+        if (!result.success) {
+            setImageError(result.error);
+            return;
+        }
+        setNewItem((prev) => ({ ...prev, imageUrl: result.url }));
+        setImageUrlDraft("");
+    };
+
+    const handleRemoveImage = () => {
+        setNewItem((prev) => ({ ...prev, imageUrl: "" }));
+        setImageError(null);
     };
 
     const handleRemoveItem = (index: number) => {
@@ -335,21 +381,75 @@ export default function NewsletterClient({ recipientCount, emailConfigured, news
                                         />
                                     </div>
 
-                                    <div>
-                                        <label className="block text-xs font-medium text-text">קישור לתמונה (אופציונלי)</label>
-                                        <input
-                                            type="url"
-                                            placeholder="https://..."
-                                            value={newItem.imageUrl}
-                                            onChange={(e) => setNewItem({ ...newItem, imageUrl: e.target.value })}
-                                            className="mt-1 w-full px-2.5 py-1.5 bg-surface border border-border rounded-lg text-xs"
-                                        />
+                                    <div className="space-y-2">
+                                        <label className="block text-xs font-medium text-text">תמונה מצורפת (אופציונלי)</label>
+
+                                        {!storageConfigured && (
+                                            <p className="text-[11px] text-text-muted">
+                                                אחסון תמונות אינו מוגדר עדיין (חסרים SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY).
+                                            </p>
+                                        )}
+
+                                        {newItem.imageUrl ? (
+                                            <div className="flex items-center gap-3 p-2 bg-surface border border-border rounded-lg">
+                                                {/* eslint-disable-next-line @next/next/no-img-element -- thumbnail of an already re-hosted Supabase Storage URL */}
+                                                <img
+                                                    src={newItem.imageUrl}
+                                                    alt=""
+                                                    className="w-14 h-14 object-cover rounded-md border border-border"
+                                                />
+                                                <div className="flex-1 text-[11px] text-text-muted truncate">{newItem.imageUrl}</div>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleRemoveImage}
+                                                    className="text-danger hover:opacity-80 text-xs font-semibold shrink-0"
+                                                >
+                                                    הסר
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-2">
+                                                <input
+                                                    ref={fileInputRef}
+                                                    type="file"
+                                                    accept="image/jpeg,image/png,image/webp,image/gif"
+                                                    disabled={isImagePending || !storageConfigured}
+                                                    onChange={handleFileSelected}
+                                                    className="w-full text-xs text-text-muted file:mr-2 file:px-2.5 file:py-1 file:rounded-lg file:border-0 file:bg-accent/10 file:text-accent-hover file:text-xs file:font-semibold"
+                                                />
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="url"
+                                                        placeholder="או הדבק כתובת URL של תמונה..."
+                                                        value={imageUrlDraft}
+                                                        disabled={isImagePending || !storageConfigured}
+                                                        onChange={(e) => setImageUrlDraft(e.target.value)}
+                                                        className="flex-1 px-2.5 py-1.5 bg-surface border border-border rounded-lg text-xs"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleIngestUrl}
+                                                        disabled={isImagePending || !storageConfigured || !imageUrlDraft.trim()}
+                                                        className="px-2.5 py-1.5 bg-accent/10 hover:bg-accent/20 disabled:opacity-50 text-accent-hover text-xs font-semibold rounded-lg shrink-0"
+                                                    >
+                                                        טען
+                                                    </button>
+                                                </div>
+                                                {isImagePending && <p className="text-[11px] text-text-muted">טוען תמונה...</p>}
+                                                {imageError && <p className="text-[11px] text-danger">{imageError}</p>}
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="flex justify-end gap-2 pt-1">
                                         <button
                                             type="button"
-                                            onClick={() => { setIsAddingItem(false); setNewItem(emptyNewItem); }}
+                                            onClick={() => {
+                                                setIsAddingItem(false);
+                                                setNewItem(emptyNewItem);
+                                                setImageUrlDraft("");
+                                                setImageError(null);
+                                            }}
                                             className="px-3 py-1 text-xs text-text-muted hover:bg-background rounded-lg"
                                         >
                                             ביטול

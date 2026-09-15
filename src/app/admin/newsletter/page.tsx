@@ -17,6 +17,7 @@ export default async function NewsletterBuilderPage() {
             <NewsletterClient
                 recipientCount={data.recipientCount}
                 emailConfigured={data.emailConfigured}
+                storageConfigured={data.storageConfigured}
                 newsletters={data.newsletters}
             />
         </>

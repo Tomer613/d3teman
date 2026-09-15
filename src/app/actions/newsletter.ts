@@ -6,6 +6,8 @@ import { requireAdmin } from "@/lib/auth";
 import { getResendClient, getFromAddress, isEmailConfigured } from "@/lib/resend";
 import { createUnsubscribeToken, getAppUrl } from "@/lib/unsubscribe";
 import { getEmailLogoUrl } from "@/lib/email";
+import { isStorageConfigured, uploadImageBuffer } from "@/lib/supabaseStorage";
+import { fetchImageFromUrl } from "@/lib/safeFetch";
 import { render } from "@react-email/render";
 import NewsletterEmail from "@/emails/NewsletterEmail";
 import { revalidatePath } from "next/cache";
@@ -42,6 +44,7 @@ export interface NewsletterDashboardData {
     recipientCount: number;
     newsletters: NewsletterListItem[];
     emailConfigured: boolean;
+    storageConfigured: boolean;
 }
 
 export async function getNewsletterDashboardData(): Promise<NewsletterDashboardData> {
@@ -56,6 +59,7 @@ export async function getNewsletterDashboardData(): Promise<NewsletterDashboardD
         return {
             recipientCount,
             emailConfigured: isEmailConfigured(),
+            storageConfigured: isStorageConfigured(),
             newsletters: newsletters.map((n) => ({
                 id: n.id,
                 subject: n.subject,
@@ -70,7 +74,7 @@ export async function getNewsletterDashboardData(): Promise<NewsletterDashboardD
         };
     } catch (error) {
         console.error("[Get Newsletter Dashboard Data Error]:", error);
-        return { recipientCount: 0, newsletters: [], emailConfigured: false };
+        return { recipientCount: 0, newsletters: [], emailConfigured: false, storageConfigured: false };
     }
 }
 
@@ -298,5 +302,57 @@ export async function sendNewsletter(newsletterId: string) {
             })
             .catch(() => { });
         return { success: false as const, error: "Failed to send newsletter" };
+    }
+}
+
+export async function uploadNewsletterImage(formData: FormData) {
+    try {
+        await requireAdmin();
+
+        if (!isStorageConfigured()) {
+            return { success: false as const, error: "אחסון תמונות אינו מוגדר עדיין" };
+        }
+
+        const file = formData.get("file");
+        if (!(file instanceof File)) {
+            return { success: false as const, error: "לא נבחר קובץ" };
+        }
+
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const result = await uploadImageBuffer({ buffer, contentType: file.type });
+        if (!result.ok) {
+            return { success: false as const, error: result.error };
+        }
+        return { success: true as const, url: result.url };
+    } catch (error) {
+        console.error("[Upload Newsletter Image Error]:", error);
+        return { success: false as const, error: "העלאת התמונה נכשלה" };
+    }
+}
+
+export async function ingestNewsletterImageUrl(url: string) {
+    try {
+        await requireAdmin();
+
+        if (!isStorageConfigured()) {
+            return { success: false as const, error: "אחסון תמונות אינו מוגדר עדיין" };
+        }
+        if (!url || !url.trim()) {
+            return { success: false as const, error: "יש להזין כתובת" };
+        }
+
+        const fetched = await fetchImageFromUrl(url.trim());
+        if (!fetched.ok) {
+            return { success: false as const, error: fetched.error };
+        }
+
+        const uploaded = await uploadImageBuffer({ buffer: fetched.buffer, contentType: fetched.contentType });
+        if (!uploaded.ok) {
+            return { success: false as const, error: uploaded.error };
+        }
+        return { success: true as const, url: uploaded.url };
+    } catch (error) {
+        console.error("[Ingest Newsletter Image URL Error]:", error);
+        return { success: false as const, error: "טעינת התמונה מהכתובת נכשלה" };
     }
 }
