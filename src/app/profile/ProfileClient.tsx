@@ -12,10 +12,12 @@ import {
     submitGeneralInquiry,
     submitAliyahRequest,
 } from "@/app/actions/requests";
+import { createFamilyMember, reviewFamilyLinkRequest } from "@/app/actions/family";
 import { HEBREW_MONTHS, YAHRZEIT_RELATIONS, HEBREW_DAYS, getHebrewDayLabel } from "@/lib/yahrzeit";
 import { LinkButton } from "@/components/ui/Button";
 import ProgressBar from "@/components/ui/ProgressBar";
 import Badge from "@/components/ui/Badge";
+import RequestCard from "@/app/admin/requests/RequestCard";
 
 interface YahrzeitRecord {
     id: string;
@@ -90,6 +92,29 @@ interface AliyahRequestRecord {
     createdAt: Date;
 }
 
+interface FamilyMemberRecord {
+    id: string;
+    firstName: string;
+    lastName: string;
+}
+
+interface FamilyRecord {
+    id: string;
+    headMemberId: string;
+    members: FamilyMemberRecord[];
+}
+
+interface FamilyLinkRequestRecord {
+    id: string;
+    message: string | null;
+    requester: {
+        firstName: string;
+        lastName: string;
+        phone: string;
+        email: string | null;
+    };
+}
+
 interface ProfileClientProps {
     member: ProfileMember;
     yahrzeits: YahrzeitRecord[];
@@ -100,6 +125,9 @@ interface ProfileClientProps {
     eventNotifications: EventNotificationRecord[];
     generalInquiries: GeneralInquiryRecord[];
     aliyahRequests: AliyahRequestRecord[];
+    family: FamilyRecord | null;
+    isFamilyHead: boolean;
+    familyLinkRequests: FamilyLinkRequestRecord[];
 }
 
 const EVENT_CATEGORY_OPTIONS: { value: string; label: string; eventTypes: { value: string; label: string }[] }[] = [
@@ -150,6 +178,9 @@ export default function ProfileClient({
     eventNotifications,
     generalInquiries,
     aliyahRequests,
+    family,
+    isFamilyHead,
+    familyLinkRequests,
 }: ProfileClientProps) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
@@ -194,14 +225,12 @@ export default function ProfileClient({
     // state so the bar - and each item's checkmark - moves as you type,
     // matching a LinkedIn-style "fill this in" nudge rather than the last
     // saved value.
-    const totalChildren = childrenAges.toddler + childrenAges.elementary + childrenAges.teen;
     const completionChecks = [
         { label: "שם פרטי", done: firstName.trim().length > 0 },
         { label: "שם משפחה", done: lastName.trim().length > 0 },
         { label: "טלפון", done: phone.trim().length > 0 },
         { label: "רחוב", done: street.trim().length > 0 },
         { label: "עיר", done: city.trim().length > 0 },
-        { label: "פרטי ילדים במשפחה", done: totalChildren > 0 },
         { label: "לפחות יום זיכרון אחד (יארצייט)", done: yahrzeits.length > 0 },
     ];
     const completionPercent = Math.round(
@@ -410,6 +439,51 @@ export default function ProfileClient({
             setInquiryForm({ subject: "", message: "" });
             setOpenRequestForm(null);
             router.refresh();
+        });
+    };
+
+    // Add-family-member form (head only)
+    const [isAddFamilyMemberOpen, setIsAddFamilyMemberOpen] = useState(false);
+    const [familyMemberForm, setFamilyMemberForm] = useState({ firstName: "", lastName: "", phone: "", email: "" });
+    const [familyMemberError, setFamilyMemberError] = useState<string | null>(null);
+    const [isSubmittingFamilyMember, startSubmittingFamilyMember] = useTransition();
+
+    const handleAddFamilyMember = (e: React.FormEvent) => {
+        e.preventDefault();
+        setFamilyMemberError(null);
+        startSubmittingFamilyMember(async () => {
+            const result = await createFamilyMember({
+                firstName: familyMemberForm.firstName,
+                lastName: familyMemberForm.lastName,
+                phone: familyMemberForm.phone || undefined,
+                email: familyMemberForm.email || undefined,
+            });
+            if (!result.success) {
+                setFamilyMemberError(result.error);
+                return;
+            }
+            setFamilyMemberForm({ firstName: "", lastName: "", phone: "", email: "" });
+            setIsAddFamilyMemberOpen(false);
+            router.refresh();
+        });
+    };
+
+    // Family-link request review (head only)
+    const [familyRequestProcessingId, setFamilyRequestProcessingId] = useState<string | null>(null);
+    const [familyRequestError, setFamilyRequestError] = useState<string | null>(null);
+
+    const handleReviewFamilyRequest = (id: string, status: "approved" | "rejected") => {
+        setFamilyRequestProcessingId(id);
+        setFamilyRequestError(null);
+        startTransition(async () => {
+            const result = await reviewFamilyLinkRequest(id, status);
+            if (!result.success) {
+                setFamilyRequestError(result.error);
+                setFamilyRequestProcessingId(null);
+                return;
+            }
+            router.refresh();
+            setFamilyRequestProcessingId(null);
         });
     };
 
@@ -972,6 +1046,139 @@ export default function ProfileClient({
                                             {STATUS_LABELS[r.status]?.label ?? r.status}
                                         </Badge>
                                     </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Section: My Family */}
+                <div className="bg-surface p-6 rounded-2xl border border-border shadow-xs space-y-4">
+                    <div className="flex items-center justify-between pb-2 border-b border-border">
+                        <div>
+                            <h2 className="text-lg font-bold text-text">המשפחה שלי</h2>
+                            <p className="text-xs text-text-muted">בני המשפחה המקובצים תחת אותה משפחה במערכת</p>
+                        </div>
+                        {isFamilyHead && !isAddFamilyMemberOpen && (
+                            <button
+                                type="button"
+                                onClick={() => setIsAddFamilyMemberOpen(true)}
+                                className="px-3.5 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent-hover text-xs font-bold rounded-lg transition-colors"
+                            >
+                                + הוספת בן/בת משפחה
+                            </button>
+                        )}
+                    </div>
+
+                    {family && family.members.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                            {family.members.map((m) => (
+                                <span
+                                    key={m.id}
+                                    className="px-3 py-1.5 bg-background rounded-lg border border-border text-sm text-text"
+                                >
+                                    {m.firstName} {m.lastName}
+                                    {m.id === family.headMemberId && (
+                                        <span className="text-[10px] text-text-muted mr-1">(ראש משפחה)</span>
+                                    )}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+
+                    {isAddFamilyMemberOpen && (
+                        <form onSubmit={handleAddFamilyMember} className="p-4 bg-accent/5 rounded-xl border border-accent/20 space-y-3">
+                            <h3 className="text-xs font-bold text-accent-hover uppercase">הוספת בן/בת משפחה</h3>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs font-medium text-text">שם פרטי</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={familyMemberForm.firstName}
+                                        onChange={(e) => setFamilyMemberForm({ ...familyMemberForm, firstName: e.target.value })}
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-text">שם משפחה</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={familyMemberForm.lastName}
+                                        onChange={(e) => setFamilyMemberForm({ ...familyMemberForm, lastName: e.target.value })}
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs font-medium text-text">טלפון (אופציונלי)</label>
+                                    <input
+                                        type="tel"
+                                        value={familyMemberForm.phone}
+                                        onChange={(e) => setFamilyMemberForm({ ...familyMemberForm, phone: e.target.value })}
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-text">מייל (אופציונלי)</label>
+                                    <input
+                                        type="email"
+                                        value={familyMemberForm.email}
+                                        onChange={(e) => setFamilyMemberForm({ ...familyMemberForm, email: e.target.value })}
+                                        className="mt-1 w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            {familyMemberError && (
+                                <div className="px-3.5 py-2.5 bg-danger-bg border border-danger-border rounded-xl text-xs font-medium text-danger">
+                                    {familyMemberError}
+                                </div>
+                            )}
+
+                            <div className="flex justify-end gap-2 pt-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAddFamilyMemberOpen(false)}
+                                    className="px-3 py-1.5 text-xs text-text-muted hover:bg-background rounded-lg"
+                                >
+                                    ביטול
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmittingFamilyMember}
+                                    className="px-4 py-1.5 bg-accent hover:bg-accent-hover disabled:bg-border text-white text-xs font-bold rounded-lg"
+                                >
+                                    {isSubmittingFamilyMember ? "מוסיף..." : "הוספה"}
+                                </button>
+                            </div>
+                        </form>
+                    )}
+
+                    {isFamilyHead && familyLinkRequests.length > 0 && (
+                        <div className="pt-2">
+                            <h3 className="text-xs font-bold text-text-muted uppercase mb-2">בקשות קישור למשפחה שלי</h3>
+                            {familyRequestError && (
+                                <div className="mb-2 px-3.5 py-2.5 bg-danger-bg border border-danger-border rounded-xl text-xs font-medium text-danger">
+                                    {familyRequestError}
+                                </div>
+                            )}
+                            <div className="divide-y divide-border border border-border rounded-xl overflow-hidden">
+                                {familyLinkRequests.map((r) => (
+                                    <RequestCard
+                                        key={r.id}
+                                        id={r.id}
+                                        contact={r.requester}
+                                        adminNotes={null}
+                                        isProcessing={familyRequestProcessingId === r.id}
+                                        onApprove={(id) => handleReviewFamilyRequest(id, "approved")}
+                                        onReject={(id) => handleReviewFamilyRequest(id, "rejected")}
+                                        details={r.message ? [{ label: "הודעה", value: r.message }] : []}
+                                    />
                                 ))}
                             </div>
                         </div>

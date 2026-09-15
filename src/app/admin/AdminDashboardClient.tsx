@@ -19,10 +19,16 @@ interface MemberRecord {
     firstName: string;
     lastName: string;
     phone: string;
-    email: string;
+    email: string | null;
     halachicStatus: string;
     role: string;
     isApproved: boolean;
+}
+
+interface FamilyRecord {
+    id: string;
+    headFirstName: string;
+    headLastName: string;
 }
 
 const ROLE_LABELS: Record<string, string> = {
@@ -48,6 +54,7 @@ interface FundBreakdownEntry {
 interface AdminDashboardClientProps {
     pendingRequests: PendingRequest[];
     members: MemberRecord[];
+    families: FamilyRecord[];
     transactions: TransactionRecord[];
     totalIncome: number;
     fundBreakdown: FundBreakdownEntry[];
@@ -68,6 +75,7 @@ function generateInitialPassword() {
 export default function AdminDashboardClient({
     pendingRequests,
     members,
+    families,
     transactions,
     totalIncome,
     fundBreakdown,
@@ -80,7 +88,7 @@ export default function AdminDashboardClient({
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const [processingId, setProcessingId] = useState<string | null>(null);
-    const [pendingApproval, setPendingApproval] = useState<{ id: string; password: string } | null>(null);
+    const [pendingApproval, setPendingApproval] = useState<{ id: string; password: string; familyId: string } | null>(null);
     const [approveError, setApproveError] = useState<string | null>(null);
     const [rejectError, setRejectError] = useState<string | null>(null);
     const [memberActionError, setMemberActionError] = useState<string | null>(null);
@@ -128,7 +136,7 @@ export default function AdminDashboardClient({
 
     const handleStartApprove = (id: string) => {
         setApproveError(null);
-        setPendingApproval({ id, password: generateInitialPassword() });
+        setPendingApproval({ id, password: generateInitialPassword(), familyId: "" });
     };
 
     const handleCancelApprove = () => {
@@ -136,11 +144,11 @@ export default function AdminDashboardClient({
         setPendingApproval(null);
     };
 
-    const handleConfirmApprove = (id: string, password: string) => {
+    const handleConfirmApprove = (id: string, password: string, familyId: string) => {
         setProcessingId(id);
         setApproveError(null);
         startTransition(async () => {
-            const result = await approveJoinRequest(id, password);
+            const result = await approveJoinRequest(id, password, familyId || undefined);
             if (!result.success) {
                 // Keep the password panel open so the admin can retry -
                 // dismissing it here would lose the one-time password.
@@ -273,6 +281,25 @@ export default function AdminDashboardClient({
                                                         העתק
                                                     </button>
                                                 </div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-success mb-1">
+                                                        שיוך למשפחה
+                                                    </label>
+                                                    <select
+                                                        value={pendingApproval.familyId}
+                                                        onChange={(e) =>
+                                                            setPendingApproval({ ...pendingApproval, familyId: e.target.value })
+                                                        }
+                                                        className="w-full px-2.5 py-1.5 bg-surface border border-success/40 rounded-lg text-xs"
+                                                    >
+                                                        <option value="">משפחה חדשה</option>
+                                                        {families.map((f) => (
+                                                            <option key={f.id} value={f.id}>
+                                                                שייך למשפחת {f.headLastName} ({f.headFirstName})
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
                                                 {approveError && (
                                                     <p className="text-xs font-medium text-danger bg-danger-bg border border-danger-border rounded-lg px-2.5 py-1.5">
                                                         {approveError}
@@ -281,7 +308,9 @@ export default function AdminDashboardClient({
                                                 <div className="flex items-center gap-2 pt-1">
                                                     <button
                                                         type="button"
-                                                        onClick={() => handleConfirmApprove(req.id, pendingApproval.password)}
+                                                        onClick={() =>
+                                                            handleConfirmApprove(req.id, pendingApproval.password, pendingApproval.familyId)
+                                                        }
                                                         disabled={processingId === req.id}
                                                         className="flex-1 px-3 py-2 bg-primary hover:bg-primary-hover disabled:bg-border text-white text-xs font-semibold rounded-xl transition-colors"
                                                     >
@@ -395,7 +424,7 @@ export default function AdminDashboardClient({
                                                 {m.firstName} {m.lastName}
                                             </td>
                                             <td className="px-6 py-3">{m.phone}</td>
-                                            <td className="px-6 py-3">{m.email}</td>
+                                            <td className="px-6 py-3">{m.email ?? "—"}</td>
                                             <td className="px-6 py-3">
                                                 <span className="px-2 py-0.5 rounded-md bg-background text-text">
                                                     {m.halachicStatus === "kohen"

@@ -222,8 +222,10 @@ export async function sendNewsletter(newsletterId: string) {
         }
 
         const items = parseItems(newsletter.items);
+        // email: { not: null } excludes credential-less family members (they
+        // have no address to send to), who would otherwise crash the send.
         const recipients = await prisma.member.findMany({
-            where: { isApproved: true, receiveNewsletter: true },
+            where: { isApproved: true, receiveNewsletter: true, email: { not: null } },
             select: { id: true, email: true },
         });
 
@@ -253,7 +255,8 @@ export async function sendNewsletter(newsletterId: string) {
                             logoUrl,
                         })
                     );
-                    return { from, to: r.email, subject: newsletter.subject, html };
+                    // Non-null assertion is safe: the query above filtered to email: { not: null }.
+                    return { from, to: r.email!, subject: newsletter.subject, html };
                 })
             );
 

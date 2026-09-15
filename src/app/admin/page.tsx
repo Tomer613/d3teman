@@ -16,6 +16,7 @@ export default async function AdminDashboardPage() {
     const {
         pendingRequests,
         members,
+        families,
         recentTransactions,
         totalIncome,
         fundBreakdown,
@@ -30,6 +31,7 @@ export default async function AdminDashboardPage() {
             <AdminDashboardClient
                 pendingRequests={pendingRequests}
                 members={members}
+                families={families}
                 transactions={recentTransactions}
                 totalIncome={totalIncome}
                 fundBreakdown={fundBreakdown}

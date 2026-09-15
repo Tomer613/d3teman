@@ -11,7 +11,7 @@ datasource db {
 // Synagogue community member record
 model Member {
   id                     String   @id @default(cuid())
-  email                  String   @unique
+  email                  String?  @unique // nullable: a family member added by their household head may have no login credentials at all
   passwordHash           String?
   mustChangePassword     Boolean  @default(false) // forces the change-password flow after a fresh/reset temporary password
   firstName              String
@@ -31,6 +31,10 @@ model Member {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
+  familyId     String?
+  family       Family? @relation("FamilyMembers", fields: [familyId], references: [id])
+  familyHeadOf Family? @relation("FamilyHead")
+
   yahrzeits               Yahrzeit[]
   transactions            Transaction[]
   communityEvents         CommunityEvent[]
@@ -39,6 +43,35 @@ model Member {
   eventNotifications      EventNotification[]
   generalInquiries        GeneralInquiry[]
   aliyahRequests          AliyahRequest[]
+  familyLinkRequestsSent  FamilyLinkRequest[]
+}
+
+// A household umbrella grouping members (e.g. spouses, dependents) together.
+// Has no stored display name - it's always derived from head.lastName, so it
+// can't go stale if the head corrects a spelling later.
+model Family {
+  id           String   @id @default(cuid())
+  headMemberId String   @unique
+  head         Member   @relation("FamilyHead", fields: [headMemberId], references: [id])
+  members      Member[] @relation("FamilyMembers")
+  createdAt    DateTime @default(now())
+
+  linkRequests FamilyLinkRequest[]
+}
+
+// A request from an already-registered member (found via the directory) to
+// join another member's family - approved by that family's head, not a gabay,
+// since only the family itself can verify the relationship.
+model FamilyLinkRequest {
+  id             String   @id @default(cuid())
+  requesterId    String
+  requester      Member   @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+  targetFamilyId String
+  targetFamily   Family   @relation(fields: [targetFamilyId], references: [id], onDelete: Cascade)
+  message        String? // optional note from the requester, e.g. "אני בעלה"
+  status         String   @default("pending") // pending | approved | rejected
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 // Memorial tracking for weekly aliyot and memorial prayers
@@ -50,8 +83,8 @@ model Yahrzeit {
   hebrewMonth  String
   notes        String?
   memberId     String
-  member          Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  createdAt       DateTime @default(now())
+  member       Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
 }
 
 // Public join requests awaiting gabay review

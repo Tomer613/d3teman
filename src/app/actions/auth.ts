@@ -34,7 +34,7 @@ export async function login(formData: FormData) {
         const token = await createSessionToken({
             sub: member.id,
             role: member.role,
-            email: member.email,
+            email, // the address they logged in with - always equal to member.email here
             mustChangePassword: member.mustChangePassword,
         });
 

@@ -16,6 +16,7 @@ export async function getAdminDashboardData() {
         const [
             pendingRequests,
             members,
+            families,
             recentTransactions,
             fundBreakdownRaw,
             recurringCount,
@@ -34,6 +35,11 @@ export async function getAdminDashboardData() {
                     orderBy: { createdAt: "desc" },
                     include: { yahrzeits: true },
                     omit: { passwordHash: true },
+                }),
+                // For the join-request approval picker ("attach to existing family")
+                prisma.family.findMany({
+                    include: { head: { select: { firstName: true, lastName: true } } },
+                    orderBy: { createdAt: "asc" },
                 }),
                 prisma.transaction.findMany({
                     take: 20,
@@ -61,6 +67,11 @@ export async function getAdminDashboardData() {
         return {
             pendingRequests,
             members,
+            families: families.map((f) => ({
+                id: f.id,
+                headFirstName: f.head.firstName,
+                headLastName: f.head.lastName,
+            })),
             recentTransactions,
             totalIncome: totalAllTime._sum.amount ?? 0,
             fundBreakdown,
@@ -74,6 +85,7 @@ export async function getAdminDashboardData() {
         return {
             pendingRequests: [],
             members: [],
+            families: [],
             recentTransactions: [],
             totalIncome: 0,
             fundBreakdown: [],
@@ -316,7 +328,10 @@ export async function updateAliyahRequestNotes(requestId: string, notes: string)
 // Approve a join request and generate a new verified community member.
 // initialPassword is the plaintext password the gabay generates and hands
 // to the new member out-of-band (phone/WhatsApp) - only its hash is stored.
-export async function approveJoinRequest(requestId: string, initialPassword: string) {
+// existingFamilyId links the new member into an already-existing family
+// (e.g. a spouse joining a family already in the community) instead of the
+// default of founding a brand-new family with the new member as its head.
+export async function approveJoinRequest(requestId: string, initialPassword: string, existingFamilyId?: string) {
     try {
         await requireAdmin();
 
@@ -332,11 +347,19 @@ export async function approveJoinRequest(requestId: string, initialPassword: str
             return { success: false as const, error: "Request not found" };
         }
 
+        if (existingFamilyId) {
+            const family = await prisma.family.findUnique({ where: { id: existingFamilyId } });
+            if (!family) {
+                return { success: false as const, error: "Selected family not found" };
+            }
+        }
+
         const passwordHash = await hashPassword(initialPassword);
 
-        // Atomic transaction: create member and mark join request as processed
-        await prisma.$transaction([
-            prisma.member.create({
+        // Interactive transaction (not the array form) because a brand-new
+        // family's headMemberId needs the just-created member's id.
+        await prisma.$transaction(async (tx) => {
+            const member = await tx.member.create({
                 data: {
                     email: request.email,
                     passwordHash,
@@ -349,12 +372,13 @@ export async function approveJoinRequest(requestId: string, initialPassword: str
                     isApproved: true,
                     role: "member",
                 },
-            }),
-            prisma.joinRequest.update({
-                where: { id: requestId },
-                data: { isProcessed: true },
-            }),
-        ]);
+            });
+
+            const familyId = existingFamilyId ?? (await tx.family.create({ data: { headMemberId: member.id } })).id;
+
+            await tx.member.update({ where: { id: member.id }, data: { familyId } });
+            await tx.joinRequest.update({ where: { id: requestId }, data: { isProcessed: true } });
+        });
 
         revalidatePath("/admin");
         revalidatePath("/directory");

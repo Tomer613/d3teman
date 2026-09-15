@@ -12,7 +12,7 @@ export interface RequestContact {
     firstName: string;
     lastName: string;
     phone: string;
-    email: string;
+    email: string | null;
 }
 
 export interface RequestDetail {
@@ -28,7 +28,10 @@ interface RequestCardProps {
     isProcessing: boolean;
     onApprove: (id: string) => void;
     onReject: (id: string) => void;
-    onSaveNotes: (id: string, notes: string) => Promise<{ success: boolean; error?: string }>;
+    // Omitted for review flows that don't need gabay-style scratch notes
+    // (e.g. a family-link approval reviewed by a peer, not a gabay) - the
+    // notes button/panel is hidden entirely when this isn't provided.
+    onSaveNotes?: (id: string, notes: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 // Generalized review card shared by every member-submitted request type
@@ -53,6 +56,7 @@ export default function RequestCard({
     const [notesError, setNotesError] = useState<string | null>(null);
 
     const handleSaveNotes = () => {
+        if (!onSaveNotes) return;
         setNotesError(null);
         startSavingNotes(async () => {
             const result = await onSaveNotes(id, notes);
@@ -84,7 +88,7 @@ export default function RequestCard({
                     </div>
                     <div className="text-xs text-text-muted flex flex-wrap gap-x-4 gap-y-1">
                         <span>טלפון: {contact.phone}</span>
-                        <span>מייל: {contact.email}</span>
+                        {contact.email && <span>מייל: {contact.email}</span>}
                     </div>
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-text bg-background p-2 rounded-lg mt-1 border border-border">
                         {details.map((d) => (
@@ -112,14 +116,16 @@ export default function RequestCard({
                             <MessageCircle className="size-3.5" aria-hidden="true" />
                             <span>שליחת הודעה</span>
                         </a>
-                        <button
-                            type="button"
-                            onClick={() => setIsNotesOpen((open) => !open)}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-background hover:bg-border text-text-muted text-xs font-semibold rounded-lg transition-colors"
-                        >
-                            <StickyNote className="size-3.5" aria-hidden="true" />
-                            <span>הערות</span>
-                        </button>
+                        {onSaveNotes && (
+                            <button
+                                type="button"
+                                onClick={() => setIsNotesOpen((open) => !open)}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-background hover:bg-border text-text-muted text-xs font-semibold rounded-lg transition-colors"
+                            >
+                                <StickyNote className="size-3.5" aria-hidden="true" />
+                                <span>הערות</span>
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -143,7 +149,7 @@ export default function RequestCard({
                 </div>
             </div>
 
-            {isNotesOpen && (
+            {onSaveNotes && isNotesOpen && (
                 <div className="p-4 bg-background rounded-xl border border-border space-y-2">
                     <Textarea
                         label="הערות פנימיות (לגבאים בלבד, לא נשלח למגיש הבקשה)"

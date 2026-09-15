@@ -28,41 +28,63 @@ export default async function ProfilePage() {
 
     // Capped so a long-tenured donor's page doesn't grow unbounded; the total
     // below still reflects every donation, not just the ones displayed.
-    const [donations, donationTotal, kiddushRequests, haftarahRequests, eventNotifications, generalInquiries, aliyahRequests] =
-        await Promise.all([
-            prisma.transaction.findMany({
-                where: { memberId: member.id },
+    const [
+        donations,
+        donationTotal,
+        kiddushRequests,
+        haftarahRequests,
+        eventNotifications,
+        generalInquiries,
+        aliyahRequests,
+        family,
+        familyLinkRequests,
+    ] = await Promise.all([
+        prisma.transaction.findMany({
+            where: { memberId: member.id },
+            orderBy: { createdAt: "desc" },
+            take: 100,
+            select: { id: true, amount: true, targetFund: true, isRecurring: true, createdAt: true },
+        }),
+        prisma.transaction.aggregate({ where: { memberId: member.id }, _sum: { amount: true } }),
+        prisma.kiddushDonationRequest.findMany({
+            where: { memberId: member.id },
+            orderBy: { createdAt: "desc" },
+            take: 10,
+        }),
+        prisma.haftarahRequest.findMany({
+            where: { memberId: member.id },
+            orderBy: { createdAt: "desc" },
+            take: 10,
+        }),
+        prisma.eventNotification.findMany({
+            where: { memberId: member.id },
+            orderBy: { createdAt: "desc" },
+            take: 10,
+        }),
+        prisma.generalInquiry.findMany({
+            where: { memberId: member.id },
+            orderBy: { createdAt: "desc" },
+            take: 10,
+        }),
+        prisma.aliyahRequest.findMany({
+            where: { memberId: member.id },
+            orderBy: { createdAt: "desc" },
+            take: 10,
+        }),
+        member.familyId
+            ? prisma.family.findUnique({
+                where: { id: member.familyId },
+                include: { members: { select: { id: true, firstName: true, lastName: true }, orderBy: { createdAt: "asc" } } },
+            })
+            : null,
+        member.familyId
+            ? prisma.familyLinkRequest.findMany({
+                where: { targetFamilyId: member.familyId, status: "pending" },
+                include: { requester: { select: { firstName: true, lastName: true, phone: true, email: true } } },
                 orderBy: { createdAt: "desc" },
-                take: 100,
-                select: { id: true, amount: true, targetFund: true, isRecurring: true, createdAt: true },
-            }),
-            prisma.transaction.aggregate({ where: { memberId: member.id }, _sum: { amount: true } }),
-            prisma.kiddushDonationRequest.findMany({
-                where: { memberId: member.id },
-                orderBy: { createdAt: "desc" },
-                take: 10,
-            }),
-            prisma.haftarahRequest.findMany({
-                where: { memberId: member.id },
-                orderBy: { createdAt: "desc" },
-                take: 10,
-            }),
-            prisma.eventNotification.findMany({
-                where: { memberId: member.id },
-                orderBy: { createdAt: "desc" },
-                take: 10,
-            }),
-            prisma.generalInquiry.findMany({
-                where: { memberId: member.id },
-                orderBy: { createdAt: "desc" },
-                take: 10,
-            }),
-            prisma.aliyahRequest.findMany({
-                where: { memberId: member.id },
-                orderBy: { createdAt: "desc" },
-                take: 10,
-            }),
-        ]);
+            })
+            : [],
+    ]);
     const totalDonated = donationTotal._sum.amount ?? 0;
 
     return (
@@ -78,6 +100,9 @@ export default async function ProfilePage() {
                 eventNotifications={eventNotifications}
                 generalInquiries={generalInquiries}
                 aliyahRequests={aliyahRequests}
+                family={family}
+                isFamilyHead={!!family && family.headMemberId === member.id}
+                familyLinkRequests={familyLinkRequests}
             />
         </>
     );

@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { HalachicStatus } from "@/types";
 import { DirectoryMember } from "@/app/actions/directory";
+import { requestFamilyLink } from "@/app/actions/family";
 import { toWhatsAppNumber } from "@/lib/phone";
 import Badge from "@/components/ui/Badge";
 
@@ -11,8 +13,28 @@ interface DirectoryClientProps {
 }
 
 export default function DirectoryClient({ members }: DirectoryClientProps) {
+    const router = useRouter();
+    const [, startTransition] = useTransition();
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
+    const [sendingId, setSendingId] = useState<string | null>(null);
+    const [linkError, setLinkError] = useState<string | null>(null);
+
+    const handleRequestLink = (member: DirectoryMember) => {
+        if (!member.familyId) return;
+        setSendingId(member.id);
+        setLinkError(null);
+        startTransition(async () => {
+            const result = await requestFamilyLink(member.familyId!);
+            if (!result.success) {
+                setLinkError(result.error);
+                setSendingId(null);
+                return;
+            }
+            router.refresh();
+            setSendingId(null);
+        });
+    };
 
     // Filter members based on search and status
     const filteredMembers = useMemo(() => {
@@ -59,6 +81,12 @@ export default function DirectoryClient({ members }: DirectoryClientProps) {
                     </div>
                 </div>
 
+                {linkError && (
+                    <div className="px-4 py-2.5 rounded-xl text-sm font-medium border bg-danger-bg border-danger-border text-danger">
+                        {linkError}
+                    </div>
+                )}
+
                 {/* Search and Filters Bar */}
                 <div className="bg-surface p-4 rounded-2xl border border-border shadow-xs flex flex-col sm:flex-row gap-3 items-center">
                     <div className="relative flex-1 w-full">
@@ -103,6 +131,11 @@ export default function DirectoryClient({ members }: DirectoryClientProps) {
                                                 ? `${member.street}, ${member.city}`
                                                 : "כתובת שמורה במערכת"}
                                         </p>
+                                        {member.familyLabel && (
+                                            <p className="text-[11px] text-accent-hover font-medium mt-0.5">
+                                                {member.familyLabel}
+                                            </p>
+                                        )}
                                     </div>
                                     {getStatusBadge(member.halachicStatus)}
                                 </div>
@@ -113,12 +146,12 @@ export default function DirectoryClient({ members }: DirectoryClientProps) {
                                     ) : (
                                         <p className="text-text-muted italic">מספר טלפון חסוי</p>
                                     )}
-                                    <p className="truncate text-text-muted">{member.email}</p>
+                                    {member.email && <p className="truncate text-text-muted">{member.email}</p>}
                                 </div>
                             </div>
 
                             {/* Quick Communication Actions */}
-                            <div className="pt-3 border-t border-border flex items-center gap-2">
+                            <div className="pt-3 border-t border-border flex items-center gap-2 flex-wrap">
                                 {member.phone && (
                                     <>
                                         <a
@@ -137,13 +170,29 @@ export default function DirectoryClient({ members }: DirectoryClientProps) {
                                         </a>
                                     </>
                                 )}
-                                <a
-                                    href={`mailto:${member.email}`}
-                                    className="py-1.5 px-3 bg-background hover:bg-border text-text text-xs font-semibold rounded-lg transition-colors"
-                                    title="שליחת מייל"
-                                >
-                                    מייל
-                                </a>
+                                {member.email && (
+                                    <a
+                                        href={`mailto:${member.email}`}
+                                        className="py-1.5 px-3 bg-background hover:bg-border text-text text-xs font-semibold rounded-lg transition-colors"
+                                        title="שליחת מייל"
+                                    >
+                                        מייל
+                                    </a>
+                                )}
+                                {!member.isOwnFamily && (
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRequestLink(member)}
+                                        disabled={member.linkRequestPending || sendingId === member.id}
+                                        className="w-full py-1.5 px-3 bg-accent/10 hover:bg-accent/20 disabled:opacity-60 text-accent-hover text-xs font-semibold rounded-lg text-center transition-colors"
+                                    >
+                                        {member.linkRequestPending
+                                            ? "בקשה ממתינה"
+                                            : sendingId === member.id
+                                                ? "שולח..."
+                                                : "בקש קישור למשפחה"}
+                                    </button>
+                                )}
                             </div>
                         </div>
                     ))}

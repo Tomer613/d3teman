@@ -12,7 +12,7 @@ export async function getCommunityStats(): Promise<CommunityStats> {
     await requireSession();
 
     const [familyCount, streets] = await Promise.all([
-        prisma.member.count({ where: { isApproved: true } }),
+        prisma.family.count(),
         prisma.member.groupBy({ by: ["street"], where: { isApproved: true } }),
     ]);
 
