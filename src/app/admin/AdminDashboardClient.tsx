@@ -462,14 +462,16 @@ export default function AdminDashboardClient({
                                             </td>
                                             <td className="px-6 py-3">
                                                 <div className="flex items-center gap-2">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleResetPassword(m.id, `${m.firstName} ${m.lastName}`)}
-                                                        disabled={isPending}
-                                                        className="px-3 py-1 rounded-lg font-semibold transition-colors disabled:opacity-50 bg-primary/10 hover:bg-primary/20 text-primary"
-                                                    >
-                                                        {processingId === m.id ? "מאפס..." : "איפוס סיסמה"}
-                                                    </button>
+                                                    {m.email && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleResetPassword(m.id, `${m.firstName} ${m.lastName}`)}
+                                                            disabled={isPending}
+                                                            className="px-3 py-1 rounded-lg font-semibold transition-colors disabled:opacity-50 bg-primary/10 hover:bg-primary/20 text-primary"
+                                                        >
+                                                            {processingId === m.id ? "מאפס..." : "איפוס סיסמה"}
+                                                        </button>
+                                                    )}
                                                     {m.id !== viewerId && (m.role !== "super_admin" || viewerRole === "super_admin") && (
                                                         <button
                                                             type="button"

@@ -179,7 +179,7 @@ export default function DirectoryClient({ members }: DirectoryClientProps) {
                                         מייל
                                     </a>
                                 )}
-                                {!member.isOwnFamily && (
+                                {!member.isOwnFamily && member.familyId && (
                                     <button
                                         type="button"
                                         onClick={() => handleRequestLink(member)}

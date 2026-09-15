@@ -358,27 +358,44 @@ export async function approveJoinRequest(requestId: string, initialPassword: str
 
         // Interactive transaction (not the array form) because a brand-new
         // family's headMemberId needs the just-created member's id.
-        await prisma.$transaction(async (tx) => {
-            const member = await tx.member.create({
-                data: {
-                    email: request.email,
-                    passwordHash,
-                    mustChangePassword: true,
-                    firstName: request.firstName,
-                    lastName: request.lastName,
-                    phone: request.phone,
-                    street: request.address,
-                    city: request.city || "לא צוין",
-                    isApproved: true,
-                    role: "member",
-                },
+        try {
+            await prisma.$transaction(async (tx) => {
+                // Re-checked here (not just in the pre-flight check above) in
+                // case the selected family was deleted between that check and
+                // this transaction (e.g. its last other member just left it).
+                if (existingFamilyId) {
+                    const stillExists = await tx.family.findUnique({ where: { id: existingFamilyId } });
+                    if (!stillExists) {
+                        throw new Error("FAMILY_NOT_FOUND");
+                    }
+                }
+
+                const member = await tx.member.create({
+                    data: {
+                        email: request.email,
+                        passwordHash,
+                        mustChangePassword: true,
+                        firstName: request.firstName,
+                        lastName: request.lastName,
+                        phone: request.phone,
+                        street: request.address,
+                        city: request.city || "לא צוין",
+                        isApproved: true,
+                        role: "member",
+                    },
+                });
+
+                const familyId = existingFamilyId ?? (await tx.family.create({ data: { headMemberId: member.id } })).id;
+
+                await tx.member.update({ where: { id: member.id }, data: { familyId } });
+                await tx.joinRequest.update({ where: { id: requestId }, data: { isProcessed: true } });
             });
-
-            const familyId = existingFamilyId ?? (await tx.family.create({ data: { headMemberId: member.id } })).id;
-
-            await tx.member.update({ where: { id: member.id }, data: { familyId } });
-            await tx.joinRequest.update({ where: { id: requestId }, data: { isProcessed: true } });
-        });
+        } catch (error) {
+            if (error instanceof Error && error.message === "FAMILY_NOT_FOUND") {
+                return { success: false as const, error: "Selected family no longer exists - please choose again" };
+            }
+            throw error;
+        }
 
         revalidatePath("/admin");
         revalidatePath("/directory");
@@ -413,6 +430,14 @@ export async function rejectJoinRequest(requestId: string) {
 export async function resetMemberPassword(memberId: string) {
     try {
         await requireAdmin();
+
+        // A credential-less family member (no email) can never log in, so
+        // there's no address to hand a new password to - issuing one would
+        // be a dead end.
+        const target = await prisma.member.findUnique({ where: { id: memberId }, select: { email: true } });
+        if (!target?.email) {
+            return { success: false as const, error: "This member has no login (no email on file)" };
+        }
 
         const initialPassword = crypto.randomUUID().replace(/-/g, "").slice(0, 12);
         const passwordHash = await hashPassword(initialPassword);

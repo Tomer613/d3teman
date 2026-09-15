@@ -218,13 +218,15 @@ export default function ProfileClient({
         childrenAges.elementary !== member.elementaryChildren ||
         childrenAges.teen !== member.teenChildren;
 
-    // Profile completion checklist: covers both fields that are optional at
-    // registration (children, yahrzeit) and fields that ARE required at
-    // registration but can still end up empty (a gabay can create/edit a
-    // member record outside the join-request flow). Reflects unsaved form
-    // state so the bar - and each item's checkmark - moves as you type,
-    // matching a LinkedIn-style "fill this in" nudge rather than the last
-    // saved value.
+    // Profile completion checklist: covers both a field that's optional at
+    // registration (yahrzeit) and fields that ARE required at registration
+    // but can still end up empty (a gabay can create/edit a member record
+    // outside the join-request flow). Children isn't included here - 0 is a
+    // legitimate, complete answer for "how many children," so there's no way
+    // to distinguish "not yet answered" from "answered: none." Reflects
+    // unsaved form state so the bar - and each item's checkmark - moves as
+    // you type, matching a LinkedIn-style "fill this in" nudge rather than
+    // the last saved value.
     const completionChecks = [
         { label: "שם פרטי", done: firstName.trim().length > 0 },
         { label: "שם משפחה", done: lastName.trim().length > 0 },

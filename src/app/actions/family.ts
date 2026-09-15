@@ -37,7 +37,11 @@ export async function createFamilyMember(data: CreateFamilyMemberInput) {
             return { success: false as const, error: "Only the family head can add family members" };
         }
 
-        const email = data.email?.trim() || null;
+        // Lowercased to match the normalization every other signup path uses
+        // (login, join-request) - otherwise this member could get an email
+        // that collides case-insensitively with an existing one, or can
+        // never log in later under the casing they were given.
+        const email = data.email?.trim().toLowerCase() || null;
         if (email) {
             const existing = await prisma.member.findUnique({ where: { email } });
             if (existing) {
@@ -81,6 +85,22 @@ export async function requestFamilyLink(targetFamilyId: string, message?: string
         });
         if (me?.familyId === targetFamilyId) {
             return { success: false as const, error: "Already a member of this family" };
+        }
+
+        // A head with other members in their family can't leave it - that
+        // would strand those dependents in a family whose head is no longer
+        // a member of it, and nobody left who could manage them.
+        if (me?.familyId) {
+            const currentFamily = await prisma.family.findUnique({
+                where: { id: me.familyId },
+                select: { headMemberId: true, _count: { select: { members: true } } },
+            });
+            if (currentFamily && currentFamily.headMemberId === session.sub && currentFamily._count.members > 1) {
+                return {
+                    success: false as const,
+                    error: "Cannot leave your family while it still has other members",
+                };
+            }
         }
 
         const targetFamily = await prisma.family.findUnique({ where: { id: targetFamilyId } });
@@ -135,7 +155,18 @@ export async function reviewFamilyLinkRequest(requestId: string, status: "approv
             const previousFamilyId = request.requester.familyId;
 
             await prisma.$transaction(async (tx) => {
-                await tx.familyLinkRequest.update({ where: { id: requestId }, data: { status } });
+                // updateMany + count guard (rather than a plain update) makes
+                // this atomic against a concurrent duplicate review of the
+                // same request - only the first caller to still find it
+                // "pending" proceeds to move the member and clean up.
+                const claim = await tx.familyLinkRequest.updateMany({
+                    where: { id: requestId, status: "pending" },
+                    data: { status },
+                });
+                if (claim.count === 0) {
+                    return;
+                }
+
                 await tx.member.update({
                     where: { id: request.requesterId },
                     data: { familyId: request.targetFamilyId },
@@ -149,7 +180,7 @@ export async function reviewFamilyLinkRequest(requestId: string, status: "approv
                 }
             });
         } else {
-            await prisma.familyLinkRequest.update({ where: { id: requestId }, data: { status } });
+            await prisma.familyLinkRequest.updateMany({ where: { id: requestId, status: "pending" }, data: { status } });
         }
 
         revalidatePath("/profile");
